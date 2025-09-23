@@ -29,7 +29,7 @@ const App: React.FC = () => {
 
   const handleStart = (name: string, categoryId: string) => {
     setUserName(name);
-    
+
     const categoryInfo = CATEGORIES.find(c => c.id === categoryId);
     if (categoryInfo) {
       setSelectedCategoryName(categoryInfo.name);
@@ -48,7 +48,7 @@ const App: React.FC = () => {
     // Initialize AI Mentor session
     initializeMentorSession(name);
     setChatHistory([
-        { role: 'model', content: `안녕하세요, ${name}님! 저는 당신의 AI 시니어 멘토 '온보딩 나침반'입니다. 무엇이든 물어보세요.` }
+      { role: 'model', content: `안녕하세요, ${name}님! 저는 당신의 AI 시니어 멘토 '온보딩 나침반'입니다. 무엇이든 물어보세요.` }
     ]);
   };
 
@@ -64,9 +64,9 @@ const App: React.FC = () => {
       setFeedbackData(aiFeedback);
     } catch (error) {
       console.error(error);
-      setFeedbackData({ 
-        feedback: '죄송합니다, 피드백을 받는 중 오류가 발생했습니다. 다시 시도해 주세요.', 
-        followUpQuestions: [] 
+      setFeedbackData({
+        feedback: '죄송합니다, 피드백을 받는 중 오류가 발생했습니다. 다시 시도해 주세요.',
+        followUpQuestions: []
       });
     } finally {
       setIsLoading(false);
@@ -84,7 +84,7 @@ const App: React.FC = () => {
       setIsCompleted(true);
     }
   };
-  
+
   const handleFollowUpQuestion = useCallback(async (question: string) => {
     if (!currentScenario) return;
 
@@ -138,7 +138,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col items-center pt-8 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
       <Header userName={userName} onHomeClick={handleRestart} />
       <main className="w-full max-w-2xl mx-auto">
         {isCompleted ? (
@@ -151,10 +151,10 @@ const App: React.FC = () => {
             selectedChoiceId={selectedChoice?.id ?? null}
           />
         ) : (
-           <p>시나리오를 불러오는 중입니다...</p>
+          <p>시나리오를 불러오는 중입니다...</p>
         )}
       </main>
-      
+
       {isFeedbackVisible && (
         <FeedbackModal
           isOpen={isFeedbackVisible}
@@ -167,7 +167,7 @@ const App: React.FC = () => {
         />
       )}
 
-      <Chatbot 
+      <Chatbot
         history={chatHistory}
         onSendMessage={handleSendMessage}
         isLoading={isChatLoading}
