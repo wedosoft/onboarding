@@ -80,10 +80,14 @@ export async function getFeedback(scenario: Scenario, userChoice: Choice): Promi
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            feedback: { type: Type.STRING },
+            feedback: {
+              type: Type.STRING,
+              description: `A detailed feedback in Korean, formatted with Markdown. It MUST strictly follow the structure requested in the prompt: H3 headings with emojis (e.g., "### 🤷 ..."), horizontal rules ("---") between sections, paragraphs separated by empty lines, and a blockquote for the summary section. The entire output must be a single Markdown string.`
+            },
             followUpQuestions: {
               type: Type.ARRAY,
               items: { type: Type.STRING },
+              description: "An array of three distinct, open-ended follow-up questions in Korean, designed to encourage deeper thinking on the topic."
             },
           },
           required: ['feedback', 'followUpQuestions'],
@@ -91,7 +95,12 @@ export async function getFeedback(scenario: Scenario, userChoice: Choice): Promi
       },
     });
     
-    const responseJson = JSON.parse(response.text);
+    let jsonString = response.text.trim();
+    if (jsonString.startsWith('```json')) {
+      jsonString = jsonString.slice(7, -3).trim();
+    }
+    
+    const responseJson = JSON.parse(jsonString);
     return responseJson;
 
   } catch (error) {
