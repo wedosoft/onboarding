@@ -138,7 +138,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 lg:p-8 pt-12 sm:pt-16 transition-colors duration-300">
       <Header userName={userName} onHomeClick={handleRestart} />
       <main className="w-full max-w-2xl mx-auto">
         {isCompleted ? (

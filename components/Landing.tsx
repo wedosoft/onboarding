@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CATEGORIES } from '../constants';
 import Header from './Header';
 
@@ -10,6 +10,13 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
   const [name, setName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [step, setStep] = useState(1); // 1 for name, 2 for category
+  const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (step === 1 && nameInputRef.current) {
+      nameInputRef.current.focus();
+    }
+  }, [step]);
 
   const handleNameSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +37,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 lg:p-8 pt-12 sm:pt-16 transition-colors duration-300">
       <div className="w-full max-w-2xl mx-auto">
         <Header />
         
@@ -40,6 +47,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             <p className="text-center text-slate-500 dark:text-slate-400 mb-6">AI 멘토가 당신을 어떻게 부르면 좋을까요?</p>
             <form onSubmit={handleNameSubmit} className="flex flex-col sm:flex-row gap-3">
               <input
+                ref={nameInputRef}
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}

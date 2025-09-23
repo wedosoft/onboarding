@@ -16,6 +16,7 @@ interface ChatWindowProps {
   isLoading: boolean;
   input: string;
   messagesEndRef: React.RefObject<HTMLDivElement>;
+  inputRef: React.RefObject<HTMLInputElement>;
   setIsOpen: (isOpen: boolean) => void;
   setIsExpanded: (isExpanded: boolean) => void;
   setInput: (input: string) => void;
@@ -29,6 +30,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   isLoading,
   input,
   messagesEndRef,
+  inputRef,
   setIsOpen,
   setIsExpanded,
   setInput,
@@ -97,6 +99,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         </button>
         <div className="relative flex-grow">
           <input
+            ref={inputRef}
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -123,16 +126,30 @@ const Chatbot: React.FC<ChatbotProps> = ({ history, onSendMessage, isLoading }) 
   const [isExpanded, setIsExpanded] = useState(false);
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Scroll to bottom when new messages are added or loading state changes
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
     }
-  }, [history, isOpen, isLoading]);
+  }, [history, isLoading, isOpen]);
+
+  // Focus input when chat window opens
+  useEffect(() => {
+    if (isOpen) {
+      // Use a timeout to allow the transition animation to complete
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 300); // Matches the transition duration
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +171,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ history, onSendMessage, isLoading }) 
     isLoading,
     input,
     messagesEndRef,
+    inputRef,
     setIsOpen,
     setIsExpanded,
     setInput,
