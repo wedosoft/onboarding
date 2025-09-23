@@ -30,10 +30,10 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center pt-8 p-4 sm:p-6 lg:p-8 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 transition-colors duration-300">
       <div className="w-full max-w-2xl mx-auto">
         <Header />
-
+        
         {step === 1 && (
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 animate-fade-in">
             <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">멘토링을 시작하기 전에,</h2>
@@ -55,20 +55,20 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 확인
               </button>
             </form>
-            <div className="text-center mt-4">
-              <button
-                onClick={handleSkip}
-                className="text-sm text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
-              >
-                바로가기 (기본 이름 '주니어'로 시작)
-              </button>
+             <div className="text-center mt-4">
+               <button
+                  onClick={handleSkip}
+                  className="text-sm text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+               >
+                 바로가기 (기본 이름 '주니어'로 시작)
+               </button>
             </div>
           </div>
         )}
 
         {step === 2 && (
           <div className="animate-fade-in">
-            <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">
+             <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">
               반가워요, <span className="text-sky-600 dark:text-sky-400">{name}</span>님!
             </h2>
             <p className="text-center text-slate-500 dark:text-slate-400 mb-8">어떤 역량을 키우고 싶으신가요? 학습할 주제를 선택해주세요.</p>
@@ -78,13 +78,14 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`p-6 rounded-2xl border-4 text-left transition-all duration-200 transform hover:-translate-y-1 ${selectedCategory === category.id
-                    ? 'bg-sky-100 dark:bg-sky-900 border-sky-500'
-                    : 'bg-white dark:bg-slate-800 border-transparent hover:border-sky-300 shadow-md'
-                    }`}
+                  className={`p-6 rounded-2xl border-4 text-left transition-all duration-200 transform hover:-translate-y-1 ${
+                    selectedCategory === category.id 
+                      ? 'bg-sky-100 dark:bg-sky-900 border-sky-500' 
+                      : 'bg-white dark:bg-slate-800 border-transparent hover:border-sky-300 shadow-md'
+                  }`}
                 >
                   <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center mb-4">
-                    <i className={`${category.icon} text-2xl text-sky-600 dark:text-sky-400`}></i>
+                     <i className={`${category.icon} text-2xl text-sky-600 dark:text-sky-400`}></i>
                   </div>
                   <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-1">{category.name}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{category.description}</p>
