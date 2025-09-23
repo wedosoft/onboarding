@@ -1,74 +1,107 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>온보딩 나침반</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class', // or 'media'
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>온보딩 나침반</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class', // or 'media'
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Add a custom animation for a smoother feel */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
       }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-      /* Add a custom animation for a smoother feel */
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
-      .animate-fade-in {
-        animation: fadeIn 0.5s ease-out forwards;
-      }
-      /* Custom styles for rendered markdown content */
-      .prose {
-        color: inherit;
-      }
-      .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-        color: inherit;
-        font-weight: 600;
-        margin-top: 1.25em;
-        margin-bottom: 0.5em;
-      }
-      .prose h3 { font-size: 1.25em; }
-      .prose a {
-        color: #0ea5e9; /* sky-500 */
-        text-decoration: none;
-      }
-      .prose a:hover {
-        text-decoration: underline;
-      }
-      .prose ul {
-        list-style-type: disc;
-        padding-left: 1.5em;
-      }
-      .prose ol {
-        list-style-type: decimal;
-        padding-left: 1.5em;
-      }
-      .prose li {
-        margin-top: 0.25em;
-        margin-bottom: 0.25em;
-      }
-      .prose code {
-        background-color: #f1f5f9; /* slate-100 */
-        padding: 0.2em 0.4em;
-        border-radius: 0.25rem;
-        font-size: 85%;
-      }
-      .dark .prose code {
-        background-color: #1e293b; /* slate-800 */
-      }
-      .prose blockquote {
-        border-left: 0.25em solid #e2e8f0; /* slate-200 */
-        padding-left: 1em;
-        font-style: italic;
-      }
-      .dark .prose blockquote {
-        border-left-color: #475569; /* slate-600 */
-      }
-    </style>
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    /* Custom styles for rendered markdown content */
+    .prose {
+      color: inherit;
+    }
+
+    .prose h1,
+    .prose h2,
+    .prose h3,
+    .prose h4,
+    .prose h5,
+    .prose h6 {
+      color: inherit;
+      font-weight: 600;
+      margin-top: 1.25em;
+      margin-bottom: 0.5em;
+    }
+
+    .prose h3 {
+      font-size: 1.25em;
+    }
+
+    .prose a {
+      color: #0ea5e9;
+      /* sky-500 */
+      text-decoration: none;
+    }
+
+    .prose a:hover {
+      text-decoration: underline;
+    }
+
+    .prose ul {
+      list-style-type: disc;
+      padding-left: 1.5em;
+    }
+
+    .prose ol {
+      list-style-type: decimal;
+      padding-left: 1.5em;
+    }
+
+    .prose li {
+      margin-top: 0.25em;
+      margin-bottom: 0.25em;
+    }
+
+    .prose code {
+      background-color: #f1f5f9;
+      /* slate-100 */
+      padding: 0.2em 0.4em;
+      border-radius: 0.25rem;
+      font-size: 85%;
+    }
+
+    .dark .prose code {
+      background-color: #1e293b;
+      /* slate-800 */
+    }
+
+    .prose blockquote {
+      border-left: 0.25em solid #e2e8f0;
+      /* slate-200 */
+      padding-left: 1em;
+      font-style: italic;
+    }
+
+    .dark .prose blockquote {
+      border-left-color: #475569;
+      /* slate-600 */
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -82,8 +115,10 @@
 }
 </script>
 </head>
-  <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>
