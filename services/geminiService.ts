@@ -78,6 +78,10 @@ export async function getFeedbackStream(scenario: Scenario, userChoice: Choice):
     const stream = await ai.models.generateContentStream({
       model: 'gemini-2.5-flash',
       contents: prompt,
+      config: {
+        // Disable thinking for faster initial response
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     });
     return stream;
   } catch (error) {
@@ -110,6 +114,10 @@ export async function getFollowUpAnswerStream(
     const stream = await ai.models.generateContentStream({
       model: 'gemini-2.5-flash',
       contents: prompt,
+      config: {
+        // Disable thinking for faster initial response
+        thinkingConfig: { thinkingBudget: 0 },
+      },
     });
     return stream;
   } catch (error) {
