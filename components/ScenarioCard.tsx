@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Scenario, Choice } from '../types';
-import LoadingSpinner from './LoadingSpinner';
 
 interface ScenarioCardProps {
   scenario: Scenario;
@@ -42,11 +41,8 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario, onSelectChoice, i
           {scenario.description}
         </p>
         <div className="space-y-3 relative">
-          {isLoading && selectedChoiceId && (
-              <div className="absolute inset-0 bg-white/60 dark:bg-slate-800/60 flex items-center justify-center z-10 rounded-lg backdrop-blur-sm">
-                <LoadingSpinner />
-              </div>
-          )}
+          {/* The loading spinner was removed from here to prevent double indicators. */}
+          {/* The buttons below are still disabled via the `isLoading` prop. */}
           {scenario.choices.map((choice) => (
             <button
               key={choice.id}

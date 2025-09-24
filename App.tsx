@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Scenario, Choice, ChatMessage, FeedbackData } from './types';
 import { SCENARIOS, CATEGORIES } from './constants';
-import { getFeedback, getChatResponse, getFollowUpAnswer, initializeMentorSession } from './services/geminiService';
+import { getFeedbackStream, getChatResponseStream, getFollowUpAnswerStream, initializeMentorSession } from './services/geminiService';
 import Header from './components/Header';
 import ScenarioCard from './components/ScenarioCard';
 import FeedbackModal from './components/FeedbackModal';
@@ -17,7 +17,8 @@ const App: React.FC = () => {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const [feedbackData, setFeedbackData] = useState<FeedbackData>({ feedback: '', followUpQuestions: [] });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isFeedbackContentLoading, setIsFeedbackContentLoading] = useState(false);
+  const [isFeedbackStreaming, setIsFeedbackStreaming] = useState(false);
   const [isFollowUpLoading, setIsFollowUpLoading] = useState(false);
   const [isFeedbackVisible, setIsFeedbackVisible] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -55,22 +56,64 @@ const App: React.FC = () => {
   const handleChoiceSelect = useCallback(async (choice: Choice) => {
     if (!currentScenario) return;
 
-    setIsLoading(true);
     setSelectedChoice(choice);
     setFeedbackData({ feedback: '', followUpQuestions: [] });
+    setIsFeedbackContentLoading(true);
+    setIsFeedbackStreaming(true);
+    setIsFeedbackVisible(true);
 
     try {
-      const aiFeedback = await getFeedback(currentScenario, choice);
-      setFeedbackData(aiFeedback);
+      const stream = await getFeedbackStream(currentScenario, choice);
+      let feedbackText = '';
+      let questionsBuffer = '';
+      let separatorFound = false;
+      const separator = '%%%QUESTIONS%%%';
+      let isFirstChunk = true; // Use a local flag to track the first chunk
+
+      for await (const chunk of stream) {
+        // On the very first chunk, turn off the main loading spinner
+        if (isFirstChunk) {
+          setIsFeedbackContentLoading(false);
+          isFirstChunk = false;
+        }
+
+        const chunkText = chunk.text;
+
+        if (separatorFound) {
+          questionsBuffer += chunkText;
+        } else {
+          if (chunkText.includes(separator)) {
+            separatorFound = true;
+            const parts = chunkText.split(separator);
+            feedbackText += parts[0];
+            questionsBuffer += parts[1];
+            setFeedbackData(prev => ({ ...prev, feedback: feedbackText }));
+          } else {
+            feedbackText += chunkText;
+            setFeedbackData(prev => ({ ...prev, feedback: feedbackText }));
+          }
+        }
+      }
+      
+      if (questionsBuffer) {
+        const questions = questionsBuffer.trim().split('\n').filter(q => q.trim());
+        setFeedbackData(prev => ({ ...prev, followUpQuestions: questions }));
+      }
+
+      // Handle the case of an empty stream, where the loop never runs
+      if (isFirstChunk) {
+        setIsFeedbackContentLoading(false);
+      }
+
     } catch (error) {
       console.error(error);
       setFeedbackData({ 
         feedback: '죄송합니다, 피드백을 받는 중 오류가 발생했습니다. 다시 시도해 주세요.', 
         followUpQuestions: [] 
       });
+      setIsFeedbackContentLoading(false); // Ensure spinner is off on error
     } finally {
-      setIsLoading(false);
-      setIsFeedbackVisible(true);
+      setIsFeedbackStreaming(false);
     }
   }, [currentScenario]);
 
@@ -86,27 +129,37 @@ const App: React.FC = () => {
   };
   
   const handleFollowUpQuestion = useCallback(async (question: string) => {
-    if (!currentScenario) return;
+    if (!currentScenario || isFollowUpLoading) return;
 
     setIsFollowUpLoading(true);
-    setFeedbackData(prev => ({ ...prev, followUpQuestions: [] }));
+    const questionHeader = `\n\n---\n\n### "${question}"에 대한 답변\n\n`;
+    setFeedbackData(prev => ({
+      ...prev,
+      feedback: prev.feedback + questionHeader,
+      followUpQuestions: [],
+    }));
 
     try {
-      const aiAnswer = await getFollowUpAnswer(currentScenario, feedbackData.feedback, question);
-      setFeedbackData(prev => ({
-        ...prev,
-        feedback: `### "${question}"에 대한 답변\n\n${aiAnswer}`,
-      }));
+        const stream = await getFollowUpAnswerStream(currentScenario, feedbackData.feedback, question);
+        let answerText = '';
+        for await (const chunk of stream) {
+            answerText += chunk.text;
+            setFeedbackData(prev => ({
+                ...prev,
+                feedback: prev.feedback.substring(0, prev.feedback.length - answerText.length) + answerText
+            }));
+        }
     } catch (error) {
       console.error(error);
+      const errorMessage = `죄송합니다. 추가 답변을 생성하는 중 오류가 발생했습니다.`;
       setFeedbackData(prev => ({
         ...prev,
-        feedback: `### "${question}"에 대한 답변\n\n---\n\n죄송합니다. 추가 답변을 생성하는 중 오류가 발생했습니다.`,
+        feedback: prev.feedback + errorMessage,
       }));
     } finally {
       setIsFollowUpLoading(false);
     }
-  }, [currentScenario, feedbackData.feedback]);
+  }, [currentScenario, feedbackData.feedback, isFollowUpLoading]);
 
   const handleRestart = () => {
     setUserName(null);
@@ -118,20 +171,33 @@ const App: React.FC = () => {
   };
 
   const handleSendMessage = useCallback(async (message: string) => {
-    setChatHistory(prev => [...prev, { role: 'user', content: message }]);
+    const newHistory: ChatMessage[] = [...chatHistory, { role: 'user', content: message }, { role: 'model', content: '' }];
+    setChatHistory(newHistory);
     setIsChatLoading(true);
 
     try {
-      const aiResponse = await getChatResponse(message);
-      setChatHistory(prev => [...prev, { role: 'model', content: aiResponse }]);
+      const stream = await getChatResponseStream(message);
+      let fullResponse = '';
+      for await (const chunk of stream) {
+          fullResponse += chunk.text;
+          setChatHistory(prev => {
+              const updatedHistory = [...prev];
+              updatedHistory[updatedHistory.length - 1].content = fullResponse;
+              return updatedHistory;
+          });
+      }
     } catch (error) {
       console.error(error);
       const errorMessage = '죄송합니다. 답변을 생성하는 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.';
-      setChatHistory(prev => [...prev, { role: 'model', content: errorMessage }]);
+      setChatHistory(prev => {
+          const updatedHistory = [...prev];
+          updatedHistory[updatedHistory.length - 1].content = errorMessage;
+          return updatedHistory;
+      });
     } finally {
       setIsChatLoading(false);
     }
-  }, []);
+  }, [chatHistory]);
 
   if (!userName) {
     return <Landing onStart={handleStart} />;
@@ -147,7 +213,7 @@ const App: React.FC = () => {
           <ScenarioCard
             scenario={currentScenario}
             onSelectChoice={handleChoiceSelect}
-            isLoading={isLoading}
+            isLoading={isFeedbackStreaming}
             selectedChoiceId={selectedChoice?.id ?? null}
           />
         ) : (
@@ -161,9 +227,10 @@ const App: React.FC = () => {
           onClose={() => setIsFeedbackVisible(false)}
           feedbackData={feedbackData}
           onNext={handleNextScenario}
-          isLoading={isLoading && !feedbackData.feedback}
+          isLoading={isFeedbackContentLoading}
           onFollowUpQuestion={handleFollowUpQuestion}
           isFollowUpLoading={isFollowUpLoading}
+          isStreaming={isFeedbackStreaming}
         />
       )}
 

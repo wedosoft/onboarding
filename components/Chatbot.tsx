@@ -58,30 +58,31 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
     {/* Messages */}
     <div className="flex-1 p-4 overflow-y-auto space-y-4">
-      {history.map((msg, index) => (
-        <div key={index} className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-          {msg.role === 'model' && <div className="w-8 h-8 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center flex-shrink-0"><i className="fa-solid fa-robot text-sky-600 dark:text-sky-400"></i></div>}
-          <div className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user' ? 'bg-sky-600 text-white rounded-br-lg' : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-lg'}`}>
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {msg.content}
-              </ReactMarkdown>
+      {history.map((msg, index) => {
+        const isLastModelMessage = msg.role === 'model' && index === history.length - 1;
+        const showBouncingDots = isLastModelMessage && msg.content === '' && isLoading;
+
+        return (
+          <div key={index} className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            {msg.role === 'model' && <div className="w-8 h-8 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center flex-shrink-0"><i className="fa-solid fa-robot text-sky-600 dark:text-sky-400"></i></div>}
+            <div className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user' ? 'bg-sky-600 text-white rounded-br-lg' : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-lg'}`}>
+              {showBouncingDots ? (
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce"></span>
+                </div>
+              ) : (
+                <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
-        </div>
-      ))}
-      {isLoading && (
-        <div className="flex items-end gap-2 justify-start">
-          <div className="w-8 h-8 bg-sky-100 dark:bg-sky-900 rounded-full flex items-center justify-center flex-shrink-0"><i className="fa-solid fa-robot text-sky-600 dark:text-sky-400"></i></div>
-          <div className="max-w-[80%] p-3 rounded-2xl bg-slate-200 dark:bg-slate-700">
-            <div className="flex items-center gap-1.5">
-              <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-              <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-              <span className="h-2 w-2 bg-slate-400 rounded-full animate-bounce"></span>
-            </div>
-          </div>
-        </div>
-      )}
+        );
+      })}
       <div ref={messagesEndRef} />
     </div>
 

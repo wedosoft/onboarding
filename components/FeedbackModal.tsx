@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import ReactMarkdown from 'react-markdown';
@@ -13,6 +12,7 @@ interface FeedbackModalProps {
   isLoading: boolean;
   onFollowUpQuestion: (question: string) => void;
   isFollowUpLoading: boolean;
+  isStreaming: boolean;
 }
 
 const FeedbackModal: React.FC<FeedbackModalProps> = ({ 
@@ -23,12 +23,13 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
   isLoading,
   onFollowUpQuestion,
   isFollowUpLoading,
+  isStreaming,
 }) => {
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 bg-black bg-opacity-60 flex items-start justify-center z-50 p-4 pt-20 sm:pt-24"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -64,7 +65,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
              </div>
           )}
 
-          {!isLoading && feedbackData.followUpQuestions.length > 0 && (
+          {!isLoading && !isStreaming && feedbackData.followUpQuestions.length > 0 && (
             <div className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
               <h4 className="font-semibold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
                 <i className="fa-solid fa-circle-question text-sky-500"></i>
@@ -101,7 +102,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
         <footer className="p-4 sm:p-6 border-t border-slate-200 dark:border-slate-700 mt-auto flex justify-end">
           <button
             onClick={onNext}
-            disabled={isLoading || !feedbackData.feedback || isFollowUpLoading}
+            disabled={isLoading || isStreaming || isFollowUpLoading}
             className="bg-sky-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-sky-700 transition-all duration-200 disabled:bg-slate-400 disabled:cursor-not-allowed flex items-center gap-2"
           >
             다음 시나리오
