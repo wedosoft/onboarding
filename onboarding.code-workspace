@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../homepage"
+		},
+		{
+			"path": "../agent-platform"
+		}
+	],
+	"settings": {}
+}
