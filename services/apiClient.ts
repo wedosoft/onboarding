@@ -345,9 +345,7 @@ export async function getProgress(sessionId: string): Promise<UserProgress> {
 
 export interface UploadDocumentRequest {
   file: File;
-  category: 'handover' | 'process';
-  author: string;
-  tags?: string[];
+  metadata?: Array<{ key: string; stringValue: string }>;
 }
 
 export interface DocumentMetadata {
@@ -366,17 +364,10 @@ export async function uploadDocument(
 ): Promise<DocumentInfo> {
   const formData = new FormData();
   formData.append('file', request.file);
-  
-  const metadata = [
-    { key: 'category', value: request.category },
-    { key: 'author', value: request.author },
-  ];
-  
-  if (request.tags) {
-    metadata.push({ key: 'tags', value: request.tags.join(',') });
+
+  if (request.metadata) {
+    formData.append('metadata', JSON.stringify(request.metadata));
   }
-  
-  formData.append('metadata', JSON.stringify(metadata));
 
   const authHeaders = await getAuthHeaders();
   const response = await fetch(
@@ -387,12 +378,12 @@ export async function uploadDocument(
       headers: authHeaders,
     }
   );
-  
+
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
     throw new ApiClientError(error.detail || 'Upload failed', response.status);
   }
-  
+
   return response.json();
 }
 
@@ -405,4 +396,25 @@ export async function deleteDocument(documentName: string): Promise<{ success: b
   return apiFetch(`/onboarding/documents/${encodeURIComponent(documentName)}`, {
     method: 'DELETE',
   });
+}
+
+// ============================================
+// 관리자 API
+// ============================================
+
+export interface SessionSummary {
+  sessionId: string;
+  userName: string;
+  completedCount: number;
+  totalScenarios: number;
+  completionRate: number;
+  lastActivity?: string;
+}
+
+export interface AllSessionsResponse {
+  sessions: SessionSummary[];
+}
+
+export async function getAllProgress(): Promise<AllSessionsResponse> {
+  return apiFetch('/onboarding/progress');
 }
