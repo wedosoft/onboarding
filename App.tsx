@@ -8,6 +8,7 @@ import FeedbackModal from './components/FeedbackModal';
 import CompletionScreen from './components/CompletionScreen';
 import Chatbot from './components/Chatbot';
 import Landing from './components/Landing';
+import DocumentUploader from './components/DocumentUploader';
 
 const App: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
@@ -28,7 +29,7 @@ const App: React.FC = () => {
 
   const currentScenario = activeScenarios[currentScenarioIndex];
 
-  const handleStart = (name: string, categoryId: string) => {
+  const handleStart = async (name: string, categoryId: string) => {
     setUserName(name);
     
     const categoryInfo = CATEGORIES.find(c => c.id === categoryId);
@@ -46,8 +47,8 @@ const App: React.FC = () => {
     setIsFeedbackVisible(false);
     setIsCompleted(false);
 
-    // Initialize AI Mentor session
-    initializeMentorSession(name);
+    // Initialize AI Mentor session (async)
+    await initializeMentorSession(name);
     setChatHistory([
         { role: 'model', content: `안녕하세요, ${name}님! 저는 당신의 AI 시니어 멘토 '온보딩 나침반'입니다. 무엇이든 물어보세요.` }
     ]);
@@ -239,6 +240,9 @@ const App: React.FC = () => {
         onSendMessage={handleSendMessage}
         isLoading={isChatLoading}
       />
+
+      {/* 인수인계 문서 업로드 */}
+      <DocumentUploader />
     </div>
   );
 };
