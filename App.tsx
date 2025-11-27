@@ -50,7 +50,7 @@ const App: React.FC = () => {
     // Initialize AI Mentor session (async)
     await initializeMentorSession(name);
     setChatHistory([
-        { role: 'model', content: `안녕하세요, ${name}님! 저는 당신의 AI 시니어 멘토 '온보딩 나침반'입니다. 무엇이든 물어보세요.` }
+        { role: 'model', content: `AI 시니어 멘토 '온보딩 나침반'입니다. 무엇이든 물어보세요.` }
     ]);
   };
 
