@@ -1,34 +1,30 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CATEGORIES } from '../constants';
 import Header from './Header';
+import { useAuth } from '../contexts/AuthContext';
 
 interface LandingProps {
   onStart: (name: string, category: string) => void;
 }
 
 const Landing: React.FC<LandingProps> = ({ onStart }) => {
+  const { user, isLoading, signIn } = useAuth();
   const [name, setName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [step, setStep] = useState(1); // 1 for name, 2 for category
-  const nameInputRef = useRef<HTMLInputElement>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  // 로그인 상태에 따라 이름 설정
   useEffect(() => {
-    if (step === 1 && nameInputRef.current) {
-      nameInputRef.current.focus();
-    }
-  }, [step]);
+    if (isLoading) return;
 
-  const handleNameSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.trim()) {
-      setStep(2);
+    if (user) {
+      const userName = user.name || user.email?.split('@')[0] || '';
+      setName(userName);
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
     }
-  };
-
-  const handleSkip = () => {
-    setName('주니어');
-    setStep(2);
-  };
+  }, [user, isLoading]);
 
   const handleStart = () => {
     if (name.trim() && selectedCategory) {
@@ -36,50 +32,61 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
     }
   };
 
+  // 로딩 중
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-slate-500">로딩 중...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-4 sm:p-6 lg:p-8 pt-12 sm:pt-16 transition-colors duration-300">
       <div className="w-full max-w-2xl mx-auto">
-        <Header />
-        
-        {step === 1 && (
+        <Header showLogin={isLoggedIn} />
+
+        {/* 비로그인 시: Google 로그인 필수 */}
+        {!isLoggedIn && (
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-8 animate-fade-in">
-            <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">멘토링을 시작하기 전에,</h2>
-            <p className="text-center text-slate-500 dark:text-slate-400 mb-6">AI 멘토가 당신을 어떻게 부르면 좋을까요?</p>
-            <form onSubmit={handleNameSubmit} className="flex flex-col sm:flex-row gap-3">
-              <input
-                ref={nameInputRef}
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="이름을 입력하세요"
-                className="flex-grow w-full py-3 px-4 bg-slate-100 dark:bg-slate-700 rounded-lg border-2 border-slate-200 dark:border-slate-600 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
-                aria-label="이름 입력"
-                required
-              />
-              <button
-                type="submit"
-                className="bg-sky-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-700 transition-all duration-200 disabled:bg-slate-400 flex-shrink-0 whitespace-nowrap"
-              >
-                확인
-              </button>
-            </form>
-             <div className="text-center mt-4">
-               <button
-                  onClick={handleSkip}
-                  className="text-sm text-slate-500 dark:text-slate-400 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
-               >
-                 바로가기 (기본 이름 '주니어'로 시작)
-               </button>
-            </div>
+            <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">
+              멘토링을 시작해볼까요?
+            </h2>
+            <p className="text-center text-slate-500 dark:text-slate-400 mb-8">
+              회사 Google 계정으로 로그인해주세요.
+            </p>
+
+            <button
+              onClick={signIn}
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 rounded-xl shadow-sm hover:shadow-md hover:border-sky-300 dark:hover:border-sky-500 transition-all"
+            >
+              <svg viewBox="0 0 24 24" width="24" height="24" className="flex-shrink-0">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              </svg>
+              <span className="text-lg font-medium text-slate-700 dark:text-slate-200">
+                Google 계정으로 로그인
+              </span>
+            </button>
+
+            <p className="text-xs text-center text-slate-400 mt-6">
+              회사 내부 시스템입니다. 회사 계정으로 로그인해주세요.
+            </p>
           </div>
         )}
 
-        {step === 2 && (
+        {/* 로그인 후: 카테고리 선택 */}
+        {isLoggedIn && (
           <div className="animate-fade-in">
-             <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">
+            <h2 className="text-2xl font-bold text-center text-slate-700 dark:text-slate-200 mb-2">
               반가워요, <span className="text-sky-600 dark:text-sky-400">{name}</span>님!
             </h2>
-            <p className="text-center text-slate-500 dark:text-slate-400 mb-8">어떤 역량을 키우고 싶으신가요? 학습할 주제를 선택해주세요.</p>
+            <p className="text-center text-slate-500 dark:text-slate-400 mb-8">
+              어떤 역량을 키우고 싶으신가요? 학습할 주제를 선택해주세요.
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
               {CATEGORIES.map(category => (
@@ -87,13 +94,13 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
                   className={`p-6 rounded-2xl border-4 text-left transition-all duration-200 transform hover:-translate-y-1 ${
-                    selectedCategory === category.id 
-                      ? 'bg-sky-100 dark:bg-sky-900 border-sky-500' 
+                    selectedCategory === category.id
+                      ? 'bg-sky-100 dark:bg-sky-900 border-sky-500'
                       : 'bg-white dark:bg-slate-800 border-transparent hover:border-sky-300 shadow-md'
                   }`}
                 >
                   <div className="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-lg flex items-center justify-center mb-4">
-                     <i className={`${category.icon} text-2xl text-sky-600 dark:text-sky-400`}></i>
+                    <i className={`${category.icon} text-2xl text-sky-600 dark:text-sky-400`}></i>
                   </div>
                   <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100 mb-1">{category.name}</h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400">{category.description}</p>

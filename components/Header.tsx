@@ -1,11 +1,13 @@
 import React from 'react';
+import GoogleLoginButton from './GoogleLoginButton';
 
 interface HeaderProps {
   userName?: string;
   onHomeClick?: () => void;
+  showLogin?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ userName, onHomeClick }) => {
+const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true }) => {
   const iconElement = (
     <div className="h-16 mx-auto mb-12 flex justify-center items-center">
       <svg
@@ -44,7 +46,14 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick }) => {
   );
 
   return (
-    <header className="text-center mb-8 md:mb-12 animate-fade-in">
+    <header className="text-center mb-8 md:mb-12 animate-fade-in relative">
+      {/* Google 로그인 버튼 - 우측 상단 */}
+      {showLogin && (
+        <div className="absolute top-0 right-0">
+          <GoogleLoginButton />
+        </div>
+      )}
+
       {userName ? (
         <button
           onClick={onHomeClick}
@@ -56,7 +65,7 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick }) => {
       ) : (
         iconElement
       )}
-      
+
       <h1 className="text-4xl sm:text-5xl font-bold text-sky-600 dark:text-sky-400 mb-2">
         온보딩 나침반
       </h1>

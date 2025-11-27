@@ -3,6 +3,8 @@
  * Gemini 직접 호출 대신 백엔드를 통해 안전하게 AI 기능 사용
  */
 
+import { getAccessToken } from './supabaseClient';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api';
 
 interface ApiError {
@@ -12,7 +14,7 @@ interface ApiError {
 
 class ApiClientError extends Error {
   status: number;
-  
+
   constructor(message: string, status: number) {
     super(message);
     this.status = status;
@@ -20,16 +22,29 @@ class ApiClientError extends Error {
   }
 }
 
+/**
+ * 인증 헤더 가져오기
+ */
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const token = await getAccessToken();
+  if (token) {
+    return { Authorization: `Bearer ${token}` };
+  }
+  return {};
+}
+
 async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
+  const authHeaders = await getAuthHeaders();
   const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
+    ...authHeaders,
   };
-  
+
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -37,7 +52,7 @@ async function apiFetch<T>(
       ...options.headers,
     },
   });
-  
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
     throw new ApiClientError(
@@ -45,7 +60,7 @@ async function apiFetch<T>(
       response.status
     );
   }
-  
+
   return response.json();
 }
 
@@ -82,11 +97,13 @@ export async function* streamChat(
   message: string
 ): AsyncGenerator<ChatStreamEvent> {
   const url = `${API_BASE_URL}/onboarding/chat/stream?sessionId=${encodeURIComponent(sessionId)}&query=${encodeURIComponent(message)}`;
-  
+
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Accept': 'text/event-stream',
+      ...authHeaders,
     },
   });
   
@@ -168,11 +185,13 @@ export async function* streamFeedback(
   });
   
   const url = `${API_BASE_URL}/onboarding/feedback/stream?${params.toString()}`;
-  
+
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Accept': 'text/event-stream',
+      ...authHeaders,
     },
   });
   
@@ -237,11 +256,13 @@ export async function* streamFollowUp(
   });
   
   const url = `${API_BASE_URL}/onboarding/followup/stream?${params.toString()}`;
-  
+
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(url, {
     method: 'GET',
     headers: {
       'Accept': 'text/event-stream',
+      ...authHeaders,
     },
   });
   
@@ -356,12 +377,14 @@ export async function uploadDocument(
   }
   
   formData.append('metadata', JSON.stringify(metadata));
-  
+
+  const authHeaders = await getAuthHeaders();
   const response = await fetch(
     `${API_BASE_URL}/onboarding/documents`,
     {
       method: 'POST',
       body: formData,
+      headers: authHeaders,
     }
   );
   
