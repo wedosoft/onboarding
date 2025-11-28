@@ -5,6 +5,10 @@
 		},
 		{
 			"path": "../agent-platform"
+		},
+		{
+			"name": "onboarding-aistudio",
+			"path": "../onboarding-aistudio"
 		}
 	],
 	"settings": {}
