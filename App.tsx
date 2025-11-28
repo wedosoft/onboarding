@@ -9,6 +9,7 @@ import MainLayout from './components/layout/MainLayout';
 import Landing from './components/Landing';
 import DashboardPage from './pages/DashboardPage';
 import ScenariosPage from './pages/ScenariosPage';
+import AssessmentPage from './pages/AssessmentPage';
 import KnowledgeChatPage from './pages/KnowledgeChatPage';
 import DocumentsPage from './pages/DocumentsPage';
 import AdminPage from './pages/AdminPage';
@@ -85,6 +86,7 @@ const App: React.FC = () => {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/scenarios" element={<ScenariosPage />} />
+          <Route path="/assessment" element={<AssessmentPage />} />
           <Route path="/knowledge" element={<KnowledgeChatPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route

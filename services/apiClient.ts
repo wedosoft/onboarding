@@ -418,3 +418,286 @@ export interface AllSessionsResponse {
 export async function getAllProgress(): Promise<AllSessionsResponse> {
   return apiFetch('/onboarding/progress');
 }
+
+// ============================================
+// 지식 베이스 (Knowledge Base)
+// ============================================
+
+export interface KnowledgeArticle {
+  id: string;
+  title: string;
+  author: string;
+  category: string;  // handover, process, tips, company, tools, etc
+  rawContent: string;
+  structuredSummary?: string;
+  createdAt: string;
+}
+
+export interface CreateKnowledgeArticleRequest {
+  title: string;
+  author: string;
+  category: string;
+  rawContent: string;
+  structuredSummary: string;
+}
+
+/**
+ * AI를 사용하여 지식 콘텐츠 구조화
+ */
+export async function structureKnowledge(rawContent: string, category: string): Promise<string> {
+  const result = await apiFetch<{ structuredSummary: string }>('/onboarding/knowledge/structure', {
+    method: 'POST',
+    body: JSON.stringify({ rawContent, category }),
+  });
+  return result.structuredSummary;
+}
+
+/**
+ * 지식 아티클 목록 조회
+ */
+export async function getKnowledgeArticles(category?: string): Promise<KnowledgeArticle[]> {
+  const params = category ? `?category=${encodeURIComponent(category)}` : '';
+  return apiFetch<KnowledgeArticle[]>(`/onboarding/knowledge${params}`);
+}
+
+/**
+ * 지식 아티클 생성
+ */
+export async function createKnowledgeArticle(request: CreateKnowledgeArticleRequest): Promise<KnowledgeArticle> {
+  return apiFetch<KnowledgeArticle>('/onboarding/knowledge', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+/**
+ * 지식 아티클 삭제
+ */
+export async function deleteKnowledgeArticle(articleId: string): Promise<{ success: boolean }> {
+  return apiFetch(`/onboarding/knowledge/${encodeURIComponent(articleId)}`, {
+    method: 'DELETE',
+  });
+}
+
+// ============================================
+// 학습 평가 (Assessment)
+// ============================================
+
+export interface AssessmentTrack {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  type: 'work_sense' | 'product_knowledge';
+  totalLevels?: number;
+}
+
+export interface AssessmentLevel {
+  id: string;
+  trackId: string;
+  order: number;
+  name: string;
+  description: string;
+  passingScore: number;
+  isUnlocked: boolean;
+  isCompleted: boolean;
+  score?: number;
+}
+
+export interface AssessmentQuestion {
+  id: string;
+  trackId: string;
+  levelId?: string;
+  type: 'multiple_choice' | 'scenario';
+  question: string;
+  context?: string;
+  choices: { id: string; text: string }[];
+}
+
+export interface AssessmentSubmitRequest {
+  sessionId: string;
+  trackId: string;
+  levelId?: string;
+  answers: { questionId: string; choiceId: string }[];
+}
+
+export interface AssessmentResult {
+  trackId: string;
+  levelId?: string;
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+  isPassed: boolean;
+  answers: {
+    questionId: string;
+    choiceId: string;
+    isCorrect: boolean;
+    correctChoiceId: string;
+    explanation: string;
+  }[];
+}
+
+/**
+ * 트랙 목록 조회
+ */
+export async function getAssessmentTracks(): Promise<AssessmentTrack[]> {
+  return apiFetch<AssessmentTrack[]>('/onboarding/assessment/tracks');
+}
+
+/**
+ * 트랙의 레벨 목록 조회 (제품 지식용)
+ */
+export async function getAssessmentLevels(trackId: string, sessionId: string): Promise<AssessmentLevel[]> {
+  return apiFetch<AssessmentLevel[]>(
+    `/onboarding/assessment/tracks/${encodeURIComponent(trackId)}/levels?sessionId=${encodeURIComponent(sessionId)}`
+  );
+}
+
+/**
+ * 학습 콘텐츠 스트리밍 조회 (RAG 기반)
+ */
+export async function* streamLearningContent(
+  trackId: string,
+  levelId: string
+): AsyncGenerator<ChatStreamEvent> {
+  const url = `${API_BASE_URL}/onboarding/assessment/learn/${encodeURIComponent(trackId)}/${encodeURIComponent(levelId)}/stream`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Learning content stream failed', response.status);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
+
+/**
+ * AI 멘토 채팅 스트리밍
+ */
+export async function* streamMentorChat(
+  sessionId: string,
+  trackId: string,
+  levelId: string,
+  message: string
+): AsyncGenerator<ChatStreamEvent> {
+  const params = new URLSearchParams({
+    sessionId,
+    trackId,
+    levelId,
+    message,
+  });
+
+  const url = `${API_BASE_URL}/onboarding/assessment/mentor/chat/stream?${params.toString()}`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Mentor chat stream failed', response.status);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 퀴즈 문제 조회
+ */
+export async function getAssessmentQuestions(
+  trackId: string,
+  levelId?: string
+): Promise<AssessmentQuestion[]> {
+  const params = levelId ? `?levelId=${encodeURIComponent(levelId)}` : '';
+  return apiFetch<AssessmentQuestion[]>(
+    `/onboarding/assessment/questions/${encodeURIComponent(trackId)}${params}`
+  );
+}
+
+/**
+ * 퀴즈 답안 제출
+ */
+export async function submitAssessment(request: AssessmentSubmitRequest): Promise<AssessmentResult> {
+  return apiFetch<AssessmentResult>('/onboarding/assessment/submit', {
+    method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+/**
+ * 진행도 조회
+ */
+export async function getAssessmentProgress(sessionId: string): Promise<{
+  tracks: {
+    trackId: string;
+    levelId?: string;
+    score: number;
+    isPassed: boolean;
+    completedAt: string;
+  }[];
+}> {
+  return apiFetch(`/onboarding/assessment/progress/${encodeURIComponent(sessionId)}`);
+}
