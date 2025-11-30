@@ -123,77 +123,75 @@ const AdminPage: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm">
+        <div className="glass-card rounded-xl p-4 shadow-sm border border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-              <i className="fas fa-users text-blue-600 dark:text-blue-400" />
+            <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+              <i className="fas fa-users text-blue-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{totalUsers}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">전체 사용자</p>
+              <p className="text-2xl font-bold text-slate-200">{totalUsers}</p>
+              <p className="text-sm text-slate-400">전체 사용자</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm">
+        <div className="glass-card rounded-xl p-4 shadow-sm border border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
-              <i className="fas fa-user-check text-green-600 dark:text-green-400" />
+            <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+              <i className="fas fa-user-check text-green-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{activeUsers}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">활성 사용자</p>
+              <p className="text-2xl font-bold text-slate-200">{activeUsers}</p>
+              <p className="text-sm text-slate-400">활성 사용자</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm">
+        <div className="glass-card rounded-xl p-4 shadow-sm border border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
-              <i className="fas fa-chart-line text-purple-600 dark:text-purple-400" />
+            <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+              <i className="fas fa-chart-line text-purple-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{avgCompletion}%</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">평균 진행률</p>
+              <p className="text-2xl font-bold text-slate-200">{avgCompletion}%</p>
+              <p className="text-sm text-slate-400">평균 진행률</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl p-4 shadow-sm">
+        <div className="glass-card rounded-xl p-4 shadow-sm border border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center">
-              <i className="fas fa-file-alt text-orange-600 dark:text-orange-400" />
+            <div className="w-10 h-10 bg-banana-500/10 rounded-lg flex items-center justify-center">
+              <i className="fas fa-file-alt text-banana-400" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-slate-800 dark:text-slate-100">{totalDocuments}</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">문서 수</p>
+              <p className="text-2xl font-bold text-slate-200">{totalDocuments}</p>
+              <p className="text-sm text-slate-400">문서 수</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden">
-        <div className="border-b border-slate-200 dark:border-slate-700">
+      <div className="glass-card rounded-xl shadow-sm overflow-hidden border border-white/5">
+        <div className="border-b border-white/10">
           <nav className="flex">
             <button
               onClick={() => setActiveTab('users')}
-              className={`px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === 'users'
-                  ? 'text-sky-600 border-b-2 border-sky-600'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
+              className={`px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'users'
+                  ? 'text-banana-400 border-b-2 border-banana-400'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                }`}
             >
               <i className="fas fa-users mr-2" />
               사용자 진행 현황
             </button>
             <button
               onClick={() => setActiveTab('documents')}
-              className={`px-6 py-4 text-sm font-medium transition-colors ${
-                activeTab === 'documents'
-                  ? 'text-sky-600 border-b-2 border-sky-600'
-                  : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
-              }`}
+              className={`px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'documents'
+                  ? 'text-banana-400 border-b-2 border-banana-400'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                }`}
             >
               <i className="fas fa-folder-open mr-2" />
               문서 관리
@@ -202,13 +200,13 @@ const AdminPage: React.FC = () => {
         </div>
 
         {/* Search */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+        <div className="p-4 border-b border-white/10">
           <input
             type="text"
             placeholder={activeTab === 'users' ? '사용자 검색...' : '문서 검색...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full max-w-md px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 dark:text-slate-100"
+            className="w-full max-w-md px-4 py-2 bg-dark-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-banana-500/50 text-slate-200 placeholder-slate-500"
           />
         </div>
 
@@ -216,13 +214,13 @@ const AdminPage: React.FC = () => {
         <div className="p-4">
           {isLoading ? (
             <div className="py-8 text-center">
-              <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="mt-2 text-slate-500 dark:text-slate-400">로딩 중...</p>
+              <div className="w-8 h-8 border-4 border-banana-500 border-t-transparent rounded-full animate-spin mx-auto" />
+              <p className="mt-2 text-slate-400">로딩 중...</p>
             </div>
           ) : activeTab === 'users' ? (
             /* Users Tab */
             filteredUsers.length === 0 ? (
-              <div className="py-8 text-center text-slate-500 dark:text-slate-400">
+              <div className="py-8 text-center text-slate-500">
                 <i className="fas fa-users text-3xl mb-2" />
                 <p>사용자 데이터가 없습니다.</p>
               </div>
@@ -230,60 +228,60 @@ const AdminPage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left text-sm text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+                    <tr className="text-left text-sm text-slate-400 border-b border-white/10">
                       <th className="pb-3 font-medium">사용자</th>
                       <th className="pb-3 font-medium">완료 시나리오</th>
                       <th className="pb-3 font-medium">진행률</th>
                       <th className="pb-3 font-medium">상태</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                  <tbody className="divide-y divide-white/5">
                     {filteredUsers.map((user, idx) => (
                       <tr key={idx} className="text-sm">
                         <td className="py-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-sky-500 flex items-center justify-center text-white font-medium text-sm">
+                            <div className="w-8 h-8 rounded-full bg-banana-500 flex items-center justify-center text-dark-900 font-bold text-sm">
                               {user.userName[0].toUpperCase()}
                             </div>
                             <div>
-                              <p className="font-medium text-slate-800 dark:text-slate-100">
+                              <p className="font-medium text-slate-200">
                                 {user.userName}
                               </p>
                               {user.sessions.length > 1 && (
-                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                <p className="text-xs text-slate-500">
                                   {user.sessions.length}개 세션
                                 </p>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 text-slate-600 dark:text-slate-300">
+                        <td className="py-3 text-slate-300">
                           {user.totalCompleted} / {SCENARIOS.length}
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <div className="w-24 bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                            <div className="w-24 bg-dark-700 rounded-full h-2">
                               <div
-                                className="bg-sky-500 h-2 rounded-full"
+                                className="bg-banana-500 h-2 rounded-full"
                                 style={{ width: `${user.completionRate}%` }}
                               />
                             </div>
-                            <span className="text-slate-600 dark:text-slate-300">
+                            <span className="text-slate-300">
                               {user.completionRate}%
                             </span>
                           </div>
                         </td>
                         <td className="py-3">
                           {user.completionRate === 100 ? (
-                            <span className="px-2 py-1 text-xs bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300 rounded-full">
+                            <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded-full border border-green-500/30">
                               완료
                             </span>
                           ) : user.totalCompleted > 0 ? (
-                            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 rounded-full">
+                            <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-400 rounded-full border border-blue-500/30">
                               진행 중
                             </span>
                           ) : (
-                            <span className="px-2 py-1 text-xs bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300 rounded-full">
+                            <span className="px-2 py-1 text-xs bg-slate-700 text-slate-400 rounded-full border border-slate-600">
                               시작 전
                             </span>
                           )}
@@ -297,7 +295,7 @@ const AdminPage: React.FC = () => {
           ) : (
             /* Documents Tab */
             filteredDocuments.length === 0 ? (
-              <div className="py-8 text-center text-slate-500 dark:text-slate-400">
+              <div className="py-8 text-center text-slate-500">
                 <i className="fas fa-folder-open text-3xl mb-2" />
                 <p>문서가 없습니다.</p>
               </div>
@@ -311,17 +309,17 @@ const AdminPage: React.FC = () => {
                   return (
                     <div
                       key={doc.name}
-                      className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg"
+                      className="flex items-center justify-between p-3 bg-dark-800/50 rounded-lg border border-white/5 hover:border-banana-500/30 transition-colors"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 bg-white dark:bg-slate-600 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-dark-700 rounded-lg flex items-center justify-center">
                           <i className="fas fa-file-alt text-slate-400" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-800 dark:text-slate-100 truncate">
+                          <p className="font-medium text-slate-200 truncate">
                             {doc.displayName || doc.name}
                           </p>
-                          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                          <div className="flex items-center gap-2 text-xs text-slate-500">
                             {category && <span className="capitalize">{category}</span>}
                             {author && <span>by {author}</span>}
                             {tags && <span>#{tags.split(',')[0]}</span>}
@@ -330,7 +328,7 @@ const AdminPage: React.FC = () => {
                       </div>
                       <button
                         onClick={() => handleDeleteDocument(doc.name, doc.displayName || doc.name)}
-                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                        className="p-2 text-slate-500 hover:text-red-400 transition-colors"
                         title="삭제"
                       >
                         <i className="fas fa-trash" />

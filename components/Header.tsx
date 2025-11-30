@@ -19,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true
       >
         <defs>
           <style>
-            {`.cls-1{fill:#3284d6;}.cls-2{fill:#383838;}`}
+            {`.cls-1{fill:#facc15;}.cls-2{fill:#facc15;}`}
           </style>
         </defs>
         <g id="Layer_1-2">
@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true
       {userName ? (
         <button
           onClick={onHomeClick}
-          className="group transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 dark:focus:ring-offset-slate-900 rounded-lg"
+          className="group transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-banana-500 dark:focus:ring-offset-slate-900 rounded-lg"
           aria-label="처음으로 돌아가기"
         >
           {iconElement}
@@ -66,17 +66,17 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true
         iconElement
       )}
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-sky-600 dark:text-sky-400 mb-2">
+      <h1 className="text-4xl sm:text-5xl font-bold text-banana-400 mb-2">
         온보딩 나침반
       </h1>
-       {userName ? (
-        <p className="text-lg text-slate-600 dark:text-slate-400">
+      {userName ? (
+        <p className="text-lg text-slate-400">
           <strong>{userName}</strong>님, AI 시니어 멘토와 함께하는 회사 생활 길라잡이
         </p>
       ) : (
-         <p className="text-lg text-slate-600 dark:text-slate-400">
-            AI 시니어 멘토와 함께하는 회사 생활 길라잡이
-          </p>
+        <p className="text-lg text-slate-400">
+          AI 시니어 멘토와 함께하는 회사 생활 길라잡이
+        </p>
       )}
     </header>
   );

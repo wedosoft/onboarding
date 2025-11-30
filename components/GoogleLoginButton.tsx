@@ -29,21 +29,21 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
   if (user) {
     return (
       <div className={`flex items-center gap-3 ${className}`}>
-        {user.picture && (
+        {user.avatar && (
           <img
-            src={user.picture}
+            src={user.avatar}
             alt={user.name || 'Profile'}
-            className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
+            className="w-8 h-8 rounded-full border-2 border-banana-500/50 shadow-sm"
           />
         )}
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+          <span className="text-sm font-medium text-slate-200">
             {user.name || user.email}
           </span>
         </div>
         <button
           onClick={signOut}
-          className="ml-2 px-3 py-1 text-xs text-slate-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors"
+          className="ml-2 px-3 py-1 text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
         >
           로그아웃
         </button>
@@ -54,7 +54,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
   return (
     <button
       onClick={signIn}
-      className={`flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm hover:shadow hover:bg-slate-50 dark:hover:bg-slate-600 transition-all ${className}`}
+      className={`flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg shadow-sm hover:shadow hover:bg-slate-50 transition-all ${className}`}
     >
       {/* Google Logo SVG */}
       <svg viewBox="0 0 24 24" width="18" height="18" className="flex-shrink-0">
@@ -75,7 +75,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         />
       </svg>
-      <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+      <span className="text-sm font-medium text-slate-700">
         Google로 로그인
       </span>
     </button>

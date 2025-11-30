@@ -1,107 +1,206 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>온보딩 나침반</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class', // or 'media'
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>온보딩 나침반</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            banana: {
+              50: '#fffaeb',
+              100: '#fff3c7',
+              200: '#ffe68f',
+              300: '#ffd24d',
+              400: '#ffc000', // Main Banana
+              500: '#f5a600',
+              600: '#d98200',
+              700: '#b35f00',
+              800: '#8f4600',
+              900: '#753900',
+            },
+            dark: {
+              900: '#0f0f0f',
+              800: '#1a1a1a',
+              700: '#2a2a2a',
+              600: '#3a3a3a',
+            }
+          },
+          backgroundImage: {
+            'banana-gradient': 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
+            'glass': 'linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
+          }
+        }
       }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-      /* Add a custom animation for a smoother feel */
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Add a custom animation for a smoother feel */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
       }
-      .animate-fade-in {
-        animation: fadeIn 0.5s ease-out forwards;
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
-      /* Custom styles for rendered markdown content */
-      .prose {
-        color: inherit;
-        line-height: 1.75; /* Increase for better readability */
-        font-size: 1rem; /* Adjust base font size for modal */
-      }
-      .prose p {
-        margin-top: 0.75em; /* Adjust paragraph spacing */
-        margin-bottom: 0.75em;
-      }
-      .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
-        color: inherit;
-        font-weight: 600;
-        margin-top: 2em;
-        margin-bottom: 0.8em;
-      }
-      .prose h3 {
-        font-size: 1.15rem; /* Adjust heading size */
-        padding-bottom: 0.5em;
-        border-bottom: 1px solid #e2e8f0; /* slate-200 */
-      }
-      .dark .prose h3 {
-        border-bottom-color: #475569; /* slate-600 */
-      }
-      .prose h3:first-of-type {
-        margin-top: 0;
-      }
-      .prose hr {
-        margin-top: 2em;
-        margin-bottom: 1.5em; /* Reduced margin after hr */
-        border-top: 1px solid #e2e8f0; /* slate-200 */
-      }
-      .dark .prose hr {
-        border-color: #334155; /* slate-700 */
-      }
-      .prose a {
-        color: #0ea5e9; /* sky-500 */
-        text-decoration: none;
-        font-weight: 500;
-      }
-      .prose a:hover {
-        text-decoration: underline;
-      }
-      .prose ul, .prose ol {
-        list-style-position: outside;
-        margin-top: 1em;
-        margin-bottom: 1em;
-        padding-left: 1.5em; /* Slightly reduce indent */
-      }
-      .prose li {
-        margin-top: 0.4em;
-        margin-bottom: 0.4em;
-      }
-      .prose code {
-        background-color: #f1f5f9; /* slate-100 */
-        padding: 0.2em 0.4em;
-        border-radius: 0.25rem;
-        font-size: 85%;
-      }
-      .dark .prose code {
-        background-color: #1e293b; /* slate-800 */
-      }
-      .prose blockquote {
-        border-left: 0.25em solid #0ea5e9; /* sky-500 */
-        padding: 0.75em 1.25em;
-        margin: 1.5em 0; /* Add vertical margin */
-        font-style: normal;
-        background-color: #f0f9ff; /* sky-50 */
-        border-radius: 0.5rem;
-      }
-      .dark .prose blockquote {
-        border-left-color: #38bdf8; /* sky-400 */
-        background-color: #0c4a6e; /* sky-900 */
-      }
-      .prose blockquote p:first-of-type {
-        margin-top: 0;
-      }
-      .prose blockquote p:last-of-type {
-        margin-bottom: 0;
-      }
-    </style>
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .glass-card {
+      background: rgba(30, 30, 30, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 215, 0, 0.1);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    /* Custom styles for rendered markdown content */
+    .prose {
+      color: inherit;
+      line-height: 1.75;
+      /* Increase for better readability */
+      font-size: 1rem;
+      /* Adjust base font size for modal */
+    }
+
+    .prose p {
+      margin-top: 0.75em;
+      /* Adjust paragraph spacing */
+      margin-bottom: 0.75em;
+    }
+
+    .prose h1,
+    .prose h2,
+    .prose h3,
+    .prose h4,
+    .prose h5,
+    .prose h6 {
+      color: inherit;
+      font-weight: 600;
+      margin-top: 2em;
+      margin-bottom: 0.8em;
+    }
+
+    .prose h3 {
+      font-size: 1.15rem;
+      /* Adjust heading size */
+      padding-bottom: 0.5em;
+      border-bottom: 1px solid #e2e8f0;
+      /* slate-200 */
+    }
+
+    .dark .prose h3 {
+      border-bottom-color: #475569;
+      /* slate-600 */
+    }
+
+    .prose h3:first-of-type {
+      margin-top: 0;
+    }
+
+    .prose hr {
+      margin-top: 2em;
+      margin-bottom: 1.5em;
+      /* Reduced margin after hr */
+      border-top: 1px solid #e2e8f0;
+      /* slate-200 */
+    }
+
+    .dark .prose hr {
+      border-color: #334155;
+      /* slate-700 */
+    }
+
+    .prose a {
+      color: #0ea5e9;
+      /* sky-500 */
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .prose a:hover {
+      text-decoration: underline;
+    }
+
+    .prose ul,
+    .prose ol {
+      list-style-position: outside;
+      margin-top: 1em;
+      margin-bottom: 1em;
+      padding-left: 1.5em;
+      /* Slightly reduce indent */
+    }
+
+    .prose li {
+      margin-top: 0.4em;
+      margin-bottom: 0.4em;
+    }
+
+    .prose code {
+      background-color: #f1f5f9;
+      /* slate-100 */
+      padding: 0.2em 0.4em;
+      border-radius: 0.25rem;
+      font-size: 85%;
+    }
+
+    .dark .prose code {
+      background-color: #1e293b;
+      /* slate-800 */
+    }
+
+    .prose blockquote {
+      border-left: 0.25em solid #0ea5e9;
+      /* sky-500 */
+      padding: 0.75em 1.25em;
+      margin: 1.5em 0;
+      /* Add vertical margin */
+      font-style: normal;
+      background-color: #f0f9ff;
+      /* sky-50 */
+      border-radius: 0.5rem;
+    }
+
+    .dark .prose blockquote {
+      border-left-color: #38bdf8;
+      /* sky-400 */
+      background-color: #0c4a6e;
+      /* sky-900 */
+    }
+
+    .prose blockquote p:first-of-type {
+      margin-top: 0;
+    }
+
+    .prose blockquote p:last-of-type {
+      margin-bottom: 0;
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -115,8 +214,10 @@
 }
 </script>
 </head>
-  <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body class="bg-banana-gradient text-slate-200 antialiased min-h-screen">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>

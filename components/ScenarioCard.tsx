@@ -12,37 +12,35 @@ interface ScenarioCardProps {
 const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario, onSelectChoice, isLoading, selectedChoiceId }) => {
 
   const getButtonClasses = (choiceId: string) => {
-    const baseClasses = "w-full text-left p-4 rounded-lg border-2 transition-all duration-200 text-slate-700 dark:text-slate-200";
+    const baseClasses = "w-full text-left p-4 rounded-xl border transition-all duration-200 text-slate-300 font-medium";
 
     if (isLoading) {
       if (selectedChoiceId === choiceId) {
-        return `${baseClasses} bg-sky-100 dark:bg-sky-900 border-sky-500 ring-2 ring-sky-500 cursor-wait`;
+        return `${baseClasses} bg-banana-500/20 border-banana-400 ring-1 ring-banana-400 cursor-wait text-banana-200`;
       }
-      return `${baseClasses} bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 cursor-not-allowed text-slate-400 dark:text-slate-500`;
-    }
-    
-    if (selectedChoiceId === choiceId) {
-      return `${baseClasses} bg-sky-100 dark:bg-sky-900 border-sky-500 ring-2 ring-sky-500`;
+      return `${baseClasses} bg-dark-800/30 border-white/5 cursor-not-allowed text-slate-600`;
     }
 
-    return `${baseClasses} bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-sky-400 transform hover:-translate-y-1`;
+    if (selectedChoiceId === choiceId) {
+      return `${baseClasses} bg-banana-500/20 border-banana-400 ring-1 ring-banana-400 text-banana-200 shadow-[0_0_15px_rgba(255,192,0,0.2)]`;
+    }
+
+    return `${baseClasses} bg-dark-800/50 border-white/10 hover:bg-white/5 hover:border-banana-400/50 hover:text-banana-100 transform hover:-translate-y-1 hover:shadow-lg`;
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 transform hover:scale-[1.01] animate-fade-in">
+    <div className="glass-card rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 animate-fade-in border border-white/10">
       <div className="p-6 sm:p-8">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-12 h-12 bg-sky-100 dark:bg-sky-900 rounded-lg flex items-center justify-center">
-            <i className={`${scenario.icon} text-2xl text-sky-600 dark:text-sky-400`}></i>
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-14 h-14 bg-banana-500/10 rounded-2xl flex items-center justify-center border border-banana-500/20 shadow-[0_0_15px_rgba(255,192,0,0.1)]">
+            <i className={`${scenario.icon} text-3xl text-banana-400`}></i>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-slate-100">{scenario.title}</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-white">{scenario.title}</h2>
         </div>
-        <p className="text-slate-600 dark:text-slate-300 mb-6 text-base sm:text-lg">
+        <p className="text-slate-300 mb-8 text-base sm:text-lg leading-relaxed">
           {scenario.description}
         </p>
-        <div className="space-y-3 relative">
-          {/* The loading spinner was removed from here to prevent double indicators. */}
-          {/* The buttons below are still disabled via the `isLoading` prop. */}
+        <div className="space-y-4 relative">
           {scenario.choices.map((choice) => (
             <button
               key={choice.id}

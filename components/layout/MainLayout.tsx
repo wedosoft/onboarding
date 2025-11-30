@@ -18,7 +18,7 @@ const MainLayout: React.FC = () => {
   const title = pageTitles[location.pathname] || '온보딩 나침반';
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
+    <div className="min-h-screen flex">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0">

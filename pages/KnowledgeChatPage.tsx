@@ -91,22 +91,21 @@ const KnowledgeChatPage: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto h-[calc(100vh-8rem)] flex flex-col">
       {/* Chat messages */}
-      <div className="flex-1 overflow-y-auto bg-white dark:bg-slate-800 rounded-xl shadow-sm">
-        <div className="p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto glass-card rounded-2xl shadow-xl border border-white/10">
+        <div className="p-6 space-y-6">
           {messages.map((msg, idx) => (
             <div
               key={idx}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                  msg.role === 'user'
-                    ? 'bg-sky-600 text-white'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100'
-                }`}
+                className={`max-w-[80%] rounded-2xl px-5 py-4 shadow-md ${msg.role === 'user'
+                    ? 'bg-banana-500 text-dark-900 font-medium'
+                    : 'bg-dark-700/80 text-slate-200 border border-white/5'
+                  }`}
               >
                 {msg.role === 'model' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
+                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-slate-200 prose-headings:text-banana-200 prose-strong:text-banana-300 prose-a:text-banana-400">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {msg.content || '...'}
                     </ReactMarkdown>
@@ -121,11 +120,11 @@ const KnowledgeChatPage: React.FC = () => {
           {/* Loading indicator */}
           {isLoading && messages[messages.length - 1]?.content === '' && (
             <div className="flex justify-start">
-              <div className="bg-slate-100 dark:bg-slate-700 rounded-2xl px-4 py-3">
+              <div className="bg-dark-700/80 rounded-2xl px-5 py-4 border border-white/5">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-sky-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="w-2 h-2 bg-banana-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-banana-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-banana-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             </div>
@@ -136,16 +135,17 @@ const KnowledgeChatPage: React.FC = () => {
 
         {/* Suggested questions (shown when no messages) */}
         {messages.length <= 1 && (
-          <div className="p-4 border-t border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+          <div className="p-6 border-t border-white/5 bg-dark-800/30">
+            <p className="text-sm text-slate-400 mb-4 flex items-center gap-2">
+              <i className="fas fa-lightbulb text-banana-400"></i>
               이런 것들을 물어보세요:
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-3">
               {suggestedQuestions.map((q, idx) => (
                 <button
                   key={idx}
                   onClick={() => handleSendMessage(q)}
-                  className="px-3 py-2 text-sm bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                  className="px-4 py-2 text-sm bg-dark-700 hover:bg-banana-500/10 text-slate-300 hover:text-banana-300 rounded-xl transition-all border border-white/5 hover:border-banana-500/30"
                 >
                   {q}
                 </button>
@@ -156,8 +156,8 @@ const KnowledgeChatPage: React.FC = () => {
       </div>
 
       {/* Input area */}
-      <form onSubmit={handleSubmit} className="mt-4">
-        <div className="flex gap-2">
+      <form onSubmit={handleSubmit} className="mt-6">
+        <div className="flex gap-3">
           <input
             ref={inputRef}
             type="text"
@@ -165,17 +165,17 @@ const KnowledgeChatPage: React.FC = () => {
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="질문을 입력하세요..."
             disabled={isLoading}
-            className="flex-1 px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500 dark:text-slate-100 disabled:opacity-50"
+            className="flex-1 px-5 py-4 bg-dark-800/50 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-banana-500/50 text-slate-200 placeholder-slate-500 disabled:opacity-50 glass"
           />
           <button
             type="submit"
             disabled={isLoading || !inputValue.trim()}
-            className="px-6 py-3 bg-sky-600 hover:bg-sky-700 disabled:bg-slate-400 text-white rounded-xl transition-colors disabled:cursor-not-allowed"
+            className="px-6 py-4 bg-banana-500 hover:bg-banana-400 disabled:bg-slate-700 text-dark-900 font-bold rounded-2xl transition-all disabled:cursor-not-allowed shadow-lg hover:shadow-banana-500/30"
           >
-            <i className="fas fa-paper-plane" />
+            <i className="fas fa-paper-plane text-lg" />
           </button>
         </div>
-        <p className="text-xs text-slate-400 mt-2 text-center">
+        <p className="text-xs text-slate-500 mt-3 text-center">
           AI 멘토는 업로드된 인수인계 문서와 제품 지식을 기반으로 답변합니다.
         </p>
       </form>

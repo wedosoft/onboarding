@@ -9,6 +9,9 @@
 		{
 			"name": "onboarding-aistudio",
 			"path": "../onboarding-aistudio"
+		},
+		{
+			"path": "../homepage"
 		}
 	],
 	"settings": {}

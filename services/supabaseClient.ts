@@ -24,7 +24,7 @@ export interface AuthUser {
   id: string;
   email: string | null;
   name: string | null;
-  picture: string | null;
+  avatar: string | null;
 }
 
 // Supabase User를 AuthUser로 변환
@@ -34,7 +34,7 @@ function toAuthUser(user: User): AuthUser {
     id: user.id,
     email: user.email || null,
     name: metadata.full_name || metadata.name || null,
-    picture: metadata.avatar_url || metadata.picture || null,
+    avatar: metadata.avatar_url || metadata.picture || null,
   };
 }
 

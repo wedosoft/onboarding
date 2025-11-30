@@ -6,10 +6,10 @@ const DocumentsPage: React.FC = () => {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
+        <h2 className="text-xl font-bold text-slate-200">
           지식 베이스
         </h2>
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-slate-400">
           사내 지식을 AI가 구조화하여 정리합니다. 인수인계, 업무 프로세스, 팁 등 모든 지식을 공유하세요.
         </p>
       </div>
