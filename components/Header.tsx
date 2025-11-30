@@ -71,11 +71,11 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true
       </h1>
       {userName ? (
         <p className="text-lg text-slate-400">
-          <strong>{userName}</strong>님, AI 시니어 멘토와 함께하는 회사 생활 길라잡이
+          <strong>{userName}</strong>님, 시니어 멘토와 함께하는 회사 생활 길라잡이
         </p>
       ) : (
         <p className="text-lg text-slate-400">
-          AI 시니어 멘토와 함께하는 회사 생활 길라잡이
+          시니어 멘토와 함께하는 회사 생활 길라잡이
         </p>
       )}
     </header>

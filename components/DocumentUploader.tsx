@@ -124,24 +124,24 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
       {/* 삭제 확인 다이얼로그 */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-[60] p-4 backdrop-blur-sm">
-          <div className="glass-card bg-dark-900/90 rounded-xl shadow-2xl w-full max-w-md p-6 border border-white/10">
+          <div className="glass-card bg-card rounded-xl shadow-2xl w-full max-w-md p-6 border border-border">
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 bg-red-500/20 rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-slate-200">문서 삭제 확인</h3>
+              <h3 className="text-lg font-semibold text-foreground">문서 삭제 확인</h3>
             </div>
-            <p className="text-slate-300 mb-6">
-              <span className="text-white font-medium">"{deleteConfirm.displayName}"</span> 문서를 삭제하시겠습니까?
+            <p className="text-muted-foreground mb-6">
+              <span className="text-foreground font-medium">"{deleteConfirm.displayName}"</span> 문서를 삭제하시겠습니까?
               <br />
               <span className="text-red-400 text-sm">이 작업은 되돌릴 수 없습니다.</span>
             </p>
             <div className="flex gap-3 justify-end">
               <button
                 onClick={handleDeleteCancel}
-                className="px-4 py-2 text-slate-400 hover:text-slate-200 transition-colors"
+                className="px-4 py-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 취소
               </button>
@@ -170,7 +170,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
       {/* 플로팅 버튼 */}
       <button
         onClick={handleOpen}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-banana-500 hover:bg-banana-400 text-dark-900 rounded-full shadow-lg shadow-banana-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110 z-40 border border-banana-400/50"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full shadow-lg shadow-primary/30 flex items-center justify-center transition-all duration-200 hover:scale-110 z-40 border border-primary/50"
         title="문서 업로드"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,18 +181,18 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
       {/* 모달 */}
       {isOpen && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-          <div className="glass-card bg-dark-900/90 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col border border-white/10">
+          <div className="glass-card bg-card rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col border border-border">
             {/* 헤더 */}
-            <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
-              <h2 className="text-xl font-semibold text-slate-200 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-banana-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
+              <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 인수인계 문서 관리
               </h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-slate-400 hover:text-slate-200 transition-colors"
+                className="text-muted-foreground hover:text-foreground transition-colors"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -203,8 +203,8 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
             {/* 콘텐츠 */}
             <div className="flex-1 overflow-y-auto p-4 space-y-6">
               {/* 업로드 폼 */}
-              <div className="bg-dark-800/50 rounded-xl p-4 space-y-4 border border-white/5">
-                <h3 className="text-sm font-medium text-slate-300">새 문서 업로드</h3>
+              <div className="bg-muted/50 rounded-xl p-4 space-y-4 border border-border">
+                <h3 className="text-sm font-medium text-foreground">새 문서 업로드</h3>
 
                 {/* 파일 선택 */}
                 <div>
@@ -218,16 +218,16 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                   />
                   <label
                     htmlFor="file-upload"
-                    className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-banana-500/50 hover:bg-white/5 transition-all"
+                    className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted transition-all"
                   >
                     {selectedFile ? (
-                      <span className="text-banana-400">{selectedFile.name}</span>
+                      <span className="text-primary">{selectedFile.name}</span>
                     ) : (
                       <>
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                         </svg>
-                        <span className="text-slate-500">파일을 선택하세요 (.txt, .md, .pdf)</span>
+                        <span className="text-muted-foreground">파일을 선택하세요 (.txt, .md, .pdf)</span>
                       </>
                     )}
                   </label>
@@ -235,11 +235,11 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
 
                 {/* 카테고리 */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">카테고리</label>
+                  <label className="block text-sm text-muted-foreground mb-1">카테고리</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as 'handover' | 'process')}
-                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-banana-500/50"
+                    className="w-full bg-card border border-border text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   >
                     <option value="handover">📋 인수인계</option>
                     <option value="process">📝 업무 프로세스</option>
@@ -248,25 +248,25 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
 
                 {/* 작성자 */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">작성자 *</label>
+                  <label className="block text-sm text-muted-foreground mb-1">작성자 *</label>
                   <input
                     type="text"
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                     placeholder="예: 김과장"
-                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-banana-500/50 placeholder-slate-600"
+                    className="w-full bg-card border border-border text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-muted-foreground"
                   />
                 </div>
 
                 {/* 태그 */}
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">태그 (쉼표로 구분)</label>
+                  <label className="block text-sm text-muted-foreground mb-1">태그 (쉼표로 구분)</label>
                   <input
                     type="text"
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     placeholder="예: A거래처, 영업, 계약"
-                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-banana-500/50 placeholder-slate-600"
+                    className="w-full bg-card border border-border text-foreground rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/50 placeholder-muted-foreground"
                   />
                 </div>
 
@@ -286,7 +286,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                 <button
                   onClick={handleUpload}
                   disabled={isUploading || !selectedFile}
-                  className="w-full bg-banana-500 hover:bg-banana-400 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-dark-900 font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full bg-primary hover:bg-primary/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-primary-foreground font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
                 >
                   {isUploading ? (
                     <>
@@ -309,7 +309,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
 
               {/* 업로드된 문서 목록 */}
               <div>
-                <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+                <h3 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                   </svg>
@@ -317,15 +317,15 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                 </h3>
 
                 {isLoadingDocs ? (
-                  <div className="text-center text-slate-400 py-4">
-                    <svg className="animate-spin h-6 w-6 mx-auto mb-2 text-banana-500" viewBox="0 0 24 24">
+                  <div className="text-center text-muted-foreground py-4">
+                    <svg className="animate-spin h-6 w-6 mx-auto mb-2 text-primary" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     문서 목록 로딩 중...
                   </div>
                 ) : documents.length === 0 ? (
-                  <div className="text-center text-slate-500 py-8 bg-dark-800/30 rounded-lg border border-white/5">
+                  <div className="text-center text-muted-foreground py-8 bg-muted/30 rounded-lg border border-border">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-2 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -336,12 +336,12 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                     {documents.map((doc, index) => (
                       <div
                         key={index}
-                        className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-lg hover:bg-dark-700 transition-colors group border border-white/5"
+                        className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors group border border-border"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-banana-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
-                        <span className="text-slate-300 text-sm truncate flex-1">
+                        <span className="text-muted-foreground text-sm truncate flex-1">
                           {doc.displayName}
                         </span>
                         <button

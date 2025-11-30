@@ -18,13 +18,13 @@ const MainLayout: React.FC = () => {
   const title = pageTitles[location.pathname] || '온보딩 나침반';
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex bg-background text-foreground">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0">
         <TopBar title={title} onMenuClick={() => setSidebarOpen(true)} />
 
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
+        <main className="flex-1 p-4 lg:p-6 overflow-auto bg-muted/30">
           <Outlet />
         </main>
       </div>

@@ -45,9 +45,11 @@ const AssessmentPage: React.FC = () => {
 
   const handleTrackSelect = (track: AssessmentTrack) => {
     if (track.type === 'product_knowledge') {
-      navigate(`/assessment/${track.id}/levels`);
+      // 제품 학습 페이지로 리다이렉트
+      navigate('/products');
     } else {
-      navigate(`/assessment/${track.id}`);
+      // 업무 센스는 시나리오 페이지로 리다이렉트
+      navigate('/scenarios');
     }
   };
 
@@ -134,7 +136,7 @@ const AssessmentPage: React.FC = () => {
           </li>
           <li className="flex items-start gap-2">
             <i className="fas fa-check-circle text-green-400 mt-0.5" />
-            <span>각 레벨은 학습 콘텐츠 + AI 멘토 채팅 + 퀴즈로 구성되어 있습니다.</span>
+            <span>각 레벨은 학습 콘텐츠 + 멘토 채팅 + 퀴즈로 구성되어 있습니다.</span>
           </li>
           <li className="flex items-start gap-2">
             <i className="fas fa-check-circle text-green-400 mt-0.5" />

@@ -44,7 +44,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     {/* Header */}
     <header className="p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0 bg-white/5">
       <h2 className="text-lg font-bold text-banana-400 flex items-center gap-2">
-        <i className="fa-solid fa-robot"></i>AI 멘토에게 질문하기
+        <i className="fa-solid fa-robot"></i>멘토에게 질문하기
       </h2>
       <div className="flex items-center gap-2">
         <button onClick={() => setIsExpanded(!isExpanded)} className="text-slate-400 hover:text-banana-400 transition-colors" aria-label={isExpanded ? "챗봇 축소" : "챗봇 확장"}>
@@ -201,7 +201,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ history, onSendMessage, isLoading }) 
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-4 sm:right-6 lg:right-8 w-16 h-16 bg-banana-500 text-dark-900 rounded-full shadow-lg shadow-banana-500/30 flex items-center justify-center hover:bg-banana-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-banana-500 dark:focus:ring-offset-slate-900 transition-all transform hover:scale-110 z-50 border border-banana-400/50"
-        aria-label="AI 멘토와 대화 시작"
+        aria-label="멘토와 대화 시작"
       >
         <i className={`fa-solid ${isOpen ? 'fa-times' : 'fa-comments'} text-2xl transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>
       </button>

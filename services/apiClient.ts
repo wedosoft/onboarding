@@ -701,3 +701,175 @@ export async function getAssessmentProgress(sessionId: string): Promise<{
 }> {
   return apiFetch(`/onboarding/assessment/progress/${encodeURIComponent(sessionId)}`);
 }
+
+// ============================================
+// 제품별 학습 (Product Learning)
+// ============================================
+
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+}
+
+export interface ProductLevel {
+  id: string;
+  order: number;
+  name: string;
+  description: string;
+  passingScore: number;
+  productId: string;
+  isUnlocked: boolean;
+  isCompleted: boolean;
+  score?: number;
+}
+
+export interface ProductQuizQuestion {
+  id: string;
+  productId: string;
+  levelId: string;
+  type: 'multiple_choice';
+  question: string;
+  choices: { id: string; text: string }[];
+}
+
+export interface ProductQuizResult {
+  productId: string;
+  levelId: string;
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+  isPassed: boolean;
+  answers: {
+    questionId: string;
+    choiceId: string;
+    isCorrect: boolean;
+    correctChoiceId: string;
+    explanation: string;
+  }[];
+}
+
+export interface ProductProgress {
+  productId: string;
+  levels: {
+    levelId: string;
+    score: number;
+    isPassed: boolean;
+    completedAt?: string;
+  }[];
+  completedLevels: number;
+  totalLevels: number;
+  completionRate: number;
+}
+
+/**
+ * 제품 목록 조회
+ */
+export async function getProducts(): Promise<Product[]> {
+  return apiFetch<Product[]>('/onboarding/assessment/products');
+}
+
+/**
+ * 제품별 레벨 목록 조회
+ */
+export async function getProductLevels(productId: string, sessionId: string): Promise<ProductLevel[]> {
+  return apiFetch<ProductLevel[]>(
+    `/onboarding/assessment/products/${encodeURIComponent(productId)}/levels?sessionId=${encodeURIComponent(sessionId)}`
+  );
+}
+
+/**
+ * 제품별 학습 콘텐츠 스트리밍
+ */
+export async function* streamProductLearning(
+  productId: string,
+  levelId: string,
+  sessionId: string
+): AsyncGenerator<ChatStreamEvent> {
+  const url = `${API_BASE_URL}/onboarding/assessment/products/${encodeURIComponent(productId)}/learn/${encodeURIComponent(levelId)}/stream?sessionId=${encodeURIComponent(sessionId)}`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Product learning stream failed', response.status);
+  }
+
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 제품별 퀴즈 조회
+ */
+export async function getProductQuiz(
+  productId: string,
+  levelId: string,
+  sessionId: string
+): Promise<ProductQuizQuestion[]> {
+  return apiFetch<ProductQuizQuestion[]>(
+    `/onboarding/assessment/products/${encodeURIComponent(productId)}/quiz/${encodeURIComponent(levelId)}?sessionId=${encodeURIComponent(sessionId)}`
+  );
+}
+
+/**
+ * 제품별 퀴즈 제출
+ */
+export async function submitProductQuiz(
+  sessionId: string,
+  productId: string,
+  levelId: string,
+  answers: { questionId: string; choiceId: string }[]
+): Promise<ProductQuizResult> {
+  return apiFetch<ProductQuizResult>('/onboarding/assessment/products/quiz/submit', {
+    method: 'POST',
+    body: JSON.stringify({
+      sessionId,
+      productId,
+      levelId,
+      answers,
+    }),
+  });
+}
+
+/**
+ * 제품별 진행도 조회
+ */
+export async function getProductProgress(productId: string, sessionId: string): Promise<ProductProgress> {
+  return apiFetch<ProductProgress>(
+    `/onboarding/assessment/products/${encodeURIComponent(productId)}/progress/${encodeURIComponent(sessionId)}`
+  );
+}

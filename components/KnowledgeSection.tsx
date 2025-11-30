@@ -192,7 +192,7 @@ const KnowledgeSection: React.FC = () => {
           <div className="p-8 flex flex-col h-full overflow-y-auto">
             <h2 className="text-xl font-bold text-slate-200 mb-2">새 지식 등록</h2>
             <p className="text-slate-400 mb-6 text-sm">
-              자유롭게 작성하세요. AI가 구조화된 요약을 생성합니다.
+              자유롭게 작성하세요. 시스템이 구조화된 요약을 생성합니다.
             </p>
 
             {/* Title */}
@@ -266,12 +266,12 @@ const KnowledgeSection: React.FC = () => {
                 {isProcessing ? (
                   <>
                     <div className="w-4 h-4 border-2 border-dark-900 border-t-transparent rounded-full animate-spin" />
-                    AI 분석 중...
+                    분석 중...
                   </>
                 ) : (
                   <>
                     <i className="fas fa-magic" />
-                    AI 구조화 & 저장
+                    구조화 & 저장
                   </>
                 )}
               </button>
@@ -306,7 +306,7 @@ const KnowledgeSection: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-8">
               <div className="mb-8">
                 <h3 className="text-xs font-bold text-banana-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <i className="fas fa-magic" /> AI 구조화 요약
+                  <i className="fas fa-magic" /> 구조화 요약
                 </h3>
                 <div className="prose prose-sm prose-invert max-w-none bg-banana-500/5 p-6 rounded-xl border border-banana-500/20 prose-headings:text-banana-200 prose-strong:text-banana-300">
                   <ReactMarkdown>{selectedArticle.structuredSummary || '요약 없음'}</ReactMarkdown>
