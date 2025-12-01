@@ -78,3 +78,52 @@ export interface AssessmentProgress {
   isPassed: boolean;
   completedAt?: string;
 }
+
+// ============================================
+// 제품별 지식 학습 (Product Knowledge)
+// ============================================
+
+export interface Product {
+  id: string;
+  name: string;
+  name_ko: string;
+  description: string;
+  description_ko: string;
+  icon: string;
+  color: string;
+}
+
+export interface ProductCategory {
+  id: string;
+  name: string;
+  nameEn: string;
+  nameKo: string | null;
+  slug: string;
+  description: string | null;
+  displayOrder: number;
+}
+
+export interface ProductFolder {
+  id: string;
+  name: string;
+  nameEn: string;
+  nameKo: string | null;
+  slug: string;
+  displayOrder: number;
+}
+
+export interface ProductDocument {
+  id: string;
+  csvId: number;
+  title: string;
+  titleEn: string;
+  titleKo: string | null;
+  slug: string;
+  folderId: string | null;
+}
+
+export interface ProductStats {
+  product_id: string;
+  category_count: number;
+  document_count: number;
+}

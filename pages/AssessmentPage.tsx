@@ -77,6 +77,31 @@ const AssessmentPage: React.FC = () => {
         </div>
       )}
 
+      {/* Product Learning Card - New Feature */}
+      <div className="mb-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200 hover:border-blue-400 transition-all cursor-pointer group"
+        onClick={() => navigate('/assessment/products')}
+      >
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-xl bg-blue-500 flex items-center justify-center">
+            <i className="fas fa-book-open text-2xl text-white" />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-lg font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">
+                제품별 지식 학습
+              </h2>
+              <span className="px-2 py-0.5 bg-blue-500 text-white text-xs rounded-full">NEW</span>
+            </div>
+            <p className="text-sm text-slate-500">
+              Freshservice, Freshdesk, Freshsales, Freshchat 제품별 기능과 사용법을 AI 멘토와 함께 학습합니다.
+            </p>
+          </div>
+          <span className="text-blue-500 text-sm font-medium group-hover:translate-x-1 transition-transform">
+            시작하기 <i className="fas fa-arrow-right ml-1" />
+          </span>
+        </div>
+      </div>
+
       {/* Track Cards */}
       <div className="grid md:grid-cols-2 gap-6">
         {tracks.map((track) => (

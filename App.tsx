@@ -17,6 +17,12 @@ import KnowledgeChatPage from './pages/KnowledgeChatPage';
 import DocumentsPage from './pages/DocumentsPage';
 import AdminPage from './pages/AdminPage';
 
+// Product Knowledge Pages
+import ProductSelectionPage from './pages/ProductSelectionPage';
+import ProductCategoriesPage from './pages/ProductCategoriesPage';
+import CategoryLearningPage from './pages/CategoryLearningPage';
+import ProductChatPage from './pages/ProductChatPage';
+
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -95,6 +101,12 @@ const App: React.FC = () => {
           <Route path="/assessment/:trackId/level/:levelId" element={<ProductKnowledgeLevelPage />} />
           <Route path="/knowledge" element={<KnowledgeChatPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
+
+          {/* Product Knowledge Routes */}
+          <Route path="/assessment/products" element={<ProductSelectionPage />} />
+          <Route path="/assessment/products/:productId" element={<ProductCategoriesPage />} />
+          <Route path="/assessment/products/:productId/chat" element={<ProductChatPage />} />
+          <Route path="/assessment/products/:productId/:categorySlug" element={<CategoryLearningPage />} />
           <Route
             path="/admin"
             element={

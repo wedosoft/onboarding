@@ -701,3 +701,198 @@ export async function getAssessmentProgress(sessionId: string): Promise<{
 }> {
   return apiFetch(`/onboarding/assessment/progress/${encodeURIComponent(sessionId)}`);
 }
+
+// ============================================
+// 제품별 지식 학습 (Product Knowledge) API
+// ============================================
+
+import type {
+  Product,
+  ProductCategory,
+  ProductFolder,
+  ProductDocument,
+  ProductStats,
+} from '../types';
+
+/**
+ * 지원 제품 목록 조회
+ */
+export async function getProducts(): Promise<Product[]> {
+  return apiFetch<Product[]>('/onboarding/products');
+}
+
+/**
+ * 단일 제품 정보 조회
+ */
+export async function getProduct(productId: string): Promise<Product> {
+  return apiFetch<Product>(`/onboarding/products/${encodeURIComponent(productId)}`);
+}
+
+/**
+ * 제품별 카테고리 목록 조회
+ */
+export async function getProductCategories(productId: string): Promise<ProductCategory[]> {
+  return apiFetch<ProductCategory[]>(
+    `/onboarding/products/${encodeURIComponent(productId)}/categories`
+  );
+}
+
+/**
+ * 단일 카테고리 정보 조회
+ */
+export async function getProductCategory(
+  productId: string,
+  categorySlug: string
+): Promise<ProductCategory> {
+  return apiFetch<ProductCategory>(
+    `/onboarding/products/${encodeURIComponent(productId)}/categories/${encodeURIComponent(categorySlug)}`
+  );
+}
+
+/**
+ * 카테고리 내 폴더 목록 조회
+ */
+export async function getCategoryFolders(
+  productId: string,
+  categorySlug: string
+): Promise<ProductFolder[]> {
+  return apiFetch<ProductFolder[]>(
+    `/onboarding/products/${encodeURIComponent(productId)}/categories/${encodeURIComponent(categorySlug)}/folders`
+  );
+}
+
+/**
+ * 카테고리 내 문서 목록 조회
+ */
+export async function getCategoryDocuments(
+  productId: string,
+  categorySlug: string,
+  limit: number = 50
+): Promise<ProductDocument[]> {
+  return apiFetch<ProductDocument[]>(
+    `/onboarding/products/${encodeURIComponent(productId)}/categories/${encodeURIComponent(categorySlug)}/documents?limit=${limit}`
+  );
+}
+
+/**
+ * 제품별 문서 통계 조회
+ */
+export async function getProductStats(productId: string): Promise<ProductStats> {
+  return apiFetch<ProductStats>(
+    `/onboarding/products/${encodeURIComponent(productId)}/stats`
+  );
+}
+
+/**
+ * 카테고리별 학습 콘텐츠 스트리밍
+ */
+export async function* streamCategoryLearning(
+  productId: string,
+  categorySlug: string
+): AsyncGenerator<ChatStreamEvent> {
+  const url = `${API_BASE_URL}/onboarding/products/${encodeURIComponent(productId)}/categories/${encodeURIComponent(categorySlug)}/learn/stream`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Failed to stream learning content', response.status);
+  }
+
+  if (!response.body) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 제품별 AI 채팅 스트리밍
+ */
+export async function* streamProductChat(
+  productId: string,
+  message: string,
+  options?: {
+    sessionId?: string;
+    categorySlug?: string;
+  }
+): AsyncGenerator<ChatStreamEvent> {
+  const params = new URLSearchParams({ message });
+  if (options?.sessionId) {
+    params.append('sessionId', options.sessionId);
+  }
+  if (options?.categorySlug) {
+    params.append('categorySlug', options.categorySlug);
+  }
+
+  const url = `${API_BASE_URL}/onboarding/products/${encodeURIComponent(productId)}/chat/stream?${params.toString()}`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Failed to stream chat', response.status);
+  }
+
+  if (!response.body) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
