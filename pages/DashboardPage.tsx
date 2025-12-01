@@ -61,11 +61,11 @@ const DashboardPage: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Welcome Card - Nano Banana Style */}
       <div className="relative overflow-hidden rounded-3xl p-8">
-        <div className="absolute inset-0 bg-gradient-to-r from-banana-400 to-banana-600 opacity-90"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 opacity-90"></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-20 mix-blend-overlay"></div>
         <div className="relative z-10">
           <h2 className="text-3xl font-bold mb-2 text-dark-900">
-            안녕하세요, {userName}님! 🍌
+            안녕하세요, {userName}님!
           </h2>
           <p className="text-dark-800 font-medium text-lg">
             온보딩 나침반과 함께 성장하는 여정을 시작해보세요.
@@ -78,11 +78,11 @@ const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Overall Progress */}
         <div className="glass-card rounded-2xl p-6 relative group overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-banana-500/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-banana-500/20"></div>
+          <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/10 rounded-full blur-2xl -mr-16 -mt-16 transition-all group-hover:bg-primary-500/20"></div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-semibold text-slate-200 text-lg">전체 진행률</h3>
-            <div className="w-12 h-12 glass rounded-xl flex items-center justify-center border border-banana-500/30">
-              <i className="fas fa-chart-pie text-banana-400 text-xl" />
+            <div className="w-12 h-12 glass rounded-xl flex items-center justify-center border border-primary-500/30">
+              <i className="fas fa-chart-pie text-primary-400 text-xl" />
             </div>
           </div>
           <div className="text-4xl font-bold text-white mb-4">
@@ -90,12 +90,12 @@ const DashboardPage: React.FC = () => {
           </div>
           <div className="w-full bg-dark-700 rounded-full h-3 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-banana-400 to-banana-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(255,192,0,0.5)]"
+              className="bg-gradient-to-r from-primary-400 to-primary-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(90,142,192,0.5)]"
               style={{ width: `${completionPercent}%` }}
             />
           </div>
           <p className="text-sm text-slate-400 mt-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-banana-500"></span>
+            <span className="w-2 h-2 rounded-full bg-primary-500"></span>
             {completedCount} / {totalCount} 시나리오 완료
           </p>
         </div>
@@ -114,22 +114,22 @@ const DashboardPage: React.FC = () => {
               to="/scenarios"
               className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors group/link border border-transparent hover:border-white/10"
             >
-              <span className="text-slate-300 group-hover/link:text-banana-300 transition-colors">시나리오 학습 계속하기</span>
-              <i className="fas fa-arrow-right text-slate-500 group-hover/link:text-banana-400 transition-colors" />
+              <span className="text-slate-300 group-hover/link:text-primary-300 transition-colors">시나리오 학습 계속하기</span>
+              <i className="fas fa-arrow-right text-slate-500 group-hover/link:text-primary-400 transition-colors" />
             </Link>
             <Link
               to="/knowledge"
               className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors group/link border border-transparent hover:border-white/10"
             >
-              <span className="text-slate-300 group-hover/link:text-banana-300 transition-colors">AI 멘토에게 질문하기</span>
-              <i className="fas fa-arrow-right text-slate-500 group-hover/link:text-banana-400 transition-colors" />
+              <span className="text-slate-300 group-hover/link:text-primary-300 transition-colors">AI 멘토에게 질문하기</span>
+              <i className="fas fa-arrow-right text-slate-500 group-hover/link:text-primary-400 transition-colors" />
             </Link>
             <Link
               to="/documents"
               className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-colors group/link border border-transparent hover:border-white/10"
             >
-              <span className="text-slate-300 group-hover/link:text-banana-300 transition-colors">인수인계 문서 보기</span>
-              <i className="fas fa-arrow-right text-slate-500 group-hover/link:text-banana-400 transition-colors" />
+              <span className="text-slate-300 group-hover/link:text-primary-300 transition-colors">인수인계 문서 보기</span>
+              <i className="fas fa-arrow-right text-slate-500 group-hover/link:text-primary-400 transition-colors" />
             </Link>
           </div>
         </div>
@@ -160,27 +160,27 @@ const DashboardPage: React.FC = () => {
       {/* Category Progress */}
       <div className="glass-card rounded-2xl p-8">
         <h3 className="font-bold text-xl text-slate-200 mb-6 flex items-center gap-2">
-          <span className="w-1 h-6 bg-banana-500 rounded-full"></span>
+          <span className="w-1 h-6 bg-primary-500 rounded-full"></span>
           카테고리별 학습 현황
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {categoryProgress.map(cat => (
             <div
               key={cat.id}
-              className="bg-dark-800/50 border border-white/5 rounded-xl p-5 hover:border-banana-500/30 transition-colors group"
+              className="bg-dark-800/50 border border-white/5 rounded-xl p-5 hover:border-primary-500/30 transition-colors group"
             >
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center group-hover:bg-banana-500/10 transition-colors">
-                  <i className={`${cat.icon} text-slate-400 group-hover:text-banana-400 text-xl transition-colors`} />
+                <div className="w-12 h-12 bg-dark-700 rounded-xl flex items-center justify-center group-hover:bg-primary-500/10 transition-colors">
+                  <i className={`${cat.icon} text-slate-400 group-hover:text-primary-400 text-xl transition-colors`} />
                 </div>
                 <div>
-                  <h4 className="font-medium text-slate-200 group-hover:text-banana-200 transition-colors">{cat.name}</h4>
+                  <h4 className="font-medium text-slate-200 group-hover:text-primary-200 transition-colors">{cat.name}</h4>
                   <p className="text-xs text-slate-500">{cat.description}</p>
                 </div>
               </div>
               <div className="w-full bg-dark-700 rounded-full h-2 mb-3">
                 <div
-                  className="bg-banana-500 h-2 rounded-full transition-all duration-500 shadow-[0_0_5px_rgba(255,192,0,0.3)]"
+                  className="bg-primary-500 h-2 rounded-full transition-all duration-500 shadow-[0_0_5px_rgba(90,142,192,0.3)]"
                   style={{ width: `${cat.percent}%` }}
                 />
               </div>
@@ -188,7 +188,7 @@ const DashboardPage: React.FC = () => {
                 <span className="text-slate-500">
                   {cat.completed} / {cat.total} 완료
                 </span>
-                <span className="font-bold text-banana-400">
+                <span className="font-bold text-primary-400">
                   {cat.percent}%
                 </span>
               </div>
@@ -200,7 +200,7 @@ const DashboardPage: React.FC = () => {
       {/* Recent Activity */}
       <div className="glass-card rounded-2xl p-8">
         <h3 className="font-bold text-xl text-slate-200 mb-6 flex items-center gap-2">
-          <span className="w-1 h-6 bg-banana-500 rounded-full"></span>
+          <span className="w-1 h-6 bg-primary-500 rounded-full"></span>
           최근 학습 활동
         </h3>
         {progress?.completedScenarios && progress.completedScenarios.length > 0 ? (
@@ -225,7 +225,7 @@ const DashboardPage: React.FC = () => {
                       </p>
                     )}
                   </div>
-                  <div className="text-banana-400 text-sm font-medium px-3 py-1 bg-banana-500/10 rounded-full border border-banana-500/20">
+                  <div className="text-primary-400 text-sm font-medium px-3 py-1 bg-primary-500/10 rounded-full border border-primary-500/20">
                     완료됨
                   </div>
                 </div>
@@ -240,7 +240,7 @@ const DashboardPage: React.FC = () => {
             <p className="mb-4">아직 학습 기록이 없습니다.</p>
             <Link
               to="/scenarios"
-              className="text-banana-400 hover:text-banana-300 hover:underline text-sm font-medium"
+              className="text-primary-400 hover:text-primary-300 hover:underline text-sm font-medium"
             >
               첫 번째 시나리오 시작하기
             </Link>

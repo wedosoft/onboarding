@@ -16,24 +16,24 @@ const ScenarioCard: React.FC<ScenarioCardProps> = ({ scenario, onSelectChoice, i
 
     if (isLoading) {
       if (selectedChoiceId === choiceId) {
-        return `${baseClasses} bg-banana-500/20 border-banana-400 ring-1 ring-banana-400 cursor-wait text-banana-200`;
+        return `${baseClasses} bg-primary-500/20 border-primary-400 ring-1 ring-primary-400 cursor-wait text-primary-200`;
       }
       return `${baseClasses} bg-dark-800/30 border-white/5 cursor-not-allowed text-slate-600`;
     }
 
     if (selectedChoiceId === choiceId) {
-      return `${baseClasses} bg-banana-500/20 border-banana-400 ring-1 ring-banana-400 text-banana-200 shadow-[0_0_15px_rgba(255,192,0,0.2)]`;
+      return `${baseClasses} bg-primary-500/20 border-primary-400 ring-1 ring-primary-400 text-primary-200 shadow-[0_0_15px_rgba(90,142,192,0.2)]`;
     }
 
-    return `${baseClasses} bg-dark-800/50 border-white/10 hover:bg-white/5 hover:border-banana-400/50 hover:text-banana-100 transform hover:-translate-y-1 hover:shadow-lg`;
+    return `${baseClasses} bg-dark-800/50 border-white/10 hover:bg-white/5 hover:border-primary-400/50 hover:text-primary-100 transform hover:-translate-y-1 hover:shadow-lg`;
   };
 
   return (
     <div className="glass-card rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 animate-fade-in border border-white/10">
       <div className="p-6 sm:p-8">
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-14 h-14 bg-banana-500/10 rounded-2xl flex items-center justify-center border border-banana-500/20 shadow-[0_0_15px_rgba(255,192,0,0.1)]">
-            <i className={`${scenario.icon} text-3xl text-banana-400`}></i>
+          <div className="w-14 h-14 bg-primary-500/10 rounded-2xl flex items-center justify-center border border-primary-500/20 shadow-[0_0_15px_rgba(90,142,192,0.1)]">
+            <i className={`${scenario.icon} text-3xl text-primary-400`}></i>
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-white">{scenario.title}</h2>
         </div>

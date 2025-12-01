@@ -4,10 +4,11 @@ import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 
 const pageTitles: Record<string, string> = {
-  '/': '대시보드',
+  '/': '온보딩 나침반',
   '/scenarios': '시나리오 학습',
+  '/assessment': '학습 평가',
   '/knowledge': '제품 지식 챗',
-  '/documents': '인수인계 문서',
+  '/documents': '지식 베이스',
   '/admin': '관리자',
 };
 

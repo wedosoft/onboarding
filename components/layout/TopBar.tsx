@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../../contexts/AuthContext';
+import ThemeToggle from '../ThemeToggle';
 
 interface TopBarProps {
   title: string;
@@ -15,7 +16,7 @@ const TopBar: React.FC<TopBarProps> = ({ title, onMenuClick }) => {
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 text-slate-400 hover:bg-white/5 hover:text-banana-400 rounded-lg transition-colors"
+          className="lg:hidden p-2 text-slate-400 hover:bg-white/5 hover:text-primary-400 rounded-lg transition-colors"
         >
           <i className="fas fa-bars text-xl" />
         </button>
@@ -26,9 +27,10 @@ const TopBar: React.FC<TopBarProps> = ({ title, onMenuClick }) => {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-2">
+        <ThemeToggle />
         <button
           onClick={signOut}
-          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-banana-400 rounded-lg transition-colors"
+          className="flex items-center gap-2 px-3 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-primary-400 rounded-lg transition-colors"
         >
           <i className="fas fa-sign-out-alt" />
           <span className="hidden sm:inline">로그아웃</span>

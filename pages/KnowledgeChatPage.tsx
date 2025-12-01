@@ -100,12 +100,12 @@ const KnowledgeChatPage: React.FC = () => {
             >
               <div
                 className={`max-w-[80%] rounded-2xl px-5 py-4 shadow-md ${msg.role === 'user'
-                    ? 'bg-banana-500 text-dark-900 font-medium'
+                    ? 'bg-primary-500 text-white font-medium'
                     : 'bg-dark-700/80 text-slate-200 border border-white/5'
                   }`}
               >
                 {msg.role === 'model' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-slate-200 prose-headings:text-banana-200 prose-strong:text-banana-300 prose-a:text-banana-400">
+                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:text-slate-200 prose-headings:text-primary-200 prose-strong:text-primary-300 prose-a:text-primary-400">
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {msg.content || '...'}
                     </ReactMarkdown>
@@ -122,9 +122,9 @@ const KnowledgeChatPage: React.FC = () => {
             <div className="flex justify-start">
               <div className="bg-dark-700/80 rounded-2xl px-5 py-4 border border-white/5">
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-banana-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <div className="w-2 h-2 bg-banana-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <div className="w-2 h-2 bg-banana-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ const KnowledgeChatPage: React.FC = () => {
         {messages.length <= 1 && (
           <div className="p-6 border-t border-white/5 bg-dark-800/30">
             <p className="text-sm text-slate-400 mb-4 flex items-center gap-2">
-              <i className="fas fa-lightbulb text-banana-400"></i>
+              <i className="fas fa-lightbulb text-primary-400"></i>
               이런 것들을 물어보세요:
             </p>
             <div className="flex flex-wrap gap-3">
@@ -145,7 +145,7 @@ const KnowledgeChatPage: React.FC = () => {
                 <button
                   key={idx}
                   onClick={() => handleSendMessage(q)}
-                  className="px-4 py-2 text-sm bg-dark-700 hover:bg-banana-500/10 text-slate-300 hover:text-banana-300 rounded-xl transition-all border border-white/5 hover:border-banana-500/30"
+                  className="px-4 py-2 text-sm bg-dark-700 hover:bg-primary-500/10 text-slate-300 hover:text-primary-300 rounded-xl transition-all border border-white/5 hover:border-primary-500/30"
                 >
                   {q}
                 </button>
@@ -165,12 +165,12 @@ const KnowledgeChatPage: React.FC = () => {
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="질문을 입력하세요..."
             disabled={isLoading}
-            className="flex-1 px-5 py-4 bg-dark-800/50 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-banana-500/50 text-slate-200 placeholder-slate-500 disabled:opacity-50 glass"
+            className="flex-1 px-5 py-4 bg-dark-800/50 border border-white/10 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-slate-200 placeholder-slate-500 disabled:opacity-50 glass"
           />
           <button
             type="submit"
             disabled={isLoading || !inputValue.trim()}
-            className="px-6 py-4 bg-banana-500 hover:bg-banana-400 disabled:bg-slate-700 text-dark-900 font-bold rounded-2xl transition-all disabled:cursor-not-allowed shadow-lg hover:shadow-banana-500/30"
+            className="px-6 py-4 bg-primary-500 hover:bg-primary-400 disabled:bg-slate-700 text-white font-bold rounded-2xl transition-all disabled:cursor-not-allowed shadow-lg hover:shadow-primary-500/30"
           >
             <i className="fas fa-paper-plane text-lg" />
           </button>

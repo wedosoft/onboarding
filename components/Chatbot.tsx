@@ -43,14 +43,14 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   >
     {/* Header */}
     <header className="p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0 bg-white/5">
-      <h2 className="text-lg font-bold text-banana-400 flex items-center gap-2">
+      <h2 className="text-lg font-bold text-primary-400 flex items-center gap-2">
         <i className="fa-solid fa-robot"></i>AI 멘토에게 질문하기
       </h2>
       <div className="flex items-center gap-2">
-        <button onClick={() => setIsExpanded(!isExpanded)} className="text-slate-400 hover:text-banana-400 transition-colors" aria-label={isExpanded ? "챗봇 축소" : "챗봇 확장"}>
+        <button onClick={() => setIsExpanded(!isExpanded)} className="text-slate-400 hover:text-primary-400 transition-colors" aria-label={isExpanded ? "챗봇 축소" : "챗봇 확장"}>
           <i className={`fa-solid ${isExpanded ? 'fa-compress' : 'fa-expand'} text-lg`}></i>
         </button>
-        <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-banana-400 transition-colors" aria-label="챗봇 닫기">
+        <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-primary-400 transition-colors" aria-label="챗봇 닫기">
           <i className="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
@@ -64,16 +64,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
         return (
           <div key={index} className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'model' && <div className="w-8 h-8 bg-banana-500/10 rounded-full flex items-center justify-center flex-shrink-0 border border-banana-500/20"><i className="fa-solid fa-robot text-banana-400"></i></div>}
-            <div className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user' ? 'bg-banana-500 text-dark-900 font-medium rounded-br-lg shadow-md' : 'bg-dark-700 text-slate-200 rounded-bl-lg border border-white/5'}`}>
+            {msg.role === 'model' && <div className="w-8 h-8 bg-primary-500/10 rounded-full flex items-center justify-center flex-shrink-0 border border-primary-500/20"><i className="fa-solid fa-robot text-primary-400"></i></div>}
+            <div className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user' ? 'bg-primary-500 text-white font-medium rounded-br-lg shadow-md' : 'bg-dark-700 text-slate-200 rounded-bl-lg border border-white/5'}`}>
               {showBouncingDots ? (
                 <div className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 bg-banana-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="h-2 w-2 bg-banana-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="h-2 w-2 bg-banana-400 rounded-full animate-bounce"></span>
+                  <span className="h-2 w-2 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="h-2 w-2 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="h-2 w-2 bg-primary-400 rounded-full animate-bounce"></span>
                 </div>
               ) : (
-                <div className="prose prose-sm prose-invert max-w-none prose-p:text-inherit prose-headings:text-banana-200 prose-strong:text-banana-300 prose-a:text-banana-400">
+                <div className="prose prose-sm prose-invert max-w-none prose-p:text-inherit prose-headings:text-primary-200 prose-strong:text-primary-300 prose-a:text-primary-400">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {msg.content}
                   </ReactMarkdown>
@@ -93,7 +93,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           type="button"
           onClick={handlePraise}
           disabled={isLoading}
-          className="flex-shrink-0 w-10 h-10 bg-dark-700 text-slate-400 rounded-full flex items-center justify-center hover:bg-banana-500/10 hover:text-banana-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-white/5"
+          className="flex-shrink-0 w-10 h-10 bg-dark-700 text-slate-400 rounded-full flex items-center justify-center hover:bg-primary-500/10 hover:text-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-white/5"
           aria-label="칭찬하기"
         >
           <i className="fa-solid fa-thumbs-up"></i>
@@ -106,12 +106,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             onChange={(e) => setInput(e.target.value)}
             placeholder="궁금한 점을 물어보세요..."
             disabled={isLoading}
-            className="w-full py-2 pl-4 pr-12 bg-dark-800/50 rounded-full border border-white/10 focus:outline-none focus:ring-2 focus:ring-banana-500/50 focus:border-transparent transition text-slate-200 placeholder-slate-500"
+            className="w-full py-2 pl-4 pr-12 bg-dark-800/50 rounded-full border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition text-slate-200 placeholder-slate-500"
           />
           <button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-banana-500 text-dark-900 rounded-full flex items-center justify-center hover:bg-banana-400 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors shadow-sm"
+            className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-400 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors shadow-sm"
             aria-label="메시지 보내기"
           >
             <i className="fa-solid fa-paper-plane text-sm"></i>
@@ -200,7 +200,7 @@ const Chatbot: React.FC<ChatbotProps> = ({ history, onSendMessage, isLoading }) 
       {/* FAB */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-4 sm:right-6 lg:right-8 w-16 h-16 bg-banana-500 text-dark-900 rounded-full shadow-lg shadow-banana-500/30 flex items-center justify-center hover:bg-banana-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-banana-500 dark:focus:ring-offset-slate-900 transition-all transform hover:scale-110 z-50 border border-banana-400/50"
+        className="fixed bottom-6 right-4 sm:right-6 lg:right-8 w-16 h-16 bg-primary-500 text-white rounded-full shadow-lg shadow-primary-500/30 flex items-center justify-center hover:bg-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-slate-900 transition-all transform hover:scale-110 z-50 border border-primary-400/50"
         aria-label="AI 멘토와 대화 시작"
       >
         <i className={`fa-solid ${isOpen ? 'fa-times' : 'fa-comments'} text-2xl transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>

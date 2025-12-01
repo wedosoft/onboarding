@@ -83,15 +83,15 @@ const AssessmentPage: React.FC = () => {
           <div
             key={track.id}
             onClick={() => handleTrackSelect(track)}
-            className="glass-card rounded-xl shadow-sm border border-white/5 p-6 cursor-pointer hover:shadow-lg hover:border-banana-500/30 transition-all group"
+            className="glass-card rounded-xl shadow-sm border border-white/5 p-6 cursor-pointer hover:shadow-lg hover:border-primary-500/30 transition-all group"
           >
             {/* Icon */}
-            <div className="w-14 h-14 rounded-xl bg-dark-700 flex items-center justify-center mb-4 group-hover:bg-banana-500/10 transition-colors">
-              <i className={`${track.icon} text-2xl text-slate-400 group-hover:text-banana-400 transition-colors`} />
+            <div className="w-14 h-14 rounded-xl bg-dark-700 flex items-center justify-center mb-4 group-hover:bg-primary-500/10 transition-colors">
+              <i className={`${track.icon} text-2xl text-slate-400 group-hover:text-primary-400 transition-colors`} />
             </div>
 
             {/* Content */}
-            <h2 className="text-lg font-semibold text-slate-200 group-hover:text-banana-200 transition-colors mb-2">
+            <h2 className="text-lg font-semibold text-slate-200 group-hover:text-primary-200 transition-colors mb-2">
               {track.name}
             </h2>
             <p className="text-sm text-slate-500 mb-4">
@@ -110,7 +110,7 @@ const AssessmentPage: React.FC = () => {
                   시나리오 기반 평가
                 </span>
               )}
-              <span className="text-banana-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
+              <span className="text-primary-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
                 시작하기 <i className="fas fa-arrow-right ml-1" />
               </span>
             </div>

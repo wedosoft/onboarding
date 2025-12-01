@@ -161,8 +161,8 @@ const AdminPage: React.FC = () => {
 
         <div className="glass-card rounded-xl p-4 shadow-sm border border-white/5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-banana-500/10 rounded-lg flex items-center justify-center">
-              <i className="fas fa-file-alt text-banana-400" />
+            <div className="w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center">
+              <i className="fas fa-file-alt text-primary-400" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-200">{totalDocuments}</p>
@@ -179,7 +179,7 @@ const AdminPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('users')}
               className={`px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'users'
-                  ? 'text-banana-400 border-b-2 border-banana-400'
+                  ? 'text-primary-400 border-b-2 border-primary-400'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                 }`}
             >
@@ -189,7 +189,7 @@ const AdminPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('documents')}
               className={`px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'documents'
-                  ? 'text-banana-400 border-b-2 border-banana-400'
+                  ? 'text-primary-400 border-b-2 border-primary-400'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
                 }`}
             >
@@ -206,7 +206,7 @@ const AdminPage: React.FC = () => {
             placeholder={activeTab === 'users' ? '사용자 검색...' : '문서 검색...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full max-w-md px-4 py-2 bg-dark-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-banana-500/50 text-slate-200 placeholder-slate-500"
+            className="w-full max-w-md px-4 py-2 bg-dark-800/50 border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-slate-200 placeholder-slate-500"
           />
         </div>
 
@@ -214,7 +214,7 @@ const AdminPage: React.FC = () => {
         <div className="p-4">
           {isLoading ? (
             <div className="py-8 text-center">
-              <div className="w-8 h-8 border-4 border-banana-500 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="mt-2 text-slate-400">로딩 중...</p>
             </div>
           ) : activeTab === 'users' ? (
@@ -240,7 +240,7 @@ const AdminPage: React.FC = () => {
                       <tr key={idx} className="text-sm">
                         <td className="py-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-banana-500 flex items-center justify-center text-dark-900 font-bold text-sm">
+                            <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold text-sm">
                               {user.userName[0].toUpperCase()}
                             </div>
                             <div>
@@ -262,7 +262,7 @@ const AdminPage: React.FC = () => {
                           <div className="flex items-center gap-2">
                             <div className="w-24 bg-dark-700 rounded-full h-2">
                               <div
-                                className="bg-banana-500 h-2 rounded-full"
+                                className="bg-primary-500 h-2 rounded-full"
                                 style={{ width: `${user.completionRate}%` }}
                               />
                             </div>
@@ -309,7 +309,7 @@ const AdminPage: React.FC = () => {
                   return (
                     <div
                       key={doc.name}
-                      className="flex items-center justify-between p-3 bg-dark-800/50 rounded-lg border border-white/5 hover:border-banana-500/30 transition-colors"
+                      className="flex items-center justify-between p-3 bg-dark-800/50 rounded-lg border border-white/5 hover:border-primary-500/30 transition-colors"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         <div className="w-10 h-10 bg-dark-700 rounded-lg flex items-center justify-center">

@@ -17,27 +17,28 @@
             sans: ['Inter', 'sans-serif'],
           },
           colors: {
-            banana: {
-              50: '#fffaeb',
-              100: '#fff3c7',
-              200: '#ffe68f',
-              300: '#ffd24d',
-              400: '#ffc000', // Main Banana
-              500: '#f5a600',
-              600: '#d98200',
-              700: '#b35f00',
-              800: '#8f4600',
-              900: '#753900',
+            // Primary blue-gray palette (matches homepage)
+            primary: {
+              50: '#f0f5fa',
+              100: '#dae5f2',
+              200: '#b8cde6',
+              300: '#8aafd4',
+              400: '#5a8ec0', // Main Primary
+              500: '#3d7ab3',
+              600: '#2f6296',
+              700: '#284f79',
+              800: '#244365',
+              900: '#223a55',
             },
             dark: {
-              900: '#0f0f0f',
-              800: '#1a1a1a',
-              700: '#2a2a2a',
-              600: '#3a3a3a',
+              900: '#0a0a0a',
+              800: '#141414',
+              700: '#1f1f1f',
+              600: '#2a2a2a',
             }
           },
           backgroundImage: {
-            'banana-gradient': 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%)',
+            'dark-gradient': 'linear-gradient(135deg, #141414 0%, #0a0a0a 100%)',
             'glass': 'linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
           }
         }
@@ -75,7 +76,7 @@
       background: rgba(30, 30, 30, 0.6);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(90, 142, 192, 0.1);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
     }
 
@@ -200,6 +201,47 @@
     .prose blockquote p:last-of-type {
       margin-bottom: 0;
     }
+
+    /* Theme-specific base styles */
+    body.dark {
+      background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
+      color: #e2e8f0;
+    }
+
+    body.light {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      color: #1e293b;
+    }
+
+    /* Light mode glass effects */
+    .light .glass {
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .light .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(61, 122, 179, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+    }
+
+    /* Light mode text colors */
+    .light .text-slate-200 { color: #334155; }
+    .light .text-slate-300 { color: #475569; }
+    .light .text-slate-400 { color: #64748b; }
+    .light .text-slate-500 { color: #94a3b8; }
+
+    /* Light mode backgrounds */
+    .light .bg-dark-800\/50 { background-color: rgba(241, 245, 249, 0.9); }
+    .light .bg-dark-700 { background-color: #f1f5f9; }
+    .light .bg-dark-800 { background-color: #e2e8f0; }
+    .light .bg-dark-900 { background-color: #f8fafc; }
+    .light .bg-dark-900\/90 { background-color: rgba(248, 250, 252, 0.95); }
+
+    /* Light mode borders */
+    .light .border-white\/5 { border-color: rgba(0, 0, 0, 0.08); }
+    .light .border-white\/10 { border-color: rgba(0, 0, 0, 0.1); }
   </style>
   <script type="importmap">
 {
@@ -215,7 +257,7 @@
 </script>
 </head>
 
-<body class="bg-banana-gradient text-slate-200 antialiased min-h-screen">
+<body class="dark antialiased min-h-screen">
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>

@@ -22,14 +22,14 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md mx-auto relative">
         {/* Decorative elements */}
-        <div className="absolute -top-20 -left-20 w-64 h-64 bg-banana-500/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-primary-500/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
 
         {/* Logo */}
         <div className="text-center mb-8 relative z-10">
           <div className="flex justify-center items-center mb-4">
-            <div className="w-20 h-20 bg-banana-400 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(255,192,0,0.5)] transform rotate-3 hover:rotate-6 transition-transform">
-              <i className="fas fa-compass text-4xl text-dark-900"></i>
+            <div className="w-20 h-20 bg-primary-400 rounded-2xl flex items-center justify-center shadow-[0_0_20px_rgba(90,142,192,0.5)] transform rotate-3 hover:rotate-6 transition-transform">
+              <i className="fas fa-compass text-4xl text-white"></i>
             </div>
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">
@@ -72,8 +72,8 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
         {/* Features */}
         <div className="mt-8 grid grid-cols-3 gap-4 text-center relative z-10">
           <div className="p-4 glass rounded-xl border border-white/5">
-            <div className="w-10 h-10 bg-banana-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
-              <i className="fas fa-tasks text-banana-400" />
+            <div className="w-10 h-10 bg-primary-500/20 rounded-lg flex items-center justify-center mx-auto mb-2">
+              <i className="fas fa-tasks text-primary-400" />
             </div>
             <p className="text-sm text-slate-300">시나리오 학습</p>
           </div>

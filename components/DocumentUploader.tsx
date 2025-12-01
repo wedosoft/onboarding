@@ -170,7 +170,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
       {/* 플로팅 버튼 */}
       <button
         onClick={handleOpen}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-banana-500 hover:bg-banana-400 text-dark-900 rounded-full shadow-lg shadow-banana-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110 z-40 border border-banana-400/50"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-400 text-white rounded-full shadow-lg shadow-primary-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110 z-40 border border-primary-400/50"
         title="문서 업로드"
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -185,7 +185,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
             {/* 헤더 */}
             <div className="p-4 border-b border-white/10 flex items-center justify-between bg-white/5">
               <h2 className="text-xl font-semibold text-slate-200 flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-banana-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 인수인계 문서 관리
@@ -218,10 +218,10 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                   />
                   <label
                     htmlFor="file-upload"
-                    className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-banana-500/50 hover:bg-white/5 transition-all"
+                    className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-white/10 rounded-lg cursor-pointer hover:border-primary-500/50 hover:bg-white/5 transition-all"
                   >
                     {selectedFile ? (
-                      <span className="text-banana-400">{selectedFile.name}</span>
+                      <span className="text-primary-400">{selectedFile.name}</span>
                     ) : (
                       <>
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -239,7 +239,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value as 'handover' | 'process')}
-                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-banana-500/50"
+                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500/50"
                   >
                     <option value="handover">📋 인수인계</option>
                     <option value="process">📝 업무 프로세스</option>
@@ -254,7 +254,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                     value={author}
                     onChange={(e) => setAuthor(e.target.value)}
                     placeholder="예: 김과장"
-                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-banana-500/50 placeholder-slate-600"
+                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500/50 placeholder-slate-600"
                   />
                 </div>
 
@@ -266,7 +266,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     placeholder="예: A거래처, 영업, 계약"
-                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-banana-500/50 placeholder-slate-600"
+                    className="w-full bg-dark-800 border border-white/10 text-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500/50 placeholder-slate-600"
                   />
                 </div>
 
@@ -286,7 +286,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                 <button
                   onClick={handleUpload}
                   disabled={isUploading || !selectedFile}
-                  className="w-full bg-banana-500 hover:bg-banana-400 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-dark-900 font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
+                  className="w-full bg-primary-500 hover:bg-primary-400 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg"
                 >
                   {isUploading ? (
                     <>
@@ -318,7 +318,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
 
                 {isLoadingDocs ? (
                   <div className="text-center text-slate-400 py-4">
-                    <svg className="animate-spin h-6 w-6 mx-auto mb-2 text-banana-500" viewBox="0 0 24 24">
+                    <svg className="animate-spin h-6 w-6 mx-auto mb-2 text-primary-500" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
@@ -338,7 +338,7 @@ const DocumentUploader: React.FC<DocumentUploaderProps> = ({ onUploadComplete })
                         key={index}
                         className="flex items-center gap-3 p-3 bg-dark-800/50 rounded-lg hover:bg-dark-700 transition-colors group border border-white/5"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-banana-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-primary-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                         <span className="text-slate-300 text-sm truncate flex-1">

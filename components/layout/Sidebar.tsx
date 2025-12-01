@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ const adminItems = [
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const { resolvedTheme } = useTheme();
 
   // 관리자 체크
   const isAdmin = user?.email === 'alan@wedosoft.net';
@@ -42,22 +44,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-center border-b border-white/5">
-          <NavLink to="/" className="flex items-center gap-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 230.03 111.78"
-              className="h-8"
-            >
-              <defs>
-                <style>{`.cls-1{fill:#ffc000;}.cls-2{fill:#ffffff;}`}</style>
-              </defs>
-              <g>
-                <path className="cls-1" d="M125.09,4.76c0-4.15-4.94-6.3-7.98-3.48l-32.96,30.59c-.97,.9-1.52,2.16-1.52,3.48v26.44c0,4.15,4.94,6.3,7.98,3.48l32.96-30.59c.97-.9,1.52-2.16,1.52-3.48V4.76Z" />
-                <path className="cls-1" d="M159.57,1.28l-32.96,30.59c-.97,.9-1.52,2.16-1.52,3.48v26.44c0,4.15,4.94,6.3,7.98,3.48l32.96-30.59c.97-.9,1.52-2.16,1.52-3.48V4.76c0-4.15-4.94-6.3-7.98-3.48Z" />
-                <circle className="cls-1" cx="74.99" cy="12.5" r="12.5" />
-              </g>
-            </svg>
-            <span className="text-lg font-bold text-banana-400">온보딩 나침반</span>
+          <NavLink to="/" className="flex items-center">
+            <img
+              src={resolvedTheme === 'dark' ? '/logo-dark.png' : '/logo-light.png'}
+              alt="온보딩 나침반"
+              className="h-10"
+            />
           </NavLink>
         </div>
 
@@ -73,8 +65,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               onClick={onClose}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive
-                  ? 'bg-banana-500/20 text-banana-400 font-medium border border-banana-500/20 shadow-[0_0_10px_rgba(255,192,0,0.1)]'
-                  : 'text-slate-400 hover:bg-white/5 hover:text-banana-200'
+                  ? 'bg-primary-500/20 text-primary-400 font-medium border border-primary-500/20 shadow-[0_0_10px_rgba(90,142,192,0.1)]'
+                  : 'text-slate-400 hover:bg-white/5 hover:text-primary-200'
                 }`
               }
             >
@@ -97,8 +89,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                     onClick={onClose}
                     className={({ isActive }) =>
                       `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${isActive
-                        ? 'bg-banana-500/20 text-banana-400 font-medium border border-banana-500/20'
-                        : 'text-slate-400 hover:bg-white/5 hover:text-banana-200'
+                        ? 'bg-primary-500/20 text-primary-400 font-medium border border-primary-500/20'
+                        : 'text-slate-400 hover:bg-white/5 hover:text-primary-200'
                       }`
                     }
                   >
@@ -119,10 +111,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <img
                   src={user.avatar}
                   alt={user.name || ''}
-                  className="w-10 h-10 rounded-full border border-banana-500/30"
+                  className="w-10 h-10 rounded-full border border-primary-500/30"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-banana-500 flex items-center justify-center text-dark-900 font-bold">
+                <div className="w-10 h-10 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold">
                   {(user.name || user.email || '?')[0].toUpperCase()}
                 </div>
               )}

@@ -33,7 +33,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
           <img
             src={user.avatar}
             alt={user.name || 'Profile'}
-            className="w-8 h-8 rounded-full border-2 border-banana-500/50 shadow-sm"
+            className="w-8 h-8 rounded-full border-2 border-primary-500/50 shadow-sm"
           />
         )}
         <div className="flex flex-col">

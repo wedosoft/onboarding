@@ -57,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true
       {userName ? (
         <button
           onClick={onHomeClick}
-          className="group transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-banana-500 dark:focus:ring-offset-slate-900 rounded-lg"
+          className="group transition-transform duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-slate-900 rounded-lg"
           aria-label="처음으로 돌아가기"
         >
           {iconElement}
@@ -66,7 +66,7 @@ const Header: React.FC<HeaderProps> = ({ userName, onHomeClick, showLogin = true
         iconElement
       )}
 
-      <h1 className="text-4xl sm:text-5xl font-bold text-banana-400 mb-2">
+      <h1 className="text-4xl sm:text-5xl font-bold text-primary-400 mb-2">
         온보딩 나침반
       </h1>
       {userName ? (
