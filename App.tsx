@@ -10,6 +10,9 @@ import Landing from './components/Landing';
 import DashboardPage from './pages/DashboardPage';
 import ScenariosPage from './pages/ScenariosPage';
 import AssessmentPage from './pages/AssessmentPage';
+import WorkSenseAssessmentPage from './pages/WorkSenseAssessmentPage';
+import ProductKnowledgeLevelsPage from './pages/ProductKnowledgeLevelsPage';
+import ProductKnowledgeLevelPage from './pages/ProductKnowledgeLevelPage';
 import KnowledgeChatPage from './pages/KnowledgeChatPage';
 import DocumentsPage from './pages/DocumentsPage';
 import AdminPage from './pages/AdminPage';
@@ -20,9 +23,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
         <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
-        <p className="mt-4 text-slate-500 dark:text-slate-400">로딩 중...</p>
+        <p className="mt-4 text-slate-500">로딩 중...</p>
       </div>
     );
   }
@@ -65,7 +68,7 @@ const App: React.FC = () => {
           path="/login"
           element={
             isLoading ? (
-              <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900">
+              <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
                 <div className="w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full animate-spin" />
               </div>
             ) : user ? (
@@ -87,6 +90,9 @@ const App: React.FC = () => {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/scenarios" element={<ScenariosPage />} />
           <Route path="/assessment" element={<AssessmentPage />} />
+          <Route path="/assessment/:trackId" element={<WorkSenseAssessmentPage />} />
+          <Route path="/assessment/:trackId/levels" element={<ProductKnowledgeLevelsPage />} />
+          <Route path="/assessment/:trackId/level/:levelId" element={<ProductKnowledgeLevelPage />} />
           <Route path="/knowledge" element={<KnowledgeChatPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
           <Route

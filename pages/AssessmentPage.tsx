@@ -63,17 +63,17 @@ const AssessmentPage: React.FC = () => {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-200 mb-2">
+        <h1 className="text-2xl font-bold text-slate-700 mb-2">
           학습 평가
         </h1>
-        <p className="text-slate-400">
+        <p className="text-slate-500">
           온보딩 과정에서 배운 내용을 점검하고, 업무에 필요한 역량을 평가합니다.
         </p>
       </div>
 
       {error && (
         <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <p className="text-red-400 text-sm">{error}</p>
+          <p className="text-red-500 text-sm">{error}</p>
         </div>
       )}
 
@@ -83,15 +83,15 @@ const AssessmentPage: React.FC = () => {
           <div
             key={track.id}
             onClick={() => handleTrackSelect(track)}
-            className="glass-card rounded-xl shadow-sm border border-white/5 p-6 cursor-pointer hover:shadow-lg hover:border-primary-500/30 transition-all group"
+            className="glass-card rounded-xl shadow-sm border border-slate-200 p-6 cursor-pointer hover:shadow-lg hover:border-primary-500/30 transition-all group"
           >
             {/* Icon */}
-            <div className="w-14 h-14 rounded-xl bg-dark-700 flex items-center justify-center mb-4 group-hover:bg-primary-500/10 transition-colors">
-              <i className={`${track.icon} text-2xl text-slate-400 group-hover:text-primary-400 transition-colors`} />
+            <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center mb-4 group-hover:bg-primary-500/10 transition-colors">
+              <i className={`${track.icon} text-2xl text-slate-500 group-hover:text-primary-500 transition-colors`} />
             </div>
 
             {/* Content */}
-            <h2 className="text-lg font-semibold text-slate-200 group-hover:text-primary-200 transition-colors mb-2">
+            <h2 className="text-lg font-semibold text-slate-700 group-hover:text-primary-600 transition-colors mb-2">
               {track.name}
             </h2>
             <p className="text-sm text-slate-500 mb-4">
@@ -110,7 +110,7 @@ const AssessmentPage: React.FC = () => {
                   시나리오 기반 평가
                 </span>
               )}
-              <span className="text-primary-400 text-sm font-medium group-hover:translate-x-1 transition-transform">
+              <span className="text-primary-500 text-sm font-medium group-hover:translate-x-1 transition-transform">
                 시작하기 <i className="fas fa-arrow-right ml-1" />
               </span>
             </div>
@@ -119,25 +119,25 @@ const AssessmentPage: React.FC = () => {
       </div>
 
       {/* Info Section */}
-      <div className="mt-8 p-6 glass rounded-xl border border-white/5">
-        <h3 className="text-sm font-semibold text-slate-300 mb-3">
+      <div className="mt-8 p-6 glass rounded-xl border border-slate-200">
+        <h3 className="text-sm font-semibold text-slate-600 mb-3">
           학습 평가 안내
         </h3>
-        <ul className="space-y-2 text-sm text-slate-400">
+        <ul className="space-y-2 text-sm text-slate-500">
           <li className="flex items-start gap-2">
-            <i className="fas fa-check-circle text-green-400 mt-0.5" />
+            <i className="fas fa-check-circle text-green-500 mt-0.5" />
             <span><strong>업무 센스 체크</strong>: 실제 업무 상황을 시뮬레이션한 시나리오 기반 문제로 업무 판단력을 평가합니다.</span>
           </li>
           <li className="flex items-start gap-2">
-            <i className="fas fa-check-circle text-green-400 mt-0.5" />
+            <i className="fas fa-check-circle text-green-500 mt-0.5" />
             <span><strong>제품 지식</strong>: 시장 포지셔닝 → 설계 철학 → 핵심 기능 → 세부 기능 순으로 체계적으로 학습합니다.</span>
           </li>
           <li className="flex items-start gap-2">
-            <i className="fas fa-check-circle text-green-400 mt-0.5" />
+            <i className="fas fa-check-circle text-green-500 mt-0.5" />
             <span>각 레벨은 학습 콘텐츠 + AI 멘토 채팅 + 퀴즈로 구성되어 있습니다.</span>
           </li>
           <li className="flex items-start gap-2">
-            <i className="fas fa-check-circle text-green-400 mt-0.5" />
+            <i className="fas fa-check-circle text-green-500 mt-0.5" />
             <span>80% 이상 정답 시 다음 레벨이 언락됩니다.</span>
           </li>
         </ul>

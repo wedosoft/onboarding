@@ -177,10 +177,10 @@ const ScenariosPage: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-slate-200 mb-2">
+          <h2 className="text-2xl font-bold text-slate-700 mb-2">
             학습할 카테고리를 선택하세요
           </h2>
-          <p className="text-slate-400">
+          <p className="text-slate-500">
             각 카테고리별로 실무에서 마주할 수 있는 시나리오를 학습합니다.
           </p>
         </div>
@@ -195,12 +195,12 @@ const ScenariosPage: React.FC = () => {
               <button
                 key={category.id}
                 onClick={() => handleCategorySelect(category.id)}
-                className="glass-card rounded-xl p-6 text-left hover:bg-white/5 transition-all border border-white/5 hover:border-primary-500/30 group"
+                className="glass-card rounded-xl p-6 text-left hover:bg-slate-50 transition-all border border-slate-200 hover:border-primary-500/30 group"
               >
-                <div className="w-14 h-14 bg-dark-700 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-500/10 transition-colors">
-                  <i className={`${category.icon} text-2xl text-slate-400 group-hover:text-primary-400 transition-colors`} />
+                <div className="w-14 h-14 bg-slate-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-primary-500/10 transition-colors">
+                  <i className={`${category.icon} text-2xl text-slate-500 group-hover:text-primary-500 transition-colors`} />
                 </div>
-                <h3 className="text-lg font-bold text-slate-200 group-hover:text-primary-200 transition-colors mb-1">
+                <h3 className="text-lg font-bold text-slate-700 group-hover:text-primary-600 transition-colors mb-1">
                   {category.name}
                 </h3>
                 <p className="text-sm text-slate-500 mb-4">
@@ -210,11 +210,11 @@ const ScenariosPage: React.FC = () => {
                   <span className="text-slate-500">
                     {completedCount} / {categoryScenarios.length} 완료
                   </span>
-                  <span className="font-bold text-primary-400">
+                  <span className="font-bold text-primary-500">
                     {progress}%
                   </span>
                 </div>
-                <div className="w-full bg-dark-700 rounded-full h-1.5 mt-2">
+                <div className="w-full bg-slate-200 rounded-full h-1.5 mt-2">
                   <div
                     className="bg-primary-500 h-1.5 rounded-full transition-all shadow-[0_0_5px_rgba(90,142,192,0.5)]"
                     style={{ width: `${progress}%` }}
@@ -236,13 +236,13 @@ const ScenariosPage: React.FC = () => {
         <div className="glass-card rounded-2xl p-8 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary-400 via-primary-300 to-primary-600"></div>
           <div className="w-24 h-24 bg-primary-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-primary-500/20 shadow-[0_0_30px_rgba(90,142,192,0.2)]">
-            <i className="fas fa-trophy text-5xl text-primary-400" />
+            <i className="fas fa-trophy text-5xl text-primary-500" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="text-3xl font-bold text-slate-800 mb-2">
             축하합니다!
           </h2>
-          <p className="text-slate-300 mb-8 text-lg">
-            <strong className="text-primary-300">{categoryName}</strong> 카테고리의 모든 시나리오를 완료했습니다.
+          <p className="text-slate-600 mb-8 text-lg">
+            <strong className="text-primary-600">{categoryName}</strong> 카테고리의 모든 시나리오를 완료했습니다.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <button
@@ -265,7 +265,7 @@ const ScenariosPage: React.FC = () => {
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={handleBackToCategories}
-            className="flex items-center gap-2 text-slate-400 hover:text-primary-400 transition-colors"
+            className="flex items-center gap-2 text-slate-500 hover:text-primary-500 transition-colors"
           >
             <i className="fas fa-arrow-left" />
             <span>카테고리 선택</span>
@@ -274,7 +274,7 @@ const ScenariosPage: React.FC = () => {
             {currentScenarioIndex + 1} / {activeScenarios.length}
           </span>
         </div>
-        <div className="w-full bg-dark-700 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
           <div
             className="bg-primary-500 h-2 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(90,142,192,0.5)]"
             style={{ width: `${((currentScenarioIndex + 1) / activeScenarios.length) * 100}%` }}

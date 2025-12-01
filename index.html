@@ -10,7 +10,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -30,17 +29,7 @@
               800: '#244365',
               900: '#223a55',
             },
-            dark: {
-              900: '#0a0a0a',
-              800: '#141414',
-              700: '#1f1f1f',
-              600: '#2a2a2a',
-            }
           },
-          backgroundImage: {
-            'dark-gradient': 'linear-gradient(135deg, #141414 0%, #0a0a0a 100%)',
-            'glass': 'linear-gradient(145deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%)',
-          }
         }
       }
     }
@@ -64,34 +53,32 @@
       animation: fadeIn 0.5s ease-out forwards;
     }
 
+    /* Glass effects for light mode */
     .glass {
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
     }
 
     .glass-card {
-      background: rgba(30, 30, 30, 0.6);
+      background: rgba(255, 255, 255, 0.8);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(90, 142, 192, 0.1);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      border: 1px solid rgba(61, 122, 179, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
     }
 
     /* Custom styles for rendered markdown content */
     .prose {
       color: inherit;
       line-height: 1.75;
-      /* Increase for better readability */
       font-size: 1rem;
-      /* Adjust base font size for modal */
     }
 
     .prose p {
       margin-top: 0.75em;
-      /* Adjust paragraph spacing */
       margin-bottom: 0.75em;
     }
 
@@ -109,15 +96,8 @@
 
     .prose h3 {
       font-size: 1.15rem;
-      /* Adjust heading size */
       padding-bottom: 0.5em;
       border-bottom: 1px solid #e2e8f0;
-      /* slate-200 */
-    }
-
-    .dark .prose h3 {
-      border-bottom-color: #475569;
-      /* slate-600 */
     }
 
     .prose h3:first-of-type {
@@ -127,19 +107,11 @@
     .prose hr {
       margin-top: 2em;
       margin-bottom: 1.5em;
-      /* Reduced margin after hr */
       border-top: 1px solid #e2e8f0;
-      /* slate-200 */
-    }
-
-    .dark .prose hr {
-      border-color: #334155;
-      /* slate-700 */
     }
 
     .prose a {
       color: #0ea5e9;
-      /* sky-500 */
       text-decoration: none;
       font-weight: 500;
     }
@@ -154,7 +126,6 @@
       margin-top: 1em;
       margin-bottom: 1em;
       padding-left: 1.5em;
-      /* Slightly reduce indent */
     }
 
     .prose li {
@@ -164,34 +135,18 @@
 
     .prose code {
       background-color: #f1f5f9;
-      /* slate-100 */
       padding: 0.2em 0.4em;
       border-radius: 0.25rem;
       font-size: 85%;
     }
 
-    .dark .prose code {
-      background-color: #1e293b;
-      /* slate-800 */
-    }
-
     .prose blockquote {
       border-left: 0.25em solid #0ea5e9;
-      /* sky-500 */
       padding: 0.75em 1.25em;
       margin: 1.5em 0;
-      /* Add vertical margin */
       font-style: normal;
       background-color: #f0f9ff;
-      /* sky-50 */
       border-radius: 0.5rem;
-    }
-
-    .dark .prose blockquote {
-      border-left-color: #38bdf8;
-      /* sky-400 */
-      background-color: #0c4a6e;
-      /* sky-900 */
     }
 
     .prose blockquote p:first-of-type {
@@ -202,46 +157,11 @@
       margin-bottom: 0;
     }
 
-    /* Theme-specific base styles */
-    body.dark {
-      background: linear-gradient(135deg, #141414 0%, #0a0a0a 100%);
-      color: #e2e8f0;
-    }
-
-    body.light {
+    /* Light mode base styles */
+    body {
       background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
       color: #1e293b;
     }
-
-    /* Light mode glass effects */
-    .light .glass {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-    }
-
-    .light .glass-card {
-      background: rgba(255, 255, 255, 0.8);
-      border: 1px solid rgba(61, 122, 179, 0.15);
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
-    }
-
-    /* Light mode text colors */
-    .light .text-slate-200 { color: #334155; }
-    .light .text-slate-300 { color: #475569; }
-    .light .text-slate-400 { color: #64748b; }
-    .light .text-slate-500 { color: #94a3b8; }
-
-    /* Light mode backgrounds */
-    .light .bg-dark-800\/50 { background-color: rgba(241, 245, 249, 0.9); }
-    .light .bg-dark-700 { background-color: #f1f5f9; }
-    .light .bg-dark-800 { background-color: #e2e8f0; }
-    .light .bg-dark-900 { background-color: #f8fafc; }
-    .light .bg-dark-900\/90 { background-color: rgba(248, 250, 252, 0.95); }
-
-    /* Light mode borders */
-    .light .border-white\/5 { border-color: rgba(0, 0, 0, 0.08); }
-    .light .border-white\/10 { border-color: rgba(0, 0, 0, 0.1); }
   </style>
   <script type="importmap">
 {
@@ -257,7 +177,7 @@
 </script>
 </head>
 
-<body class="dark antialiased min-h-screen">
+<body class="antialiased min-h-screen">
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
