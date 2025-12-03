@@ -964,17 +964,104 @@ export async function* streamModuleLearning(
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+    
+    // SSE 이벤트는 빈 줄로 구분됨
+    const events = buffer.split('\n\n');
+    buffer = events.pop() || '';
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          yield { event: data.event || 'chunk', data };
-        } catch {
-          // Skip invalid JSON
+    for (const eventBlock of events) {
+      if (!eventBlock.trim()) continue;
+      
+      const lines = eventBlock.split('\n');
+      let eventType = 'chunk';
+      let eventData: Record<string, unknown> = {};
+      
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          eventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ')) {
+          try {
+            eventData = JSON.parse(line.slice(6));
+          } catch {
+            // Skip invalid JSON
+          }
         }
+      }
+      
+      if (Object.keys(eventData).length > 0) {
+        yield { event: eventType, data: eventData };
+      }
+    }
+  }
+}
+
+/**
+ * 모듈 섹션별 학습 콘텐츠 스트리밍
+ */
+export async function* streamModuleSection(
+  moduleId: string,
+  sessionId: string,
+  sectionId: string,
+  sectionPrompt: string
+): AsyncGenerator<ChatStreamEvent> {
+  const params = new URLSearchParams({
+    sessionId,
+    sectionId,
+    sectionPrompt,
+  });
+  const url = `${API_BASE_URL}/curriculum/modules/${encodeURIComponent(moduleId)}/section/stream?${params.toString()}`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Failed to stream section content', response.status);
+  }
+
+  if (!response.body) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    
+    const events = buffer.split('\n\n');
+    buffer = events.pop() || '';
+
+    for (const eventBlock of events) {
+      if (!eventBlock.trim()) continue;
+      
+      const lines = eventBlock.split('\n');
+      let eventType = 'chunk';
+      let eventData: Record<string, unknown> = {};
+      
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          eventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ')) {
+          try {
+            eventData = JSON.parse(line.slice(6));
+          } catch {
+            // Skip invalid JSON
+          }
+        }
+      }
+      
+      if (Object.keys(eventData).length > 0) {
+        yield { event: eventType, data: eventData };
       }
     }
   }
@@ -1016,17 +1103,32 @@ export async function* streamModuleChat(
     if (done) break;
 
     buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split('\n');
-    buffer = lines.pop() || '';
+    
+    // SSE 이벤트는 빈 줄로 구분됨
+    const events = buffer.split('\n\n');
+    buffer = events.pop() || '';
 
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try {
-          const data = JSON.parse(line.slice(6));
-          yield { event: data.event || 'chunk', data };
-        } catch {
-          // Skip invalid JSON
+    for (const eventBlock of events) {
+      if (!eventBlock.trim()) continue;
+      
+      const lines = eventBlock.split('\n');
+      let eventType = 'chunk';
+      let eventData: Record<string, unknown> = {};
+      
+      for (const line of lines) {
+        if (line.startsWith('event: ')) {
+          eventType = line.slice(7).trim();
+        } else if (line.startsWith('data: ')) {
+          try {
+            eventData = JSON.parse(line.slice(6));
+          } catch {
+            // Skip invalid JSON
+          }
         }
+      }
+      
+      if (Object.keys(eventData).length > 0) {
+        yield { event: eventType, data: eventData };
       }
     }
   }
