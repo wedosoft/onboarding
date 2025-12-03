@@ -80,6 +80,109 @@ export interface AssessmentProgress {
 }
 
 // ============================================
+// 커리큘럼 모듈 (Curriculum Module)
+// ============================================
+
+export interface CurriculumModule {
+  id: string;
+  product: string;
+  nameKo: string;
+  nameEn?: string;
+  slug: string;
+  description?: string;
+  icon?: string;
+  estimatedMinutes: number;
+  displayOrder: number;
+  
+  // 진도 정보
+  isUnlocked: boolean;
+  status: 'not_started' | 'learning' | 'quiz_ready' | 'completed';
+  basicQuizPassed: boolean;
+  advancedQuizPassed: boolean;
+  basicQuizScore?: number;
+  advancedQuizScore?: number;
+}
+
+export interface QuizChoice {
+  id: string;
+  text: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  moduleId: string;
+  difficulty: 'basic' | 'advanced';
+  questionOrder: number;
+  question: string;
+  context?: string;
+  choices: QuizChoice[];
+  kbDocumentId?: string;
+  referenceUrl?: string;
+}
+
+export interface QuizAnswer {
+  questionId: string;
+  choiceId: string;
+}
+
+export interface QuizAnswerResult {
+  questionId: string;
+  choiceId: string;
+  isCorrect: boolean;
+  correctChoiceId: string;
+  explanation?: string;
+}
+
+export interface QuizSubmitRequest {
+  sessionId: string;
+  moduleId: string;
+  difficulty: 'basic' | 'advanced';
+  answers: QuizAnswer[];
+  startedAt?: string;
+}
+
+export interface QuizSubmitResponse {
+  moduleId: string;
+  difficulty: 'basic' | 'advanced';
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+  isPassed: boolean;
+  passingScore: number;
+  answers: QuizAnswerResult[];
+  durationSeconds?: number;
+}
+
+export interface ModuleProgress {
+  id?: string;
+  sessionId: string;
+  moduleId: string;
+  status: 'not_started' | 'learning' | 'quiz_ready' | 'completed';
+  
+  learningStartedAt?: string;
+  learningCompletedAt?: string;
+  
+  basicQuizScore?: number;
+  basicQuizPassed: boolean;
+  basicQuizAttempts: number;
+  
+  advancedQuizScore?: number;
+  advancedQuizPassed: boolean;
+  advancedQuizAttempts: number;
+  
+  completedAt?: string;
+}
+
+export interface ProgressSummary {
+  sessionId: string;
+  totalModules: number;
+  completedModules: number;
+  inProgressModules: number;
+  completionRate: number;
+  modules: CurriculumModule[];
+}
+
+// ============================================
 // 제품별 지식 학습 (Product Knowledge)
 // ============================================
 

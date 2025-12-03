@@ -23,6 +23,10 @@ import ProductCategoriesPage from './pages/ProductCategoriesPage';
 import CategoryLearningPage from './pages/CategoryLearningPage';
 import ProductChatPage from './pages/ProductChatPage';
 
+// Curriculum Module Pages
+import CurriculumModulesPage from './pages/CurriculumModulesPage';
+import ModuleLearningPage from './pages/ModuleLearningPage';
+
 // Protected route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, isLoading } = useAuth();
@@ -107,6 +111,11 @@ const App: React.FC = () => {
           <Route path="/assessment/products/:productId" element={<ProductCategoriesPage />} />
           <Route path="/assessment/products/:productId/chat" element={<ProductChatPage />} />
           <Route path="/assessment/products/:productId/:categorySlug" element={<CategoryLearningPage />} />
+          
+          {/* Curriculum Module Routes */}
+          <Route path="/curriculum/modules" element={<CurriculumModulesPage />} />
+          <Route path="/curriculum/modules/:moduleId" element={<ModuleLearningPage />} />
+          
           <Route
             path="/admin"
             element={

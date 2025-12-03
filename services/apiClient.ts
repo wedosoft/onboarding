@@ -896,3 +896,211 @@ export async function* streamProductChat(
     }
   }
 }
+
+// ============================================
+// 커리큘럼 API (Curriculum)
+// ============================================
+
+import type {
+  CurriculumModule,
+  QuizQuestion,
+  QuizSubmitRequest,
+  QuizSubmitResponse,
+  ModuleProgress,
+  ProgressSummary,
+} from '../types';
+
+/**
+ * 커리큘럼 모듈 목록 조회 (진도 포함)
+ */
+export async function getCurriculumModules(
+  sessionId: string,
+  product: string = 'freshservice'
+): Promise<CurriculumModule[]> {
+  return apiFetch<CurriculumModule[]>(
+    `/curriculum/modules?sessionId=${encodeURIComponent(sessionId)}&product=${encodeURIComponent(product)}`
+  );
+}
+
+/**
+ * 모듈 상세 조회
+ */
+export async function getCurriculumModule(moduleId: string): Promise<CurriculumModule> {
+  return apiFetch<CurriculumModule>(`/curriculum/modules/${encodeURIComponent(moduleId)}`);
+}
+
+/**
+ * 모듈 학습 콘텐츠 스트리밍
+ */
+export async function* streamModuleLearning(
+  moduleId: string,
+  sessionId: string
+): AsyncGenerator<ChatStreamEvent> {
+  const url = `${API_BASE_URL}/curriculum/modules/${encodeURIComponent(moduleId)}/learn/stream?sessionId=${encodeURIComponent(sessionId)}`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Failed to stream learning content', response.status);
+  }
+
+  if (!response.body) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 모듈 컨텍스트 AI 멘토 채팅 스트리밍
+ */
+export async function* streamModuleChat(
+  moduleId: string,
+  sessionId: string,
+  query: string
+): AsyncGenerator<ChatStreamEvent> {
+  const url = `${API_BASE_URL}/curriculum/modules/${encodeURIComponent(moduleId)}/chat/stream?sessionId=${encodeURIComponent(sessionId)}&query=${encodeURIComponent(query)}`;
+
+  const authHeaders = await getAuthHeaders();
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Accept': 'text/event-stream',
+      ...authHeaders,
+    },
+  });
+
+  if (!response.ok) {
+    throw new ApiClientError('Failed to stream module chat', response.status);
+  }
+
+  if (!response.body) {
+    throw new ApiClientError('No response body', 500);
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop() || '';
+
+    for (const line of lines) {
+      if (line.startsWith('data: ')) {
+        try {
+          const data = JSON.parse(line.slice(6));
+          yield { event: data.event || 'chunk', data };
+        } catch {
+          // Skip invalid JSON
+        }
+      }
+    }
+  }
+}
+
+/**
+ * 퀴즈 문제 조회
+ */
+export async function getQuizQuestions(
+  moduleId: string,
+  difficulty: 'basic' | 'advanced'
+): Promise<QuizQuestion[]> {
+  return apiFetch<QuizQuestion[]>(
+    `/curriculum/modules/${encodeURIComponent(moduleId)}/questions?difficulty=${difficulty}`
+  );
+}
+
+/**
+ * 퀴즈 제출 및 채점
+ */
+export async function submitQuiz(
+  moduleId: string,
+  request: QuizSubmitRequest
+): Promise<QuizSubmitResponse> {
+  return apiFetch<QuizSubmitResponse>(
+    `/curriculum/modules/${encodeURIComponent(moduleId)}/submit`,
+    {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }
+  );
+}
+
+/**
+ * 전체 학습 진도 요약 조회
+ */
+export async function getProgressSummary(
+  sessionId: string,
+  product: string = 'freshservice'
+): Promise<ProgressSummary> {
+  return apiFetch<ProgressSummary>(
+    `/curriculum/progress?sessionId=${encodeURIComponent(sessionId)}&product=${encodeURIComponent(product)}`
+  );
+}
+
+/**
+ * 모듈별 진도 조회
+ */
+export async function getModuleProgress(
+  moduleId: string,
+  sessionId: string
+): Promise<ModuleProgress> {
+  return apiFetch<ModuleProgress>(
+    `/curriculum/modules/${encodeURIComponent(moduleId)}/progress?sessionId=${encodeURIComponent(sessionId)}`
+  );
+}
+
+/**
+ * 모듈 진도 업데이트
+ */
+export async function updateModuleProgress(
+  moduleId: string,
+  sessionId: string,
+  options: { status?: string; learningCompleted?: boolean }
+): Promise<ModuleProgress> {
+  return apiFetch<ModuleProgress>(
+    `/curriculum/modules/${encodeURIComponent(moduleId)}/progress`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({
+        sessionId,
+        status: options.status,
+        learningCompleted: options.learningCompleted,
+      }),
+    }
+  );
+}
