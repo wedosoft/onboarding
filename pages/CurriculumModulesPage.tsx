@@ -23,21 +23,30 @@ interface ModuleWithProgress extends CurriculumModule {
 export default function CurriculumModulesPage() {
   const { productId } = useParams<{ productId: string }>();
   const navigate = useNavigate();
-  const sessionId = localStorage.getItem('onboarding_session_id') || '';
+  
+  // sessionId가 없으면 새로 생성
+  const getOrCreateSessionId = () => {
+    let sessionId = localStorage.getItem('onboarding_session_id');
+    if (!sessionId) {
+      sessionId = crypto.randomUUID();
+      localStorage.setItem('onboarding_session_id', sessionId);
+    }
+    return sessionId;
+  };
+  
+  const sessionId = getOrCreateSessionId();
 
   const [modules, setModules] = useState<ModuleWithProgress[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchModules = useCallback(async () => {
-    if (!sessionId) return;
-
     try {
       setIsLoading(true);
       setError(null);
 
       // 모듈 목록 조회
-      const modulesData = await getCurriculumModules(productId || 'freshservice');
+      const modulesData = await getCurriculumModules(sessionId, productId || 'freshservice');
       
       // 각 모듈의 진행률 조회
       const modulesWithProgress = await Promise.all(
