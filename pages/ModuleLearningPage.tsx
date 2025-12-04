@@ -13,7 +13,6 @@ import {
 import { CurriculumModule, QuizQuestion, QuizSubmitResponse, QuizAnswer } from '../types';
 
 type Phase = 'learning' | 'quiz' | 'result';
-type Difficulty = 'basic' | 'advanced';
 
 interface LearningSection {
   id: string;
@@ -100,9 +99,8 @@ const ModuleLearningPage: React.FC = () => {
   const [module, setModule] = useState<CurriculumModule | null>(null);
   const [isLoadingModule, setIsLoadingModule] = useState(true);
 
-  // Phase & Difficulty
+  // Phase (자가 점검 - 난이도 구분 없음)
   const [phase, setPhase] = useState<Phase>('learning');
-  const [difficulty, setDifficulty] = useState<Difficulty>('basic');
 
   // Section-based learning state
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
@@ -180,12 +178,12 @@ const ModuleLearningPage: React.FC = () => {
     loadSectionContent();
   }, [moduleId, sessionId, module, phase, currentSection, sectionContents]);
 
-  // 퀴즈 문제 로드
+  // 자가 점검 문제 로드
   useEffect(() => {
     const loadQuestions = async () => {
       if (!moduleId) return;
       try {
-        const data = await getQuizQuestions(moduleId, difficulty);
+        const data = await getQuizQuestions(moduleId);
         setQuestions(data);
         setCurrentQuestionIndex(0);
         setSelectedAnswers({});
@@ -197,7 +195,7 @@ const ModuleLearningPage: React.FC = () => {
     if (phase === 'quiz') {
       loadQuestions();
     }
-  }, [moduleId, phase, difficulty]);
+  }, [moduleId, phase]);
 
   // 채팅 메시지 전송
   const handleSendChat = useCallback(async (message: string) => {
@@ -259,7 +257,7 @@ const ModuleLearningPage: React.FC = () => {
     }
   }, [currentSectionIndex]);
 
-  // 학습 완료 → 퀴즈 시작
+  // 학습 완료 → 자가 점검 시작
   const handleStartQuiz = useCallback(async () => {
     if (!moduleId || !sessionId) return;
     try {
@@ -289,7 +287,7 @@ const ModuleLearningPage: React.FC = () => {
     }
   };
 
-  // 퀴즈 제출
+  // 자가 점검 제출
   const handleSubmitQuiz = async () => {
     if (!moduleId || !sessionId) return;
     setIsSubmitting(true);
@@ -301,7 +299,6 @@ const ModuleLearningPage: React.FC = () => {
       const response = await submitQuiz(moduleId, {
         sessionId,
         moduleId,
-        difficulty,
         answers,
         startedAt: quizStartTime?.toISOString(),
       });
@@ -309,24 +306,16 @@ const ModuleLearningPage: React.FC = () => {
       setPhase('result');
     } catch (error) {
       console.error('Failed to submit quiz:', error);
-      alert('퀴즈 제출 중 오류가 발생했습니다.');
+      alert('자가 점검 제출 중 오류가 발생했습니다.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // 다음 단계
+  // 결과 확인 후 다음 단계
   const handleNextStep = () => {
-    if (result?.isPassed && difficulty === 'basic') {
-      setDifficulty('advanced');
-      setPhase('quiz');
-      setResult(null);
-    } else if (result?.isPassed && difficulty === 'advanced') {
-      navigate('/curriculum/modules');
-    } else {
-      setPhase('quiz');
-      setResult(null);
-    }
+    // 모듈 목록으로 돌아가기
+    navigate('/curriculum/modules');
   };
 
   if (isLoadingModule) {
@@ -376,7 +365,7 @@ const ModuleLearningPage: React.FC = () => {
                 <h1 className="text-xl font-bold text-slate-800">{module.nameKo}</h1>
                 <p className="text-sm text-slate-500">
                   {phase === 'learning' && `${currentSectionIndex + 1}/${LEARNING_SECTIONS.length} - ${currentSection.title}`}
-                  {phase === 'quiz' && `${difficulty === 'basic' ? '기초' : '심화'} 퀴즈`}
+                  {phase === 'quiz' && '자가 점검'}
                   {phase === 'result' && '결과'}
                 </p>
               </div>
@@ -490,7 +479,7 @@ const ModuleLearningPage: React.FC = () => {
                       disabled={isLoadingSection}
                       className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
                     >
-                      <span>퀴즈 시작</span>
+                      <span>자가 점검 시작</span>
                       <i className="fa-solid fa-play"></i>
                     </button>
                   )}
@@ -601,18 +590,14 @@ const ModuleLearningPage: React.FC = () => {
         </main>
       )}
 
-      {/* Quiz Phase */}
+      {/* Quiz Phase (자가 점검) */}
       {phase === 'quiz' && questions.length > 0 && (
         <main className="max-w-3xl mx-auto px-6 py-8">
           <div className="space-y-6">
             {/* Quiz Header */}
             <div className="flex items-center justify-between">
-              <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                difficulty === 'basic'
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-orange-100 text-orange-700'
-              }`}>
-                {difficulty === 'basic' ? '기초 퀴즈' : '심화 퀴즈'}
+              <span className="px-4 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
+                자가 점검
               </span>
               <span className="text-slate-500">
                 <span className="text-slate-800 font-bold">{currentQuestionIndex + 1}</span> / {questions.length}
@@ -720,16 +705,12 @@ const ModuleLearningPage: React.FC = () => {
         </main>
       )}
 
-      {/* Result Phase */}
+      {/* Result Phase (자가 점검 결과 - 통과/불통과 없음) */}
       {phase === 'result' && result && (
         <main className="max-w-2xl mx-auto px-6 py-8">
           <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 text-center">
             {/* Score */}
-            <div className={`w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center border-4 ${
-              result.isPassed
-                ? 'bg-green-50 border-green-500 text-green-600'
-                : 'bg-red-50 border-red-500 text-red-600'
-            }`}>
+            <div className="w-32 h-32 rounded-full mx-auto mb-6 flex items-center justify-center border-4 bg-blue-50 border-blue-500 text-blue-600">
               <div>
                 <div className="text-4xl font-bold">{result.score}</div>
                 <div className="text-sm opacity-75">점</div>
@@ -737,12 +718,14 @@ const ModuleLearningPage: React.FC = () => {
             </div>
 
             <h2 className="text-2xl font-bold text-slate-800 mb-2">
-              {result.isPassed ? '🎉 축하합니다!' : '💪 다시 도전해보세요'}
+              자가 점검 완료! 📋
             </h2>
             <p className="text-slate-500 mb-6">
-              {result.isPassed
-                ? `${difficulty === 'basic' ? '기초' : '심화'} 퀴즈를 통과했습니다!`
-                : `${result.passingScore}점 이상이 필요합니다.`}
+              {result.correctCount === result.totalQuestions 
+                ? '모든 문제를 맞추셨네요! 훌륭합니다.'
+                : result.correctCount > result.totalQuestions / 2
+                ? '잘 하셨어요! 틀린 문제를 복습해보세요.'
+                : '틀린 문제를 복습하고 다시 학습해보세요.'}
             </p>
 
             {/* Stats */}
@@ -787,9 +770,16 @@ const ModuleLearningPage: React.FC = () => {
                             {i + 1}. {question?.question}
                           </p>
                           {!answer.isCorrect && (
-                            <p className="text-sm text-green-600">
-                              정답: {question?.choices.find(c => c.id === answer.correctChoiceId)?.text}
-                            </p>
+                            <>
+                              <p className="text-sm text-green-600">
+                                정답: {question?.choices.find(c => c.id === answer.correctChoiceId)?.text}
+                              </p>
+                              {answer.explanation && (
+                                <p className="text-sm text-slate-500 mt-1 italic">
+                                  💡 {answer.explanation}
+                                </p>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>
@@ -799,17 +789,24 @@ const ModuleLearningPage: React.FC = () => {
               </div>
             </details>
 
-            {/* Action */}
-            <button
-              onClick={handleNextStep}
-              className={`w-full px-6 py-3 text-white rounded-xl font-medium shadow-sm ${
-                result.isPassed ? 'bg-primary-500 hover:bg-primary-600' : 'bg-orange-500 hover:bg-orange-600'
-              }`}
-            >
-              {result.isPassed && difficulty === 'basic' && '심화 퀴즈 시작 →'}
-              {result.isPassed && difficulty === 'advanced' && '모듈 완료 ✓'}
-              {!result.isPassed && '다시 도전하기 ↺'}
-            </button>
+            {/* Actions */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setPhase('quiz');
+                  setResult(null);
+                }}
+                className="flex-1 px-6 py-3 text-slate-700 bg-slate-100 rounded-xl font-medium hover:bg-slate-200"
+              >
+                다시 풀기 ↺
+              </button>
+              <button
+                onClick={handleNextStep}
+                className="flex-1 px-6 py-3 text-white bg-primary-500 rounded-xl font-medium hover:bg-primary-600 shadow-sm"
+              >
+                완료 ✓
+              </button>
+            </div>
           </div>
         </main>
       )}

@@ -78,49 +78,27 @@ export default function CurriculumModulesPage() {
     navigate(`/curriculum/modules/${moduleId}`);
   };
 
+  // 상태 표시 (단순화: not_started, learning, completed)
   const getProgressStatus = (progress?: ModuleProgress) => {
     if (!progress) return { status: 'not-started', label: '미시작', color: 'text-slate-400' };
     
-    // 기초+심화 모두 통과
-    if (progress.basicQuizPassed && progress.advancedQuizPassed) {
-      return { status: 'completed', label: '완료', color: 'text-green-600' };
+    switch (progress.status) {
+      case 'completed':
+        return { status: 'completed', label: '학습 완료', color: 'text-green-600' };
+      case 'learning':
+        return { status: 'learning', label: '학습 중', color: 'text-blue-600' };
+      default:
+        return { status: 'not-started', label: '미시작', color: 'text-slate-400' };
     }
-    
-    // 기초만 통과
-    if (progress.basicQuizPassed && !progress.advancedQuizPassed) {
-      return { status: 'advanced-pending', label: '심화 퀴즈 대기', color: 'text-blue-600' };
-    }
-    
-    // 학습 완료, 퀴즈 대기
-    if (progress.learningCompletedAt) {
-      return { status: 'quiz-pending', label: '기초 퀴즈 대기', color: 'text-yellow-600' };
-    }
-    
-    // 학습 중
-    if (progress.learningStartedAt) {
-      return { status: 'in-progress', label: '학습 중', color: 'text-yellow-600' };
-    }
-    
-    return { status: 'not-started', label: '미시작', color: 'text-slate-400' };
   };
 
   const getCompletedCount = () => {
-    return modules.filter(
-      (m) => m.progress?.basicQuizPassed && m.progress?.advancedQuizPassed
-    ).length;
+    return modules.filter((m) => m.progress?.status === 'completed').length;
   };
 
   const getQuizScore = (progress?: ModuleProgress): number | null => {
-    if (!progress) return null;
-    // 기초+심화 평균 점수
-    const basic = progress.basicQuizScore;
-    const advanced = progress.advancedQuizScore;
-    if (basic !== undefined && advanced !== undefined) {
-      return Math.round((basic + advanced) / 2);
-    }
-    if (basic !== undefined) return basic;
-    if (advanced !== undefined) return advanced;
-    return null;
+    if (!progress || progress.quizScore === undefined || progress.quizScore === null) return null;
+    return progress.quizScore;
   };
 
   if (isLoading) {
@@ -254,9 +232,7 @@ export default function CurriculumModulesPage() {
                       <span className={`font-medium ${progressInfo.color}`}>
                         <i className={`fas ${
                           progressInfo.status === 'completed' ? 'fa-check-circle' :
-                          progressInfo.status === 'advanced-pending' ? 'fa-arrow-up' :
-                          progressInfo.status === 'quiz-pending' ? 'fa-clipboard-list' :
-                          progressInfo.status === 'in-progress' ? 'fa-spinner' :
+                          progressInfo.status === 'learning' ? 'fa-spinner' :
                           'fa-circle'
                         } mr-1`}></i>
                         {progressInfo.label}
@@ -264,8 +240,8 @@ export default function CurriculumModulesPage() {
                       
                       {quizScore !== null && (
                         <span className="text-slate-500">
-                          <i className="fas fa-star mr-1 text-yellow-500"></i>
-                          퀴즈 점수: {quizScore}점
+                          <i className="fas fa-clipboard-check mr-1 text-blue-500"></i>
+                          자가 점검: {quizScore}점
                         </span>
                       )}
                       
@@ -299,7 +275,7 @@ export default function CurriculumModulesPage() {
           <ul className="text-sm text-amber-700 space-y-2">
             <li className="flex items-start gap-2">
               <i className="fas fa-check mt-1"></i>
-              <span>각 모듈은 <strong>학습 → 질문(선택) → 퀴즈</strong> 순서로 진행됩니다.</span>
+              <span>각 모듈은 <strong>학습 → 질문(선택) → 자가 점검</strong> 순서로 진행됩니다.</span>
             </li>
             <li className="flex items-start gap-2">
               <i className="fas fa-check mt-1"></i>
@@ -307,11 +283,11 @@ export default function CurriculumModulesPage() {
             </li>
             <li className="flex items-start gap-2">
               <i className="fas fa-check mt-1"></i>
-              <span>퀴즈는 기초 10문제 + 심화 10문제로 구성되며, <strong>80점 이상</strong> 시 통과입니다.</span>
+              <span>자가 점검 퀴즈는 <strong>이해도 확인용</strong>이며, 통과 조건이 없습니다.</span>
             </li>
             <li className="flex items-start gap-2">
               <i className="fas fa-check mt-1"></i>
-              <span>통과하지 못한 모듈은 언제든 다시 학습하고 재시험을 볼 수 있습니다.</span>
+              <span>언제든 다시 학습하고 자가 점검을 해볼 수 있습니다.</span>
             </li>
           </ul>
         </div>

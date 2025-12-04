@@ -11,7 +11,6 @@ const navItems = [
   { path: '/', icon: 'fas fa-home', label: '대시보드' },
   { path: '/curriculum/modules', icon: 'fas fa-graduation-cap', label: '핵심 기능 학습' },
   { path: '/scenarios', icon: 'fas fa-tasks', label: '시나리오 학습' },
-  { path: '/assessment', icon: 'fas fa-clipboard-check', label: '학습 평가' },
   { path: '/knowledge', icon: 'fas fa-comments', label: '제품 지식 챗' },
   { path: '/documents', icon: 'fas fa-book', label: '지식 베이스' },
 ];

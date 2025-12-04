@@ -9,10 +9,6 @@ import MainLayout from './components/layout/MainLayout';
 import Landing from './components/Landing';
 import DashboardPage from './pages/DashboardPage';
 import ScenariosPage from './pages/ScenariosPage';
-import AssessmentPage from './pages/AssessmentPage';
-import WorkSenseAssessmentPage from './pages/WorkSenseAssessmentPage';
-import ProductKnowledgeLevelsPage from './pages/ProductKnowledgeLevelsPage';
-import ProductKnowledgeLevelPage from './pages/ProductKnowledgeLevelPage';
 import KnowledgeChatPage from './pages/KnowledgeChatPage';
 import DocumentsPage from './pages/DocumentsPage';
 import AdminPage from './pages/AdminPage';
@@ -99,10 +95,6 @@ const App: React.FC = () => {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/scenarios" element={<ScenariosPage />} />
-          <Route path="/assessment" element={<AssessmentPage />} />
-          <Route path="/assessment/:trackId" element={<WorkSenseAssessmentPage />} />
-          <Route path="/assessment/:trackId/levels" element={<ProductKnowledgeLevelsPage />} />
-          <Route path="/assessment/:trackId/level/:levelId" element={<ProductKnowledgeLevelPage />} />
           <Route path="/knowledge" element={<KnowledgeChatPage />} />
           <Route path="/documents" element={<DocumentsPage />} />
 
