@@ -28,7 +28,9 @@ export interface FeedbackData {
 
 export interface CurriculumModule {
   id: string;
-  product: string;
+  targetProductId: string;
+  targetProductType: string;
+  targetProductName?: string;
   nameKo: string;
   nameEn?: string;
   slug: string;
@@ -36,14 +38,17 @@ export interface CurriculumModule {
   icon?: string;
   estimatedMinutes: number;
   displayOrder: number;
+  learningObjectives?: string[];
+  contentStrategy?: string;
+  kbCategorySlug?: string;
+  isActive: boolean;
+  createdAt?: string;
   
-  // 진도 정보
-  isUnlocked: boolean;
-  status: 'not_started' | 'learning' | 'quiz_ready' | 'completed';
-  basicQuizPassed: boolean;
-  advancedQuizPassed: boolean;
-  basicQuizScore?: number;
-  advancedQuizScore?: number;
+  // 진도 정보 (join된 경우)
+  status?: 'not_started' | 'learning' | 'completed';
+  quizScore?: number;
+  quizAttempts?: number;
+  completedAt?: string;
 }
 
 export interface QuizChoice {

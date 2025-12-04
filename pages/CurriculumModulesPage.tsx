@@ -1,24 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { getCurriculumModules, getModuleProgress } from '../services/apiClient';
-import { CurriculumModule, ModuleProgress } from '../types';
+import { getProgressSummary } from '../services/apiClient';
+import { CurriculumModule, ProgressSummary } from '../types';
 
 // 모듈 아이콘 매핑
 const moduleIcons: Record<string, string> = {
-  'ticket-management': 'fas fa-ticket-alt',
+  'ticket-basics': 'fas fa-ticket-alt',
   'service-catalog': 'fas fa-book-open',
-  'sla-management': 'fas fa-clock',
-  'change-management': 'fas fa-random',
-  'asset-management': 'fas fa-laptop',
-  'problem-management': 'fas fa-bug',
-  'release-management': 'fas fa-rocket',
-  'project-management': 'fas fa-project-diagram',
+  'automation': 'fas fa-robot',
+  'asset-management': 'fas fa-server',
+  'reporting': 'fas fa-chart-bar',
 };
-
-interface ModuleWithProgress extends CurriculumModule {
-  progress?: ModuleProgress;
-}
 
 export default function CurriculumModulesPage() {
   const { productId } = useParams<{ productId: string }>();
@@ -36,32 +29,18 @@ export default function CurriculumModulesPage() {
   
   const sessionId = getOrCreateSessionId();
 
-  const [modules, setModules] = useState<ModuleWithProgress[]>([]);
+  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchModules = useCallback(async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true)
       setError(null);
 
-      // 모듈 목록 조회
-      const modulesData = await getCurriculumModules(sessionId, productId || 'freshservice');
-      
-      // 각 모듈의 진행률 조회
-      const modulesWithProgress = await Promise.all(
-        modulesData.map(async (mod) => {
-          try {
-            const progress = await getModuleProgress(mod.id, sessionId);
-            return { ...mod, progress };
-          } catch {
-            // 진행 기록이 없으면 undefined
-            return { ...mod, progress: undefined };
-          }
-        })
-      );
-
-      setModules(modulesWithProgress);
+      // 진도 요약 조회 (모듈 + 진도 포함)
+      const summary = await getProgressSummary(sessionId, productId || 'freshservice');
+      setProgressSummary(summary);
     } catch (err) {
       console.error('Failed to fetch curriculum modules:', err);
       setError('커리큘럼 모듈을 불러오는 중 오류가 발생했습니다.');
@@ -79,10 +58,10 @@ export default function CurriculumModulesPage() {
   };
 
   // 상태 표시 (단순화: not_started, learning, completed)
-  const getProgressStatus = (progress?: ModuleProgress) => {
-    if (!progress) return { status: 'not-started', label: '미시작', color: 'text-slate-400' };
+  const getProgressStatus = (mod: CurriculumModule) => {
+    const status = mod.status || 'not_started';
     
-    switch (progress.status) {
+    switch (status) {
       case 'completed':
         return { status: 'completed', label: '학습 완료', color: 'text-green-600' };
       case 'learning':
@@ -92,13 +71,14 @@ export default function CurriculumModulesPage() {
     }
   };
 
-  const getCompletedCount = () => {
-    return modules.filter((m) => m.progress?.status === 'completed').length;
-  };
+  // progressSummary에서 데이터 가져오기
+  const modules = progressSummary?.modules || [];
+  const completedCount = progressSummary?.completedModules || 0;
+  const completionRate = progressSummary?.completionRate || 0;
 
-  const getQuizScore = (progress?: ModuleProgress): number | null => {
-    if (!progress || progress.quizScore === undefined || progress.quizScore === null) return null;
-    return progress.quizScore;
+  const getQuizScore = (mod: CurriculumModule): number | null => {
+    if (mod.quizScore === undefined || mod.quizScore === null) return null;
+    return mod.quizScore;
   };
 
   if (isLoading) {
@@ -156,12 +136,12 @@ export default function CurriculumModulesPage() {
                 학습 진행 현황
               </h2>
               <p className="text-sm text-slate-600">
-                {getCompletedCount()}개 모듈 완료 / 총 {modules.length}개 모듈
+                {completedCount}개 모듈 완료 / 총 {modules.length}개 모듈
               </p>
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-blue-600">
-                {modules.length > 0 ? Math.round((getCompletedCount() / modules.length) * 100) : 0}%
+                {Math.round(completionRate)}%
               </div>
               <div className="text-xs text-slate-500">전체 진행률</div>
             </div>
@@ -172,7 +152,7 @@ export default function CurriculumModulesPage() {
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-500"
               style={{
-                width: `${modules.length > 0 ? (getCompletedCount() / modules.length) * 100 : 0}%`,
+                width: `${completionRate}%`,
               }}
             />
           </div>
@@ -182,9 +162,9 @@ export default function CurriculumModulesPage() {
         <div className="space-y-4">
           {modules.map((mod, index) => {
             const icon = moduleIcons[mod.slug] || 'fas fa-book';
-            const progressInfo = getProgressStatus(mod.progress);
+            const progressInfo = getProgressStatus(mod);
             const isCompleted = progressInfo.status === 'completed';
-            const quizScore = getQuizScore(mod.progress);
+            const quizScore = getQuizScore(mod);
 
             return (
               <button
@@ -293,7 +273,7 @@ export default function CurriculumModulesPage() {
         </div>
 
         {/* 빠른 팁 */}
-        {getCompletedCount() === 0 && (
+        {completedCount === 0 && (
           <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
             <h3 className="font-semibold text-blue-800 mb-2">
               <i className="fas fa-play-circle mr-2"></i>

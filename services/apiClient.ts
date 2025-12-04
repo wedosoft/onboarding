@@ -706,6 +706,60 @@ export async function getCurriculumModule(moduleId: string): Promise<CurriculumM
   return apiFetch<CurriculumModule>(`/curriculum/modules/${encodeURIComponent(moduleId)}`);
 }
 
+// ============================================
+// 모듈 콘텐츠 조회 (정적 콘텐츠)
+// ============================================
+
+/**
+ * 모듈 콘텐츠 타입
+ */
+export interface ModuleContent {
+  id: string;
+  moduleId: string;
+  sectionType: string;  // overview, core_concepts, features, practice, faq
+  level: string;  // basic, intermediate, advanced
+  titleKo: string;
+  titleEn?: string;
+  contentMd: string;
+  displayOrder: number;
+  estimatedMinutes: number;
+  isActive: boolean;
+}
+
+export interface ModuleContentResponse {
+  moduleId: string;
+  moduleName: string;
+  levels: string[];  // ["basic", "intermediate", "advanced"]
+  sections: Record<string, ModuleContent[]>;  // level -> contents
+}
+
+/**
+ * 모듈의 전체 학습 콘텐츠 조회 (정적 콘텐츠)
+ * - LLM 지연 없이 즉시 로드
+ */
+export async function getModuleContents(
+  moduleId: string,
+  level?: string
+): Promise<ModuleContentResponse> {
+  const params = level ? `?level=${encodeURIComponent(level)}` : '';
+  return apiFetch<ModuleContentResponse>(
+    `/curriculum/modules/${encodeURIComponent(moduleId)}/contents${params}`
+  );
+}
+
+/**
+ * 특정 섹션 콘텐츠 조회
+ */
+export async function getSectionContent(
+  moduleId: string,
+  sectionType: string,
+  level: string = 'basic'
+): Promise<ModuleContent> {
+  return apiFetch<ModuleContent>(
+    `/curriculum/modules/${encodeURIComponent(moduleId)}/contents/${encodeURIComponent(sectionType)}?level=${encodeURIComponent(level)}`
+  );
+}
+
 /**
  * 모듈 학습 콘텐츠 스트리밍
  */
