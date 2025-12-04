@@ -43,6 +43,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
+        // OAuth 리다이렉트 후 URL 해시 처리
+        // Supabase가 자동으로 세션을 설정하지만, URL을 깔끔하게 정리
+        if (window.location.hash.includes('access_token')) {
+          // 해시를 제거하고 현재 경로로 교체
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+
         const currentUser = await getCurrentUser();
         setUser(currentUser);
       } catch (error) {
