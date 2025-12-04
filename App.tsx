@@ -105,8 +105,9 @@ const App: React.FC = () => {
           <Route path="/assessment/products/:productId/:categorySlug" element={<CategoryLearningPage />} />
           
           {/* Curriculum Module Routes */}
-          <Route path="/curriculum/modules" element={<CurriculumModulesPage />} />
-          <Route path="/curriculum/modules/:moduleId" element={<ModuleLearningPage />} />
+          <Route path="/curriculum" element={<ProductSelectionPage />} />
+          <Route path="/curriculum/:productId" element={<CurriculumModulesPage />} />
+          <Route path="/curriculum/:productId/:moduleId" element={<ModuleLearningPage />} />
           
           <Route
             path="/admin"

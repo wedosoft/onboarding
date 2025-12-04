@@ -171,3 +171,14 @@ export interface ProductStats {
   category_count: number;
   document_count: number;
 }
+
+// ============================================
+// 제품 확장 타입 (Product Module/Bundle)
+// ============================================
+
+export interface ProductWithModules extends Product {
+  product_type: 'standalone' | 'bundle';
+  display_order?: number;
+  module_count?: number;
+  total_contents?: number;
+}

@@ -11,6 +11,32 @@ const moduleIcons: Record<string, string> = {
   'automation': 'fas fa-robot',
   'asset-management': 'fas fa-server',
   'reporting': 'fas fa-chart-bar',
+  'omnichannel': 'fas fa-globe',
+  'knowledge-base': 'fas fa-book',
+  'live-chat-setup': 'fas fa-comments',
+  'chatbot': 'fas fa-robot',
+  'messaging-channels': 'fas fa-paper-plane',
+  'team-routing': 'fas fa-users',
+  'campaigns': 'fas fa-bullhorn',
+  'omni-workspace': 'fas fa-layer-group',
+  'chat-to-ticket': 'fas fa-exchange-alt',
+  'omni-routing': 'fas fa-random',
+  'customer-360': 'fas fa-user-circle',
+  'crm-basics': 'fas fa-address-book',
+  'sales-pipeline': 'fas fa-funnel-dollar',
+  'email-tracking': 'fas fa-envelope-open-text',
+  'lead-scoring': 'fas fa-star',
+  'sales-automation': 'fas fa-cogs',
+  'freshsales-omni-integration': 'fas fa-plug',
+};
+
+// 제품명 매핑
+const productNames: Record<string, string> = {
+  freshservice: 'Freshservice',
+  freshdesk: 'Freshdesk',
+  freshdesk_omni: 'Freshdesk Omni',
+  freshchat: 'Freshchat',
+  freshsales: 'Freshsales',
 };
 
 export default function CurriculumModulesPage() {
@@ -54,7 +80,7 @@ export default function CurriculumModulesPage() {
   }, [fetchModules]);
 
   const handleModuleSelect = (moduleId: string) => {
-    navigate(`/curriculum/modules/${moduleId}`);
+    navigate(`/curriculum/${productId}/${moduleId}`);
   };
 
   // 상태 표시 (단순화: not_started, learning, completed)
@@ -113,17 +139,17 @@ export default function CurriculumModulesPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/curriculum')}
               className="text-slate-500 hover:text-slate-700"
             >
               <i className="fas fa-arrow-left"></i>
             </button>
             <h1 className="text-2xl font-bold text-slate-800">
-              Freshservice 핵심 기능 학습
+              {productNames[productId || ''] || productId} 핵심 기능 학습
             </h1>
           </div>
           <p className="text-slate-600">
-            Freshservice의 핵심 기능을 단계별로 학습하고 퀴즈를 통해 이해도를 확인하세요.
+            {productNames[productId || ''] || '제품'}의 핵심 기능을 단계별로 학습하고 퀴즈를 통해 이해도를 확인하세요.
           </p>
         </div>
 

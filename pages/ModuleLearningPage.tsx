@@ -46,7 +46,7 @@ const SUGGESTED_QUESTIONS = [
 
 const ModuleLearningPage: React.FC = () => {
   const navigate = useNavigate();
-  const { moduleId } = useParams<{ moduleId: string }>();
+  const { productId, moduleId } = useParams<{ productId: string; moduleId: string }>();
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Module state
@@ -245,7 +245,7 @@ const ModuleLearningPage: React.FC = () => {
 
   // 모듈 목록으로 돌아가기
   const handleGoBack = () => {
-    navigate('/curriculum/modules');
+    navigate(`/curriculum/${productId}`);
   };
 
   // 로딩 중
@@ -452,107 +452,137 @@ const ModuleLearningPage: React.FC = () => {
     );
   }
 
-  // 학습 화면 (정적 콘텐츠) - 2컬럼 레이아웃
+  // 학습 화면 (정적 콘텐츠) - homepage 스타일
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* 헤더 */}
-      <div className="bg-white border-b p-4">
-        <button onClick={handleGoBack} className="text-gray-500 hover:text-gray-700 mb-3">
-          <i className="fas fa-arrow-left mr-2"></i>목록으로
-        </button>
-        <h1 className="text-2xl font-bold text-gray-800">{module.nameKo}</h1>
-        <p className="text-gray-500 mt-1">{module.description}</p>
-        
-        {/* 레벨 탭 */}
-        <div className="mt-4 flex gap-2">
-          {availableLevels.map((level) => {
-            const levelInfo = LEVELS.find(l => l.id === level) || { name: level, icon: 'fa-book', description: '' };
-            return (
-              <button
-                key={level}
-                onClick={() => {
-                  setCurrentLevel(level);
-                  setExpandedSections(new Set(['overview']));
-                }}
-                className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-                  currentLevel === level
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                <i className={`fas ${levelInfo.icon}`}></i>
-                {levelInfo.name}
-              </button>
-            );
-          })}
+    <div className="min-h-screen bg-slate-50">
+      {/* 히어로 헤더 - 전체 너비 */}
+      <div className="bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {/* 상단: 뒤로가기 + 레벨 탭 */}
+          <div className="flex items-center justify-between mb-6">
+            <button 
+              onClick={handleGoBack} 
+              className="flex items-center gap-2 text-slate-400 hover:text-white transition group"
+            >
+              <i className="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+              <span>목록으로</span>
+            </button>
+            
+            {/* 레벨 탭 */}
+            <div className="flex gap-1 bg-slate-800 rounded-lg p-1">
+              {availableLevels.map((level) => {
+                const levelInfo = LEVELS.find(l => l.id === level) || { name: level, icon: 'fa-book', description: '' };
+                return (
+                  <button
+                    key={level}
+                    onClick={() => {
+                      setCurrentLevel(level);
+                      setExpandedSections(new Set(['overview']));
+                    }}
+                    className={`px-4 py-2 rounded-md font-medium transition flex items-center gap-2 text-sm ${
+                      currentLevel === level
+                        ? 'bg-white text-slate-900'
+                        : 'text-slate-400 hover:text-white hover:bg-slate-700'
+                    }`}
+                  >
+                    <i className={`fas ${levelInfo.icon}`}></i>
+                    {levelInfo.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          
+          {/* 모듈 정보 */}
+          <div className="flex items-end justify-between gap-8">
+            <div className="flex-1">
+              <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight">{module.nameKo}</h1>
+              <p className="text-slate-400 mt-2 max-w-2xl">{module.description}</p>
+              <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">
+                <span className="flex items-center gap-2">
+                  <i className="fas fa-clock"></i>
+                  약 {module.estimatedMinutes}분
+                </span>
+                <span className="text-slate-600">·</span>
+                <span className="flex items-center gap-2">
+                  <i className={`fas ${LEVELS.find(l => l.id === currentLevel)?.icon || 'fa-book'}`}></i>
+                  {LEVELS.find(l => l.id === currentLevel)?.description || ''}
+                </span>
+              </div>
+            </div>
+            
+            {/* 자가점검 버튼 */}
+            <button
+              onClick={() => setPhase('quiz')}
+              className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-lg font-medium hover:bg-slate-100 transition"
+            >
+              <i className="fas fa-clipboard-check"></i>
+              <span>자가 점검</span>
+            </button>
+          </div>
         </div>
-        
-        {/* 현재 레벨 설명 */}
-        <p className="mt-2 text-sm text-gray-500">
-          {LEVELS.find(l => l.id === currentLevel)?.description || ''}
-        </p>
       </div>
 
-      {/* 2컬럼 메인 영역 */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* 왼쪽: 학습 콘텐츠 (60-70%) */}
-        <div className="flex-[2] overflow-y-auto p-6">
-          <div className="max-w-4xl mx-auto">
+      {/* 메인 콘텐츠 영역 */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="flex gap-8">
+          {/* 왼쪽: 학습 콘텐츠 */}
+          <div className="flex-1 min-w-0">
             {/* 콘텐츠 로딩 */}
             {isLoadingContent ? (
-              <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 mx-auto"></div>
-                <p className="mt-4 text-gray-600">콘텐츠를 불러오는 중...</p>
+              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-slate-900 mx-auto"></div>
+                <p className="mt-4 text-slate-500">콘텐츠를 불러오는 중...</p>
               </div>
             ) : currentSections.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-8 text-center">
-                <i className="fas fa-book-open text-4xl text-gray-300 mb-4"></i>
-                <p className="text-gray-500">이 레벨에는 아직 콘텐츠가 없습니다.</p>
-                <p className="text-sm text-gray-400 mt-2">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
+              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
+                <i className="fas fa-book-open text-3xl text-slate-300 mb-4"></i>
+                <p className="text-slate-500">이 레벨에는 아직 콘텐츠가 없습니다.</p>
+                <p className="text-sm text-slate-400 mt-2">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
               </div>
             ) : (
               <>
                 {/* 전체 펼치기/접기 */}
-                <div className="flex justify-end mb-4 gap-2">
+                <div className="flex justify-end mb-4 gap-4">
                   <button
                     onClick={() => toggleAllSections(true)}
-                    className="text-sm text-blue-500 hover:text-blue-600"
+                    className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
                   >
-                    <i className="fas fa-expand-alt mr-1"></i>모두 펼치기
+                    <i className="fas fa-expand-alt"></i>모두 펼치기
                   </button>
                   <button
                     onClick={() => toggleAllSections(false)}
-                    className="text-sm text-gray-500 hover:text-gray-600"
+                    className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
                   >
-                    <i className="fas fa-compress-alt mr-1"></i>모두 접기
+                    <i className="fas fa-compress-alt"></i>모두 접기
                   </button>
                 </div>
 
                 {/* 섹션 목록 (아코디언) */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {currentSections.map((section, index) => (
-                    <div key={section.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div key={section.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:border-slate-300 transition-colors">
                       {/* 섹션 헤더 */}
                       <button
                         onClick={() => toggleSection(section.sectionType)}
-                        className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition"
+                        className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition"
                       >
-                        <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                        <div className="flex items-center gap-4">
+                          <span className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center text-sm">
                             <i className={`fas ${SECTION_ICONS[section.sectionType] || 'fa-file'}`}></i>
                           </span>
                           <div className="text-left">
-                            <h3 className="font-semibold text-gray-800">{section.titleKo}</h3>
-                            <p className="text-xs text-gray-500">약 {section.estimatedMinutes}분</p>
+                            <h3 className="font-medium text-slate-900">{section.titleKo}</h3>
+                            <p className="text-xs text-slate-500">약 {section.estimatedMinutes}분</p>
                           </div>
                         </div>
-                        <i className={`fas fa-chevron-down text-gray-400 transition-transform ${expandedSections.has(section.sectionType) ? 'rotate-180' : ''}`}></i>
+                        <i className={`fas fa-chevron-down text-slate-400 transition-transform duration-200 ${expandedSections.has(section.sectionType) ? 'rotate-180' : ''}`}></i>
                       </button>
                       
                       {/* 섹션 내용 */}
                       {expandedSections.has(section.sectionType) && (
-                        <div className="px-6 pb-6 border-t border-gray-100">
-                          <div className="pt-4 prose prose-sm max-w-none">
+                        <div className="px-5 pb-5 border-t border-slate-100">
+                          <div className="pt-5 prose prose-slate prose-sm max-w-none prose-headings:text-slate-800 prose-a:text-blue-600 prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-100">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {section.contentMd}
                             </ReactMarkdown>
@@ -565,106 +595,108 @@ const ModuleLearningPage: React.FC = () => {
               </>
             )}
 
-            {/* 자가 점검 버튼 */}
-            <div className="mt-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-xl p-6 text-white">
+            {/* 자가 점검 버튼 - 모바일용 */}
+            <div className="mt-8 lg:hidden bg-slate-900 rounded-lg p-5 text-white">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold">학습을 완료하셨나요?</h3>
-                  <p className="text-purple-100 text-sm mt-1">자가 점검 퀴즈로 이해도를 확인해보세요!</p>
+                  <h3 className="font-medium">학습을 완료하셨나요?</h3>
+                  <p className="text-slate-400 text-sm mt-1">자가 점검 퀴즈로 이해도를 확인해보세요</p>
                 </div>
                 <button
                   onClick={() => setPhase('quiz')}
-                  className="px-6 py-3 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition flex-shrink-0"
+                  className="px-4 py-2 bg-white text-slate-900 rounded-lg font-medium hover:bg-slate-100 transition flex-shrink-0"
                 >
-                  <i className="fas fa-clipboard-check mr-2"></i>자가 점검 시작
+                  <i className="fas fa-clipboard-check mr-2"></i>시작
                 </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* 오른쪽: AI 멘토 (30-40%) */}
-        <div className="flex-1 bg-white border-l flex flex-col">
-          {/* 채팅 헤더 */}
-          <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                <i className="fas fa-robot"></i>
-              </div>
-              <div>
-                <h3 className="font-semibold">AI 멘토</h3>
-                <p className="text-xs text-blue-100">궁금한 점을 물어보세요</p>
+          {/* 오른쪽: AI 멘토 - 고정 사이드바 */}
+          <div className="hidden lg:flex w-[400px] flex-shrink-0 flex-col bg-white rounded-lg border border-slate-200 overflow-hidden sticky top-4 self-start" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
+            {/* 채팅 헤더 */}
+            <div className="p-4 bg-slate-900 text-white">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-slate-700 flex items-center justify-center">
+                  <i className="fas fa-robot text-sm"></i>
+                </div>
+                <div>
+                  <h3 className="font-medium">AI 멘토</h3>
+                  <p className="text-xs text-slate-400">궁금한 점을 물어보세요</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* 채팅 메시지 */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {chatMessages.length === 0 && (
-              <div className="text-center py-8">
-                <i className="fas fa-comments text-4xl text-gray-300 mb-4"></i>
-                <p className="text-gray-500 text-sm">학습 중 궁금한 점을 물어보세요!</p>
-                <div className="mt-4 space-y-2">
-                  {SUGGESTED_QUESTIONS.map((q, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSendChat(q)}
-                      className="block w-full text-left text-sm px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-lg px-4 py-2 ${
-                  msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {msg.role === 'assistant' ? (
-                    <div className="prose prose-sm max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content || '...'}</ReactMarkdown>
-                    </div>
-                  ) : (
-                    msg.content
-                  )}
-                </div>
-              </div>
-            ))}
-            {isChatLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gray-100 rounded-lg px-4 py-2">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></span>
-                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></span>
+            {/* 채팅 메시지 */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+              {chatMessages.length === 0 && (
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-slate-200 flex items-center justify-center">
+                    <i className="fas fa-comments text-xl text-slate-500"></i>
+                  </div>
+                  <p className="text-slate-500 text-sm mb-4">학습 중 궁금한 점을 물어보세요!</p>
+                  <div className="space-y-2">
+                    {SUGGESTED_QUESTIONS.map((q, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleSendChat(q)}
+                        className="block w-full text-left text-sm px-3 py-2.5 bg-white rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition text-slate-600"
+                      >
+                        {q}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
+              )}
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] rounded-lg px-4 py-2.5 ${
+                    msg.role === 'user' 
+                      ? 'bg-slate-900 text-white' 
+                      : 'bg-white border border-slate-200 text-slate-800'
+                  }`}>
+                    {msg.role === 'assistant' ? (
+                      msg.content ? (
+                        <div className="prose prose-sm max-w-none prose-slate">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : null
+                    ) : (
+                      msg.content
+                    )}
+                  </div>
+                </div>
+              ))}
+              {isChatLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
+                    <span className="text-sm text-slate-500">답변 생성 중...</span>
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
 
-          {/* 채팅 입력 */}
-          <div className="p-4 border-t">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
-                placeholder="질문을 입력하세요..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                disabled={isChatLoading}
-              />
-              <button
-                onClick={() => handleSendChat(chatInput)}
-                disabled={!chatInput.trim() || isChatLoading}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition"
-              >
-                <i className="fas fa-paper-plane"></i>
-              </button>
+            {/* 채팅 입력 */}
+            <div className="p-4 border-t border-slate-200 bg-white">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
+                  placeholder="질문을 입력하세요..."
+                  className="flex-1 px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-300 transition text-sm bg-slate-50"
+                  disabled={isChatLoading}
+                />
+                <button
+                  onClick={() => handleSendChat(chatInput)}
+                  disabled={!chatInput.trim() || isChatLoading}
+                  className="px-5 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+                >
+                  <i className="fas fa-paper-plane"></i>
+                </button>
+              </div>
             </div>
           </div>
         </div>
