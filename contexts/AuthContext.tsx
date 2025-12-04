@@ -43,15 +43,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
-        // OAuth 리다이렉트 후 URL 해시 처리
-        // Supabase가 자동으로 세션을 설정하지만, URL을 깔끔하게 정리
-        if (window.location.hash.includes('access_token')) {
-          // 해시를 제거하고 현재 경로로 교체
-          window.history.replaceState(null, '', window.location.pathname);
+        // OAuth 리다이렉트인지 확인
+        const hasAuthHash = window.location.hash.includes('access_token');
+
+        if (hasAuthHash) {
+          console.log('OAuth callback detected, processing session...');
+          // OAuth 콜백 처리를 위해 약간의 지연
+          await new Promise(resolve => setTimeout(resolve, 100));
         }
 
+        // 먼저 사용자 정보를 가져옴 (Supabase가 해시에서 세션을 자동으로 설정)
         const currentUser = await getCurrentUser();
+        console.log('Current user:', currentUser);
         setUser(currentUser);
+
+        // 세션이 설정된 후 URL 해시 정리
+        if (hasAuthHash) {
+          console.log('Cleaning up URL hash');
+          window.history.replaceState(null, '', window.location.pathname);
+        }
       } catch (error) {
         console.error('Failed to load user:', error);
       } finally {
