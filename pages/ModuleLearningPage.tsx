@@ -452,51 +452,52 @@ const ModuleLearningPage: React.FC = () => {
     );
   }
 
-  // 학습 화면 (정적 콘텐츠)
+  // 학습 화면 (정적 콘텐츠) - 2컬럼 레이아웃
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        {/* 메인 콘텐츠 */}
-        <div className={`flex-1 transition-all duration-300 ${isChatExpanded ? 'mr-96' : 'mr-16'}`}>
-          <div className="max-w-4xl mx-auto py-8 px-4">
-            {/* 헤더 */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-              <button onClick={handleGoBack} className="text-gray-500 hover:text-gray-700 mb-4">
-                <i className="fas fa-arrow-left mr-2"></i>목록으로
+    <div className="h-screen flex flex-col bg-gray-50">
+      {/* 헤더 */}
+      <div className="bg-white border-b p-4">
+        <button onClick={handleGoBack} className="text-gray-500 hover:text-gray-700 mb-3">
+          <i className="fas fa-arrow-left mr-2"></i>목록으로
+        </button>
+        <h1 className="text-2xl font-bold text-gray-800">{module.nameKo}</h1>
+        <p className="text-gray-500 mt-1">{module.description}</p>
+        
+        {/* 레벨 탭 */}
+        <div className="mt-4 flex gap-2">
+          {availableLevels.map((level) => {
+            const levelInfo = LEVELS.find(l => l.id === level) || { name: level, icon: 'fa-book', description: '' };
+            return (
+              <button
+                key={level}
+                onClick={() => {
+                  setCurrentLevel(level);
+                  setExpandedSections(new Set(['overview']));
+                }}
+                className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
+                  currentLevel === level
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                <i className={`fas ${levelInfo.icon}`}></i>
+                {levelInfo.name}
               </button>
-              <h1 className="text-2xl font-bold text-gray-800">{module.nameKo}</h1>
-              <p className="text-gray-500 mt-1">{module.description}</p>
-              
-              {/* 레벨 탭 */}
-              <div className="mt-6 flex gap-2">
-                {availableLevels.map((level) => {
-                  const levelInfo = LEVELS.find(l => l.id === level) || { name: level, icon: 'fa-book', description: '' };
-                  return (
-                    <button
-                      key={level}
-                      onClick={() => {
-                        setCurrentLevel(level);
-                        setExpandedSections(new Set(['overview']));
-                      }}
-                      className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 ${
-                        currentLevel === level
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                    >
-                      <i className={`fas ${levelInfo.icon}`}></i>
-                      {levelInfo.name}
-                    </button>
-                  );
-                })}
-              </div>
-              
-              {/* 현재 레벨 설명 */}
-              <p className="mt-2 text-sm text-gray-500">
-                {LEVELS.find(l => l.id === currentLevel)?.description || ''}
-              </p>
-            </div>
+            );
+          })}
+        </div>
+        
+        {/* 현재 레벨 설명 */}
+        <p className="mt-2 text-sm text-gray-500">
+          {LEVELS.find(l => l.id === currentLevel)?.description || ''}
+        </p>
+      </div>
 
+      {/* 2컬럼 메인 영역 */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* 왼쪽: 학습 콘텐츠 (60-70%) */}
+        <div className="flex-[2] overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto">
             {/* 콘텐츠 로딩 */}
             {isLoadingContent ? (
               <div className="bg-white rounded-xl shadow-sm p-8 text-center">
@@ -573,7 +574,7 @@ const ModuleLearningPage: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setPhase('quiz')}
-                  className="px-6 py-3 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition"
+                  className="px-6 py-3 bg-white text-purple-600 rounded-lg font-medium hover:bg-purple-50 transition flex-shrink-0"
                 >
                   <i className="fas fa-clipboard-check mr-2"></i>자가 점검 시작
                 </button>
@@ -582,109 +583,90 @@ const ModuleLearningPage: React.FC = () => {
           </div>
         </div>
 
-        {/* AI 멘토 사이드바 */}
-        <div className={`fixed right-0 top-0 h-full bg-white shadow-xl transition-all duration-300 z-40 ${isChatExpanded ? 'w-96' : 'w-16'}`}>
-          {/* 토글 버튼 */}
-          <button
-            onClick={() => setIsChatExpanded(!isChatExpanded)}
-            className="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-16 bg-blue-500 text-white rounded-l-lg shadow-lg hover:bg-blue-600 transition"
-          >
-            <i className={`fas ${isChatExpanded ? 'fa-chevron-right' : 'fa-chevron-left'}`}></i>
-          </button>
-
-          {isChatExpanded ? (
-            <div className="h-full flex flex-col">
-              {/* 채팅 헤더 */}
-              <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                    <i className="fas fa-robot"></i>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">AI 멘토</h3>
-                    <p className="text-xs text-blue-100">궁금한 점을 물어보세요</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* 채팅 메시지 */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                {chatMessages.length === 0 && (
-                  <div className="text-center py-8">
-                    <i className="fas fa-comments text-4xl text-gray-300 mb-4"></i>
-                    <p className="text-gray-500 text-sm">학습 중 궁금한 점을 물어보세요!</p>
-                    <div className="mt-4 space-y-2">
-                      {SUGGESTED_QUESTIONS.map((q, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => handleSendChat(q)}
-                          className="block w-full text-left text-sm px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {chatMessages.map((msg, idx) => (
-                  <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                      msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {msg.role === 'assistant' ? (
-                        <div className="prose prose-sm max-w-none">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content || '...'}</ReactMarkdown>
-                        </div>
-                      ) : (
-                        msg.content
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {isChatLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-100 rounded-lg px-4 py-2">
-                      <div className="flex gap-1">
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></span>
-                        <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={chatEndRef} />
-              </div>
-
-              {/* 채팅 입력 */}
-              <div className="p-4 border-t">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
-                    placeholder="질문을 입력하세요..."
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
-                    disabled={isChatLoading}
-                  />
-                  <button
-                    onClick={() => handleSendChat(chatInput)}
-                    disabled={!chatInput.trim() || isChatLoading}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition"
-                  >
-                    <i className="fas fa-paper-plane"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center">
-              <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center">
+        {/* 오른쪽: AI 멘토 (30-40%) */}
+        <div className="flex-1 bg-white border-l flex flex-col">
+          {/* 채팅 헤더 */}
+          <div className="p-4 border-b bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
                 <i className="fas fa-robot"></i>
               </div>
-              <span className="mt-2 text-xs text-gray-500 writing-mode-vertical" style={{writingMode: 'vertical-rl'}}>AI 멘토</span>
+              <div>
+                <h3 className="font-semibold">AI 멘토</h3>
+                <p className="text-xs text-blue-100">궁금한 점을 물어보세요</p>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* 채팅 메시지 */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {chatMessages.length === 0 && (
+              <div className="text-center py-8">
+                <i className="fas fa-comments text-4xl text-gray-300 mb-4"></i>
+                <p className="text-gray-500 text-sm">학습 중 궁금한 점을 물어보세요!</p>
+                <div className="mt-4 space-y-2">
+                  {SUGGESTED_QUESTIONS.map((q, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSendChat(q)}
+                      className="block w-full text-left text-sm px-3 py-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {chatMessages.map((msg, idx) => (
+              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] rounded-lg px-4 py-2 ${
+                  msg.role === 'user' ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {msg.role === 'assistant' ? (
+                    <div className="prose prose-sm max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content || '...'}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    msg.content
+                  )}
+                </div>
+              </div>
+            ))}
+            {isChatLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 rounded-lg px-4 py-2">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span>
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></span>
+                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></span>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* 채팅 입력 */}
+          <div className="p-4 border-t">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
+                placeholder="질문을 입력하세요..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                disabled={isChatLoading}
+              />
+              <button
+                onClick={() => handleSendChat(chatInput)}
+                disabled={!chatInput.trim() || isChatLoading}
+                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 transition"
+              >
+                <i className="fas fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
