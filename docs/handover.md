@@ -98,10 +98,16 @@ NOTIFY pgrst, 'reload config';
 
 ### 완료
 - [x] ~~Supabase `onboarding` 스키마 API 노출 설정~~ (완료 2025-12-06)
-- [x] ~~핵심 제품군 모듈 콘텐츠 확장~~ (완료 2025-12-06)
-  - Freshservice automation: 0개 → 6개 콘텐츠
-  - Freshservice asset-cmdb: 3개 → 6개 콘텐츠
-  - Freshservice reporting: 4개 → 7개 콘텐츠
+- [x] ~~핵심 제품군 모듈 콘텐츠 확장 (1차)~~ (완료 2025-12-06)
+  - Freshservice automation: ✅ 6개 섹션 (풍부한 콘텐츠 - 2,482줄)
+  - Freshservice asset-cmdb: ⏳ 부분 완료 (다음 세션에서 계속)
+  - Freshservice reporting: ⏳ 대기 중 (다음 세션에서 계속)
+
+### 진행 중 (다음 세션)
+- [ ] **핵심 제품군 모듈 콘텐츠 품질 개선 (2차)**
+  - Asset Management: 6개 섹션 전면 재작성 (인코딩 이슈 해결 후)
+  - Reporting: 7개 섹션 전면 재작성
+  - 상세 인수인계: `docs/content-enrichment-handover.md` 참조
 
 ### 대기 중
 - [ ] 학습 진행률 저장/복원
