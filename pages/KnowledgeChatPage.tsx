@@ -91,15 +91,17 @@ const KnowledgeChatPage: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-6rem)] flex flex-col -mt-2">
-      {/* Header Area */}
-      <div className="flex-none pb-4 px-2">
-        <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-indigo-600">
-          AI 멘토링
-        </h1>
-        <p className="text-sm text-slate-500">
-          실시간으로 궁금한 점을 해소하고 피드백을 받아보세요.
-        </p>
+    <div className="h-[calc(100vh-6rem)] flex flex-col">
+      {/* Header */}
+      <div className="flex-none mb-6">
+        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
+            멘토 채팅
+          </h1>
+          <p className="text-sm text-gray-600">
+            실시간으로 궁금한 점을 해소하고 피드백을 받아보세요
+          </p>
+        </div>
       </div>
 
       <div className="flex-1 min-h-0 flex flex-col relative glass-card rounded-3xl overflow-hidden border border-white/40 shadow-xl shadow-slate-200/50">

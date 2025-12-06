@@ -123,30 +123,21 @@ export default function ProductSelectionPage() {
   const standalones = products.filter(p => p.product_type !== 'bundle');
 
   return (
-    <div className="space-y-12 pb-12">
+    <div className="space-y-6 pb-12">
       {/* Header */}
-      <div className="text-center space-y-4 pt-8">
-        <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900 tracking-tight">
-          학습할 제품을 선택하세요
+      <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          고복수 팀장의 온보딩 가이드
         </h1>
-        <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
-          Freshworks의 다양한 제품군 중 학습하고 싶은 과정을 선택해주세요.<br />
-          AI 멘토가 여러분의 맞춤형 학습을 도와드립니다.
+        <p className="text-sm text-gray-600">
+          학습하고 싶은 제품을 선택해주세요
         </p>
       </div>
 
       {/* Bundles Section */}
       {bundles.length > 0 && (
-        <div className="space-y-6">
-          <div className="flex items-center gap-3 px-2">
-            <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200"></span>
-            <span className="px-3 py-1 bg-slate-900 text-white text-xs font-bold tracking-wider rounded-full uppercase">
-              Integrated Solution
-            </span>
-            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200"></span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-4">
+          <div className="max-w-4xl mx-auto">
             {bundles.map((product) => {
               const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshdesk_omni;
               const info = PRODUCT_DESCRIPTIONS[product.id];
@@ -155,37 +146,30 @@ export default function ProductSelectionPage() {
                 <button
                   key={product.id}
                   onClick={() => handleProductSelect(product.id)}
-                  className="group relative text-left h-full"
+                  className="group relative text-left bg-white p-6 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
-                  <div className="relative h-full glass-card p-8 rounded-3xl border border-white/50 hover:border-white transition-all duration-300 group-hover:-translate-y-1 overflow-hidden">
-                    {/* Background decoration */}
-                    <div className={`absolute -right-12 -top-12 w-48 h-48 bg-gradient-to-br ${style.gradient} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`}></div>
-
-                    <div className="flex items-start gap-6 relative z-10">
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300`}>
-                        <i className={style.icon}></i>
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-xl`}>
+                      <i className={style.icon}></i>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h2 className="text-lg font-bold text-gray-900">{product.name}</h2>
+                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wide">
+                          BUNDLE
+                        </span>
                       </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h2 className="text-2xl font-bold text-slate-900">{product.name}</h2>
-                          <span className="px-2 py-0.5 bg-gradient-to-r from-amber-200 to-yellow-400 text-amber-900 text-[10px] font-bold rounded uppercase tracking-wide">
-                            Premium
+                      <p className="text-sm text-gray-600 mb-3">{info?.tagline || product.description_ko}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {info?.features?.map((feature, idx) => (
+                          <span key={idx} className="px-2 py-1 bg-gray-50 text-gray-600 text-xs rounded border border-gray-200">
+                            {feature}
                           </span>
-                        </div>
-                        <p className="text-slate-500 font-medium mb-4">{info?.tagline || product.description_ko}</p>
-
-                        <div className="flex flex-wrap gap-2">
-                          {info?.features?.map((feature, idx) => (
-                            <span key={idx} className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-md">
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
+                        ))}
                       </div>
-                      <div className="self-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                        <i className="fas fa-arrow-right text-slate-400 text-xl"></i>
-                      </div>
+                    </div>
+                    <div className="self-center text-gray-400 group-hover:text-blue-600 transition-colors">
+                      <i className="fas fa-arrow-right"></i>
                     </div>
                   </div>
                 </button>
@@ -196,16 +180,9 @@ export default function ProductSelectionPage() {
       )}
 
       {/* Standalones Section */}
-      <div className="space-y-6">
-        <div className="flex items-center gap-3 px-2">
-          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200"></span>
-          <span className="px-3 py-1 bg-slate-200 text-slate-600 text-xs font-bold tracking-wider rounded-full uppercase">
-            Individual Products
-          </span>
-          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200"></span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-4">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide px-2">개별 제품</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {standalones.map((product) => {
             const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshservice;
             const info = PRODUCT_DESCRIPTIONS[product.id];
@@ -214,34 +191,28 @@ export default function ProductSelectionPage() {
               <button
                 key={product.id}
                 onClick={() => handleProductSelect(product.id)}
-                className="group relative text-left h-full"
+                className="group text-left bg-white p-5 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all h-full flex flex-col"
               >
-                <div className="absolute inset-0 bg-white rounded-3xl transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary-500/10 border border-slate-200 hover:border-primary-200">
-                  <div className="p-6 h-full flex flex-col">
-                    <div className="flex items-center justify-between mb-6">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
-                        <i className={style.icon}></i>
-                      </div>
-                      <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary-50 group-hover:text-primary-500 transition-colors">
-                        <i className="fas fa-arrow-right text-sm"></i>
-                      </div>
-                    </div>
-
-                    <h2 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
-                      {product.name}
-                    </h2>
-                    <p className="text-sm text-slate-500 mb-4 flex-1 line-clamp-2">
-                      {info?.tagline || product.description_ko}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1.5 mt-auto">
-                      {info?.features?.slice(0, 3).map((feature, idx) => (
-                        <span key={idx} className="px-2 py-0.5 bg-slate-50 text-slate-500 text-[10px] font-medium rounded border border-slate-100">
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
+                <div className="flex items-center justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-lg`}>
+                    <i className={style.icon}></i>
                   </div>
+                  <div className="text-gray-400 group-hover:text-blue-600 transition-colors">
+                    <i className="fas fa-arrow-right text-sm"></i>
+                  </div>
+                </div>
+                <h2 className="text-base font-bold text-gray-900 mb-1">
+                  {product.name}
+                </h2>
+                <p className="text-sm text-gray-600 mb-4 flex-1">
+                  {info?.tagline || product.description_ko}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {info?.features?.slice(0, 3).map((feature, idx) => (
+                    <span key={idx} className="px-2 py-1 bg-gray-50 text-gray-600 text-xs rounded border border-gray-200">
+                      {feature}
+                    </span>
+                  ))}
                 </div>
               </button>
             );

@@ -53,6 +53,16 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          대시보드
+        </h1>
+        <p className="text-sm text-gray-600">
+          온보딩 진행 상황과 최근 활동을 확인하세요
+        </p>
+      </div>
+
       {/* 1. Bento Grid - Top Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-80">
 

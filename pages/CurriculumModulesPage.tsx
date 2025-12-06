@@ -90,44 +90,53 @@ export default function CurriculumModulesPage() {
   }
 
   return (
-    <div className="space-y-8 pb-12">
-      {/* Header with Back Button */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-4">
-        <div>
-          <button
-            onClick={() => navigate('/curriculum')}
-            className="text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 mb-2 text-sm font-medium"
-          >
-            <i className="fas fa-arrow-left"></i> 제품 선택으로 돌아가기
-          </button>
-          <h1 className="text-3xl font-display font-bold text-slate-900">
-            학습 시나리오 <span className="text-slate-400 font-light">| Modules</span>
-          </h1>
-        </div>
-
-        {/* Progress Card */}
-        <div className="glass-card p-4 rounded-2xl flex items-center gap-6 min-w-[280px]">
-          <div className="flex-1">
-            <div className="flex justify-between text-sm mb-2">
-              <span className="text-slate-600 font-medium">전체 진행률</span>
-              <span className="text-primary-600 font-bold">{Math.round(completionRate)}%</span>
+    <div className="space-y-6 pb-12">
+      {/* Header */}
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+        <button
+          onClick={() => navigate('/curriculum')}
+          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition mb-3 text-sm"
+        >
+          <i className="fas fa-arrow-left"></i>
+          <span>제품 선택으로 돌아가기</span>
+        </button>
+        
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">
+              학습 시나리오
+            </h1>
+            <p className="text-sm text-gray-600">
+              단계별 미션을 통해 실무 역량을 키우세요.
+            </p>
+          </div>
+          
+          {/* Progress Summary */}
+          <div className="bg-gray-50 rounded-lg p-4 min-w-[240px] border border-gray-200">
+            <div className="flex justify-between items-end mb-2">
+              <div>
+                <span className="text-xs font-semibold text-gray-500 uppercase">진행률</span>
+                <p className="text-xl font-bold text-gray-900">{Math.round(completionRate)}%</p>
+              </div>
+              <div className="text-right">
+                <span className="text-sm font-medium text-blue-600">
+                  {completedCount} / {modules.length}
+                </span>
+                <p className="text-xs text-gray-500">모듈 완료</p>
+              </div>
             </div>
-            <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div
-                className="bg-primary-500 h-full rounded-full transition-all duration-1000"
+                className="bg-blue-600 h-full rounded-full transition-all duration-500"
                 style={{ width: `${completionRate}%` }}
               ></div>
             </div>
-          </div>
-          <div className="text-right border-l pl-6 border-slate-200">
-            <div className="text-2xl font-bold text-slate-800">{completedCount}</div>
-            <div className="text-xs text-slate-500">완료한 모듈</div>
           </div>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {modules.map((mod, index) => {
           const style = getModuleStyle(mod.slug);
           const isCompleted = mod.status === 'completed';
@@ -137,74 +146,61 @@ export default function CurriculumModulesPage() {
             <button
               key={mod.id}
               onClick={() => handleModuleSelect(mod.id)}
-              className="group relative text-left h-full"
+              className="text-left group bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
             >
-              <div
-                className={`
-                  h-full glass-card overflow-hidden transition-all duration-300
-                  hover:-translate-y-1 hover:shadow-xl
-                  ${isCompleted ? 'border-green-200 bg-green-50/30' : 'hover:border-primary-200'}
-                `}
-              >
-                {/* Card Top: Visual Header */}
-                <div className={`h-32 bg-gradient-to-br ${style.gradient} relative p-6 flex flex-col justify-between overflow-hidden`}>
-
-                  {/* Abstract shapes in background */}
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-                  <div className="absolute bottom-0 left-0 w-24 h-24 bg-black opacity-10 rounded-full blur-xl -ml-8 -mb-8"></div>
-
-                  <div className="relative z-10 flex justify-between items-start">
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-white/20 backdrop-blur-md text-white text-sm font-bold border border-white/20">
-                      {index + 1}
-                    </span>
-                    {isCompleted && (
-                      <span className="bg-white/90 text-green-600 text-xs font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1">
-                        <i className="fas fa-check-circle"></i> 완료됨
-                      </span>
-                    )}
-                  </div>
-
-                  <div className="relative z-10 text-white text-4xl opacity-90 group-hover:scale-110 transition-transform duration-500 origin-bottom-left">
+              {/* Visual Header */}
+              <div className={`h-24 bg-gradient-to-br ${style.gradient} p-4 flex items-center justify-between relative overflow-hidden rounded-t-lg`}>
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
+                
+                <div className="relative z-10 flex items-center gap-3">
+                  <span className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm font-bold flex items-center justify-center">
+                    {index + 1}
+                  </span>
+                  <div className="text-white text-2xl">
                     <i className={style.icon}></i>
                   </div>
                 </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-primary-600 transition-colors line-clamp-1">
-                    {mod.nameKo}
-                  </h3>
-                  <p className="text-slate-500 text-sm mb-6 line-clamp-2 h-10">
-                    {mod.description}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-xs text-slate-400 font-medium">
-                      <i className="far fa-clock"></i>
-                      <span>{mod.estimatedMinutes || 15}분</span>
-                    </div>
-
-                    <div className={`
-                       px-4 py-2 rounded-lg text-sm font-semibold transition-colors
-                       ${isCompleted
-                        ? 'bg-green-100 text-green-700'
-                        : isStarted
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-slate-100 text-slate-600 group-hover:bg-slate-900 group-hover:text-white'
-                      }
-                     `}>
-                      {isCompleted ? '복습하기' : isStarted ? '이어하기' : '시작하기'}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Progress Bar (Bottom) */}
-                {isStarted && !isCompleted && (
-                  <div className="absolute bottom-0 left-0 w-full h-1 bg-blue-100">
-                    <div className="h-full bg-blue-500 w-1/3"></div>
-                  </div>
+                
+                {isCompleted && (
+                  <span className="relative z-10 bg-white/90 text-green-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                    <i className="fas fa-check-circle"></i> 완료
+                  </span>
                 )}
               </div>
+
+              {/* Content */}
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
+                  {mod.nameKo}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  {mod.description}
+                </p>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <i className="far fa-clock"></i>
+                    <span>{mod.estimatedMinutes || 15}분</span>
+                  </div>
+
+                  <div className={`px-3 py-1 rounded text-xs font-semibold ${
+                    isCompleted
+                      ? 'bg-green-100 text-green-700'
+                      : isStarted
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'bg-gray-100 text-gray-600 group-hover:bg-blue-600 group-hover:text-white'
+                  }`}>
+                    {isCompleted ? '복습하기' : isStarted ? '이어하기' : '시작하기'}
+                  </div>
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              {isStarted && !isCompleted && (
+                <div className="h-1 bg-blue-100 rounded-b-lg overflow-hidden">
+                  <div className="h-full bg-blue-500 w-1/3"></div>
+                </div>
+              )}
             </button>
           );
         })}

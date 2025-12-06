@@ -108,7 +108,15 @@ const App: React.FC = () => {
           <Route path="/curriculum" element={<ProductSelectionPage />} />
           <Route path="/curriculum/:productId" element={<CurriculumModulesPage />} />
           <Route path="/curriculum/:productId/:moduleId" element={<ModuleLearningPage />} />
-          
+        </Route>
+        
+        <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route
             path="/admin"
             element={
