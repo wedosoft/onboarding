@@ -164,7 +164,7 @@ const ModuleLearningPage: React.FC = () => {
     try {
       const stream = streamModuleChat(moduleId, sessionId, message);
       let response = '';
-      
+
       setChatMessages(prev => [...prev, { role: 'assistant', content: '' }]);
 
       for await (const event of stream) {
@@ -232,7 +232,12 @@ const ModuleLearningPage: React.FC = () => {
         questionId,
         choiceId,
       }));
-      const response = await submitQuiz(moduleId, sessionId, answers, quizStartTime || undefined);
+      const response = await submitQuiz(moduleId, {
+        sessionId,
+        moduleId,
+        answers,
+        startedAt: quizStartTime?.toISOString()
+      });
       setResult(response);
       setPhase('result');
     } catch (error) {
@@ -252,7 +257,7 @@ const ModuleLearningPage: React.FC = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">모듈 정보를 불러오는 중...</p>
         </div>
       </div>
@@ -265,7 +270,7 @@ const ModuleLearningPage: React.FC = () => {
         <div className="text-center">
           <i className="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
           <p className="text-gray-600">모듈을 찾을 수 없습니다.</p>
-          <button onClick={handleGoBack} className="mt-4 text-blue-500 hover:underline">
+          <button onClick={handleGoBack} className="mt-4 text-primary-500 hover:underline">
             목록으로 돌아가기
           </button>
         </div>
@@ -280,18 +285,18 @@ const ModuleLearningPage: React.FC = () => {
   // 퀴즈 결과 화면
   if (phase === 'result' && result) {
     return (
-      <div className="min-h-screen bg-gray-50 py-8 px-4">
+      <div className="min-h-screen bg-slate-50 py-8 px-4">
         <div className="max-w-3xl mx-auto">
           {/* 헤더 */}
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-            <button onClick={handleGoBack} className="text-gray-500 hover:text-gray-700 mb-4">
+            <button onClick={handleGoBack} className="text-slate-500 hover:text-slate-700 mb-4">
               <i className="fas fa-arrow-left mr-2"></i>목록으로
             </button>
-            <h1 className="text-2xl font-bold text-gray-800">{module.nameKo} - 자가 점검 결과</h1>
+            <h1 className="text-2xl font-bold text-slate-800">{module.nameKo} - 자가 점검 결과</h1>
           </div>
 
           {/* 점수 카드 */}
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl shadow-lg p-8 text-white text-center mb-6">
+          <div className="bg-gradient-to-r from-primary-500 to-indigo-600 rounded-xl shadow-lg p-8 text-white text-center mb-6">
             <div className="text-6xl font-bold mb-2">{result.score}점</div>
             <p className="text-blue-100">
               {result.correctCount}개 정답 / {result.totalQuestions}개 문제
@@ -303,8 +308,8 @@ const ModuleLearningPage: React.FC = () => {
 
           {/* 결과 상세 */}
           <div className="bg-white rounded-xl shadow-sm p-6 space-y-6">
-            <h2 className="text-lg font-semibold text-gray-800">문제별 결과</h2>
-            {result.results.map((r, idx) => {
+            <h2 className="text-lg font-semibold text-slate-800">문제별 결과</h2>
+            {result.answers.map((r, idx) => {
               const question = questions.find(q => q.id === r.questionId);
               if (!question) return null;
               return (
@@ -382,11 +387,10 @@ const ModuleLearningPage: React.FC = () => {
                   <button
                     key={choice.id}
                     onClick={() => handleAnswerSelect(currentQuestion.id, choice.id)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition ${
-                      selectedAnswers[currentQuestion.id] === choice.id
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className={`w-full text-left p-4 rounded-lg border-2 transition ${selectedAnswers[currentQuestion.id] === choice.id
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                      }`}
                   >
                     {choice.text}
                   </button>
@@ -409,7 +413,7 @@ const ModuleLearningPage: React.FC = () => {
             >
               <i className="fas fa-chevron-left mr-2"></i>이전
             </button>
-            
+
             {currentQuestionIndex < questions.length - 1 ? (
               <button
                 onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
@@ -434,13 +438,12 @@ const ModuleLearningPage: React.FC = () => {
               <button
                 key={q.id}
                 onClick={() => setCurrentQuestionIndex(idx)}
-                className={`w-8 h-8 rounded-full text-sm font-medium transition ${
-                  idx === currentQuestionIndex
-                    ? 'bg-blue-500 text-white'
-                    : selectedAnswers[q.id]
+                className={`w-8 h-8 rounded-full text-sm font-medium transition ${idx === currentQuestionIndex
+                  ? 'bg-blue-500 text-white'
+                  : selectedAnswers[q.id]
                     ? 'bg-green-100 text-green-700'
                     : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
+                  }`}
               >
                 {idx + 1}
               </button>
@@ -451,26 +454,33 @@ const ModuleLearningPage: React.FC = () => {
     );
   }
 
-  // 학습 화면 (정적 콘텐츠) - homepage 스타일
+  // 학습 화면 (정적 콘텐츠) - Modern Deep Glass Style
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* 히어로 헤더 - 전체 너비 */}
-      <div className="bg-slate-900 text-white">
-        <div className="max-w-7xl mx-auto px-6 py-8">
+    <div className="min-h-screen pb-12 -mt-2">
+      {/* 히어로 헤더 - Glass & Gradient */}
+      <div className="relative overflow-hidden mb-8 rounded-b-3xl">
+        <div className="absolute inset-0 bg-slate-900 z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/90 via-slate-900 to-slate-900 z-10"></div>
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-500/20 rounded-full blur-[100px] opacity-50 z-10 pointer-events-none"></div>
+
+        <div className="relative z-20 max-w-7xl mx-auto px-6 py-10">
           {/* 상단: 뒤로가기 + 레벨 탭 */}
-          <div className="flex items-center justify-between mb-6">
-            <button 
-              onClick={handleGoBack} 
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition group"
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 mb-8">
+            <button
+              onClick={handleGoBack}
+              className="flex items-center gap-2 text-white/60 hover:text-white transition group w-fit"
             >
-              <i className="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-              <span>목록으로</span>
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-white/20 backdrop-blur-sm transition-colors">
+                <i className="fas fa-arrow-left group-hover:-translate-x-0.5 transition-transform text-sm"></i>
+              </div>
+              <span className="text-sm font-medium">목록으로</span>
             </button>
-            
+
             {/* 레벨 탭 */}
-            <div className="flex gap-1 bg-slate-800 rounded-lg p-1">
+            <div className="flex p-1 bg-white/10 backdrop-blur-md rounded-xl border border-white/10 w-fit self-start lg:self-auto">
               {availableLevels.map((level) => {
                 const levelInfo = LEVELS.find(l => l.id === level) || { name: level, icon: 'fa-book', description: '' };
+                const isActive = currentLevel === level;
                 return (
                   <button
                     key={level}
@@ -478,12 +488,12 @@ const ModuleLearningPage: React.FC = () => {
                       setCurrentLevel(level);
                       setExpandedSections(new Set(['overview']));
                     }}
-                    className={`px-4 py-2 rounded-md font-medium transition flex items-center gap-2 text-sm ${
-                      currentLevel === level
-                        ? 'bg-white text-slate-900'
-                        : 'text-slate-400 hover:text-white hover:bg-slate-700'
-                    }`}
+                    className={`px-4 py-2 rounded-lg font-medium transition flex items-center gap-2 text-sm relative ${isActive ? 'text-white' : 'text-white/50 hover:text-white hover:bg-white/5'
+                      }`}
                   >
+                    {isActive && (
+                      <div className="absolute inset-0 bg-primary-500 rounded-lg shadow-lg shadow-primary-500/30 -z-10 animate-fade-in"></div>
+                    )}
                     <i className={`fas ${levelInfo.icon}`}></i>
                     {levelInfo.name}
                   </button>
@@ -491,97 +501,141 @@ const ModuleLearningPage: React.FC = () => {
               })}
             </div>
           </div>
-          
+
           {/* 모듈 정보 */}
-          <div className="flex items-end justify-between gap-8">
+          <div className="flex flex-col lg:flex-row items-start lg:items-end justify-between gap-8">
             <div className="flex-1">
-              <h1 className="text-2xl lg:text-3xl font-semibold tracking-tight">{module.nameKo}</h1>
-              <p className="text-slate-400 mt-2 max-w-2xl">{module.description}</p>
-              <div className="mt-4 flex items-center gap-4 text-sm text-slate-500">
-                <span className="flex items-center gap-2">
-                  <i className="fas fa-clock"></i>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="px-3 py-1 bg-white/10 backdrop-blur-md border border-white/10 rounded-full text-xs font-bold text-primary-300">
+                  Module {module.id.toUpperCase()}
+                </span>
+              </div>
+              <h1 className="text-3xl lg:text-4xl font-display font-bold text-white tracking-tight mb-4 leading-tight">{module.nameKo}</h1>
+              <p className="text-white/70 text-lg max-w-2xl leading-relaxed">{module.description}</p>
+
+              <div className="mt-6 flex flex-wrap items-center gap-6 text-sm font-medium text-white/50">
+                <span className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                  <i className="fas fa-clock text-primary-400"></i>
                   약 {module.estimatedMinutes}분
                 </span>
-                <span className="text-slate-600">·</span>
-                <span className="flex items-center gap-2">
-                  <i className={`fas ${LEVELS.find(l => l.id === currentLevel)?.icon || 'fa-book'}`}></i>
+                <span className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-lg border border-white/5">
+                  <i className={`fas ${LEVELS.find(l => l.id === currentLevel)?.icon || 'fa-book'} text-primary-400`}></i>
                   {LEVELS.find(l => l.id === currentLevel)?.description || ''}
                 </span>
               </div>
             </div>
-            
+
             {/* 자가점검 버튼 */}
             <button
               onClick={() => setPhase('quiz')}
-              className="hidden lg:flex items-center gap-2 px-5 py-2.5 bg-white text-slate-900 rounded-lg font-medium hover:bg-slate-100 transition"
+              className="hidden lg:flex items-center gap-3 px-6 py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-indigo-50 transition shadow-lg shadow-black/20 group"
             >
-              <i className="fas fa-clipboard-check"></i>
-              <span>자가 점검</span>
+              <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i className="fas fa-clipboard-check"></i>
+              </div>
+              <div className="text-left">
+                <div className="text-xs text-slate-500 font-medium">학습 완료 후</div>
+                <div className="text-base">자가 점검 시작</div>
+              </div>
+              <i className="fas fa-chevron-right ml-2 text-slate-300 group-hover:text-indigo-500 transition-colors"></i>
             </button>
           </div>
         </div>
       </div>
 
       {/* 메인 콘텐츠 영역 */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="flex gap-8">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col lg:flex-row gap-8">
           {/* 왼쪽: 학습 콘텐츠 (약 70%) */}
-          <div className="basis-[70%] grow min-w-0">
+          <div className="flex-1 min-w-0">
             {/* 콘텐츠 로딩 */}
             {isLoadingContent ? (
-              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-slate-300 border-t-slate-900 mx-auto"></div>
-                <p className="mt-4 text-slate-500">콘텐츠를 불러오는 중...</p>
+              <div className="glass-card rounded-2xl p-12 text-center">
+                <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-slate-500 font-medium">콘텐츠를 불러오는 중...</p>
               </div>
             ) : currentSections.length === 0 ? (
-              <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
-                <i className="fas fa-book-open text-3xl text-slate-300 mb-4"></i>
-                <p className="text-slate-500">이 레벨에는 아직 콘텐츠가 없습니다.</p>
-                <p className="text-sm text-slate-400 mt-2">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
+              <div className="glass-card rounded-2xl p-12 text-center">
+                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fas fa-book-open text-3xl text-slate-300"></i>
+                </div>
+                <p className="text-slate-600 font-bold text-lg mb-2">이 레벨에는 아직 콘텐츠가 없습니다.</p>
+                <p className="text-sm text-slate-400">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
               </div>
             ) : (
               <>
                 {/* 전체 펼치기/접기 */}
-                <div className="flex justify-end mb-4 gap-4">
+                <div className="flex justify-end mb-4 gap-3">
                   <button
                     onClick={() => toggleAllSections(true)}
-                    className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
+                    className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors flex items-center gap-1.5"
                   >
                     <i className="fas fa-expand-alt"></i>모두 펼치기
                   </button>
                   <button
                     onClick={() => toggleAllSections(false)}
-                    className="text-sm text-slate-600 hover:text-slate-900 flex items-center gap-1.5"
+                    className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors flex items-center gap-1.5"
                   >
                     <i className="fas fa-compress-alt"></i>모두 접기
                   </button>
                 </div>
 
                 {/* 섹션 목록 (아코디언) */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {currentSections.map((section, index) => (
-                    <div key={section.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:border-slate-300 transition-colors">
+                    <div
+                      key={section.id}
+                      className={`glass-card rounded-2xl overflow-hidden transition-all duration-300 border border-white/60
+                        ${expandedSections.has(section.sectionType) ? 'shadow-xl ring-1 ring-primary-500/10' : 'hover:shadow-md'}
+                      `}
+                    >
                       {/* 섹션 헤더 */}
                       <button
                         onClick={() => toggleSection(section.sectionType)}
-                        className="w-full px-5 py-4 flex items-center justify-between hover:bg-slate-50 transition"
+                        className={`w-full px-6 py-5 flex items-center justify-between transition-colors
+                          ${expandedSections.has(section.sectionType) ? 'bg-primary-50/30' : 'hover:bg-white/50'}
+                        `}
                       >
-                        <div className="flex items-center gap-4">
-                          <span className="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center text-sm">
+                        <div className="flex items-center gap-5">
+                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-all
+                            ${expandedSections.has(section.sectionType)
+                              ? 'bg-gradient-to-br from-primary-500 to-indigo-600 text-white scale-110'
+                              : 'bg-white text-slate-400 border border-slate-100'}
+                          `}>
                             <i className={`fas ${SECTION_ICONS[section.sectionType] || 'fa-file'}`}></i>
-                          </span>
+                          </div>
                           <div className="text-left">
-                            <h3 className="font-medium text-slate-900">{section.titleKo}</h3>
-                            <p className="text-xs text-slate-500">약 {section.estimatedMinutes}분</p>
+                            <h3 className={`font-bold text-lg transition-colors ${expandedSections.has(section.sectionType) ? 'text-primary-800' : 'text-slate-700'}`}>
+                              {section.titleKo}
+                            </h3>
+                            <p className="text-xs text-slate-400 font-medium mt-0.5">
+                              <i className="far fa-clock mr-1"></i>
+                              약 {section.estimatedMinutes}분
+                            </p>
                           </div>
                         </div>
-                        <i className={`fas fa-chevron-down text-slate-400 transition-transform duration-200 ${expandedSections.has(section.sectionType) ? 'rotate-180' : ''}`}></i>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
+                          ${expandedSections.has(section.sectionType) ? 'bg-primary-100 text-primary-600 rotate-180' : 'bg-slate-100 text-slate-400'}
+                        `}>
+                          <i className="fas fa-chevron-down"></i>
+                        </div>
                       </button>
-                      
+
                       {/* 섹션 내용 */}
                       {expandedSections.has(section.sectionType) && (
-                        <div className="px-5 pb-5 border-t border-slate-100">
-                          <div className="pt-5 prose prose-slate prose-sm max-w-none prose-headings:text-slate-800 prose-a:text-blue-600 prose-code:bg-slate-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-slate-900 prose-pre:text-slate-100">
+                        <div className="px-8 pb-8 pt-2">
+                          <div className="h-px w-full bg-gradient-to-r from-transparent via-primary-100 to-transparent mb-6"></div>
+                          <div className="prose prose-slate prose-lg max-w-none 
+                            prose-headings:font-display prose-headings:font-bold prose-headings:text-slate-800 
+                            prose-h3:text-primary-700 prose-h3:text-xl
+                            prose-p:text-slate-600 prose-p:leading-relaxed
+                            prose-strong:text-slate-900 prose-strong:font-bold
+                            prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
+                            prose-code:text-pink-600 prose-code:bg-pink-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium
+                            prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-xl prose-pre:shadow-lg
+                            prose-blockquote:border-l-4 prose-blockquote:border-primary-400 prose-blockquote:bg-primary-50/50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+                            prose-img:rounded-xl prose-img:shadow-md
+                          ">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
                               {section.contentMd}
                             </ReactMarkdown>
@@ -595,15 +649,15 @@ const ModuleLearningPage: React.FC = () => {
             )}
 
             {/* 자가 점검 버튼 - 모바일용 */}
-            <div className="mt-8 lg:hidden bg-slate-900 rounded-lg p-5 text-white">
-              <div className="flex items-center justify-between">
+            <div className="mt-8 lg:hidden glass-dark rounded-2xl p-6 text-white shadow-xl">
+              <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-medium">학습을 완료하셨나요?</h3>
+                  <h3 className="font-bold text-lg">학습을 완료하셨나요?</h3>
                   <p className="text-slate-400 text-sm mt-1">자가 점검 퀴즈로 이해도를 확인해보세요</p>
                 </div>
                 <button
                   onClick={() => setPhase('quiz')}
-                  className="px-4 py-2 bg-white text-slate-900 rounded-lg font-medium hover:bg-slate-100 transition flex-shrink-0"
+                  className="px-5 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition shadow-lg flex-shrink-0"
                 >
                   <i className="fas fa-clipboard-check mr-2"></i>시작
                 </button>
@@ -612,34 +666,35 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 오른쪽: AI 멘토 - 고정 사이드바 (약 30%) */}
-          <div className="hidden lg:flex basis-[30%] max-w-[420px] flex-shrink-0 flex-col bg-white rounded-lg border border-slate-200 overflow-hidden sticky top-4 self-start" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
+          <div className="hidden lg:flex basis-[350px] xl:basis-[400px] flex-shrink-0 flex-col glass-card rounded-2xl overflow-hidden sticky top-6 self-start shadow-xl shadow-slate-200/50 border border-white/60" style={{ maxHeight: 'calc(100vh - 3rem)' }}>
             {/* 채팅 헤더 */}
-            <div className="p-4 bg-slate-900 text-white">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-slate-700 flex items-center justify-center">
-                  <i className="fas fa-robot text-sm"></i>
+            <div className="p-5 bg-gradient-to-r from-slate-900 to-slate-800 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary-500/20 rounded-full blur-2xl -mr-10 -mt-10"></div>
+              <div className="relative z-10 flex items-center gap-4">
+                <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-md border border-white/10 shadow-inner">
+                  <i className="fas fa-robot text-primary-300"></i>
                 </div>
                 <div>
-                  <h3 className="font-medium">AI 멘토</h3>
-                  <p className="text-xs text-slate-400">궁금한 점을 물어보세요</p>
+                  <h3 className="font-bold text-lg">AI 학습 멘토</h3>
+                  <p className="text-xs text-slate-400 font-medium">실시간 질의응답</p>
                 </div>
               </div>
             </div>
 
             {/* 채팅 메시지 */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
+            <div className="flex-1 overflow-y-auto p-5 space-y-5 bg-slate-50/50 scroll-smooth">
               {chatMessages.length === 0 && (
-                <div className="text-center py-6">
-                  <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-slate-200 flex items-center justify-center">
-                    <i className="fas fa-comments text-xl text-slate-500"></i>
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm">
+                    <i className="fas fa-comments text-2xl text-primary-300"></i>
                   </div>
-                  <p className="text-slate-500 text-sm mb-4">학습 중 궁금한 점을 물어보세요!</p>
-                  <div className="space-y-2">
+                  <p className="text-slate-500 font-medium text-sm mb-6">학습 내용을 기반으로 답변해드립니다.<br />궁금한 점을 선택해보세요!</p>
+                  <div className="space-y-2.5">
                     {SUGGESTED_QUESTIONS.map((q, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleSendChat(q)}
-                        className="block w-full text-left text-sm px-3 py-2.5 bg-white rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition text-slate-600"
+                        className="block w-full text-left text-xs font-medium px-4 py-3 bg-white rounded-xl border border-slate-200 hover:border-primary-400 hover:text-primary-700 hover:shadow-md transition-all text-slate-600 shadow-sm"
                       >
                         {q}
                       </button>
@@ -648,28 +703,48 @@ const ModuleLearningPage: React.FC = () => {
                 </div>
               )}
               {chatMessages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-lg px-4 py-2.5 ${
-                    msg.role === 'user' 
-                      ? 'bg-slate-900 text-white' 
-                      : 'bg-white border border-slate-200 text-slate-800'
-                  }`}>
+                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
+                  {msg.role === 'assistant' && (
+                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1 shadow-md border border-slate-700">
+                      <i className="fas fa-robot"></i>
+                    </div>
+                  )}
+                  <div className={`max-w-[85%] rounded-2xl px-5 py-3 shadow-sm text-sm leading-relaxed ${msg.role === 'user'
+                    ? 'bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-tr-none'
+                    : 'bg-white border border-slate-100 text-slate-700 rounded-tl-none'
+                    }`}>
                     {msg.role === 'assistant' ? (
                       msg.content ? (
-                        <div className="prose prose-sm max-w-none prose-slate">
+                        <div className="prose prose-sm max-w-none 
+                          prose-p:text-slate-700 prose-headings:text-slate-800 prose-strong:text-indigo-700 prose-a:text-indigo-600
+                          prose-code:text-pink-600 prose-code:bg-pink-50 prose-code:px-1 prose-code:rounded
+                        ">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
                         </div>
-                      ) : null
+                      ) : (
+                        <div className="flex gap-1.5 py-1">
+                          <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      )
                     ) : (
                       msg.content
                     )}
                   </div>
                 </div>
               ))}
-              {isChatLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-white border border-slate-200 rounded-lg px-4 py-3">
-                    <span className="text-sm text-slate-500">답변 생성 중...</span>
+              {isChatLoading && chatMessages[chatMessages.length - 1]?.role === 'user' && ( // Show loading only if last msg was user (waiting for assistant start)
+                <div className="flex justify-start animate-fade-in">
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1 shadow-md border border-slate-700">
+                    <i className="fas fa-robot"></i>
+                  </div>
+                  <div className="bg-white border border-slate-100 rounded-2xl rounded-tl-none px-5 py-3 shadow-sm">
+                    <div className="flex gap-1.5 py-1">
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                      <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -677,23 +752,23 @@ const ModuleLearningPage: React.FC = () => {
             </div>
 
             {/* 채팅 입력 */}
-            <div className="p-4 border-t border-slate-200 bg-white">
-              <div className="flex gap-3">
+            <div className="p-4 border-t border-white/60 bg-white/50 backdrop-blur-md">
+              <div className="relative">
                 <input
                   type="text"
                   value={chatInput}
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
-                  placeholder="질문을 입력하세요..."
-                  className="flex-1 px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-200 focus:border-slate-300 transition text-sm bg-slate-50"
+                  placeholder="무엇이든 물어보세요..."
+                  className="w-full pl-5 pr-12 py-3.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/30 focus:border-primary-500 transition text-sm shadow-inner"
                   disabled={isChatLoading}
                 />
                 <button
                   onClick={() => handleSendChat(chatInput)}
                   disabled={!chatInput.trim() || isChatLoading}
-                  className="px-5 py-3 bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 bg-slate-900 text-white rounded-lg hover:bg-slate-800 disabled:opacity-50 disabled:bg-slate-300 transition flex items-center justify-center shadow-lg"
                 >
-                  <i className="fas fa-paper-plane"></i>
+                  <i className={`fas ${isChatLoading ? 'fa-spinner fa-spin' : 'fa-paper-plane'} text-xs`}></i>
                 </button>
               </div>
             </div>

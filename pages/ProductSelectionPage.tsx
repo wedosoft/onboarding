@@ -3,46 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { getProducts } from '../services/apiClient';
 import type { Product } from '../types';
 
-// 제품별 아이콘 매핑 (Font Awesome)
-const PRODUCT_ICONS: Record<string, string> = {
-  freshservice: 'fas fa-cog',
-  freshdesk: 'fas fa-headset',
-  freshdesk_omni: 'fas fa-layer-group',
-  freshsales: 'fas fa-chart-line',
-  freshchat: 'fas fa-comments',
-};
-
-// 제품별 색상 매핑
-const PRODUCT_COLORS: Record<string, { bg: string; border: string; text: string; gradient: string }> = {
+// 제품별 아이콘 및 스타일 매핑
+const PRODUCT_STYLES: Record<string, { icon: string; gradient: string; accent: string }> = {
   freshservice: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200 hover:border-blue-400',
-    text: 'text-blue-600',
-    gradient: 'from-blue-500 to-blue-600',
+    icon: 'fas fa-cog',
+    gradient: 'from-blue-500 to-indigo-600',
+    accent: 'bg-blue-500',
   },
   freshdesk: {
-    bg: 'bg-green-50',
-    border: 'border-green-200 hover:border-green-400',
-    text: 'text-green-600',
-    gradient: 'from-green-500 to-green-600',
+    icon: 'fas fa-headset',
+    gradient: 'from-emerald-400 to-teal-600',
+    accent: 'bg-emerald-500',
   },
   freshdesk_omni: {
-    bg: 'bg-teal-50',
-    border: 'border-teal-200 hover:border-teal-400',
-    text: 'text-teal-600',
-    gradient: 'from-teal-500 to-cyan-600',
+    icon: 'fas fa-layer-group',
+    gradient: 'from-cyan-400 to-blue-600',
+    accent: 'bg-cyan-500',
   },
   freshsales: {
-    bg: 'bg-purple-50',
-    border: 'border-purple-200 hover:border-purple-400',
-    text: 'text-purple-600',
-    gradient: 'from-purple-500 to-purple-600',
+    icon: 'fas fa-chart-line',
+    gradient: 'from-violet-500 to-purple-600',
+    accent: 'bg-violet-500',
   },
   freshchat: {
-    bg: 'bg-orange-50',
-    border: 'border-orange-200 hover:border-orange-400',
-    text: 'text-orange-600',
-    gradient: 'from-orange-500 to-orange-600',
+    icon: 'fas fa-comments',
+    gradient: 'from-orange-400 to-pink-500',
+    accent: 'bg-orange-500',
   },
 };
 
@@ -99,16 +85,15 @@ export default function ProductSelectionPage() {
   }, []);
 
   const handleProductSelect = (productId: string) => {
-    // 커리큘럼 모듈 페이지로 이동
     navigate(`/curriculum/${productId}`);
   };
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">제품 목록을 불러오는 중...</p>
+          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-500 font-medium animate-pulse">제품 목록을 불러오는 중...</p>
         </div>
       </div>
     );
@@ -116,15 +101,16 @@ export default function ProductSelectionPage() {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <div className="text-center">
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center glass-card p-8 max-w-md mx-auto">
           <div className="text-red-500 text-6xl mb-4">
-            <i className="fas fa-exclamation-triangle"></i>
+            <i className="fas fa-exclamation-circle"></i>
           </div>
-          <p className="text-slate-600">{error}</p>
+          <h3 className="text-xl font-bold text-slate-800 mb-2">오류 발생</h3>
+          <p className="text-slate-600 mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition shadow-lg"
           >
             다시 시도
           </button>
@@ -133,92 +119,73 @@ export default function ProductSelectionPage() {
     );
   }
 
-  // 번들과 단독 제품 분리
   const bundles = products.filter(p => p.product_type === 'bundle');
   const standalones = products.filter(p => p.product_type !== 'bundle');
 
   return (
-    <div className="py-8 px-4 max-w-6xl mx-auto">
-      {/* 헤더 */}
-      <div className="text-center mb-10">
-        <h1 className="text-3xl font-bold text-slate-800 mb-3">
-          제품 학습 선택
+    <div className="space-y-12 pb-12">
+      {/* Header */}
+      <div className="text-center space-y-4 pt-8">
+        <h1 className="text-4xl md:text-5xl font-display font-bold text-slate-900 tracking-tight">
+          학습할 제품을 선택하세요
         </h1>
-        <p className="text-slate-600 max-w-2xl mx-auto">
-          학습할 Freshworks 제품을 선택하세요.
-          각 제품의 핵심 기능을 AI 멘토와 함께 체계적으로 학습할 수 있습니다.
+        <p className="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+          Freshworks의 다양한 제품군 중 학습하고 싶은 과정을 선택해주세요.<br />
+          AI 멘토가 여러분의 맞춤형 학습을 도와드립니다.
         </p>
       </div>
 
-      {/* 번들 제품 (있는 경우) */}
+      {/* Bundles Section */}
       {bundles.length > 0 && (
-        <div className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <span className="px-3 py-1 bg-gradient-to-r from-teal-500 to-cyan-500 text-white text-xs font-semibold rounded-full">
-              BUNDLE
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 px-2">
+            <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200"></span>
+            <span className="px-3 py-1 bg-slate-900 text-white text-xs font-bold tracking-wider rounded-full uppercase">
+              Integrated Solution
             </span>
-            <h2 className="text-lg font-semibold text-slate-700">통합 솔루션</h2>
+            <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200"></span>
           </div>
-          
-          <div className="grid grid-cols-1 gap-4">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {bundles.map((product) => {
-              const colors = PRODUCT_COLORS[product.id] || PRODUCT_COLORS.freshdesk_omni;
-              const icon = PRODUCT_ICONS[product.id] || 'fas fa-layer-group';
+              const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshdesk_omni;
               const info = PRODUCT_DESCRIPTIONS[product.id];
 
               return (
                 <button
                   key={product.id}
                   onClick={() => handleProductSelect(product.id)}
-                  className={`
-                    ${colors.bg} ${colors.border}
-                    border-2 rounded-xl p-6 text-left
-                    transition-all duration-200
-                    hover:shadow-lg hover:scale-[1.01]
-                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500
-                    relative overflow-hidden
-                  `}
+                  className="group relative text-left h-full"
                 >
-                  {/* 번들 배지 */}
-                  <div className="absolute top-0 right-0">
-                    <div className={`bg-gradient-to-r ${colors.gradient} text-white text-xs px-3 py-1 rounded-bl-lg`}>
-                      통합
-                    </div>
-                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-3xl blur opacity-20 group-hover:opacity-40 transition-opacity duration-500"></div>
+                  <div className="relative h-full glass-card p-8 rounded-3xl border border-white/50 hover:border-white transition-all duration-300 group-hover:-translate-y-1 overflow-hidden">
+                    {/* Background decoration */}
+                    <div className={`absolute -right-12 -top-12 w-48 h-48 bg-gradient-to-br ${style.gradient} opacity-10 rounded-full blur-3xl group-hover:opacity-20 transition-opacity`}></div>
 
-                  <div className="flex items-start gap-5">
-                    {/* 아이콘 */}
-                    <div className={`${colors.text} text-4xl`}>
-                      <i className={icon}></i>
-                    </div>
+                    <div className="flex items-start gap-6 relative z-10">
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-3xl shadow-lg shadow-blue-500/20 group-hover:scale-110 transition-transform duration-300`}>
+                        <i className={style.icon}></i>
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h2 className="text-2xl font-bold text-slate-900">{product.name}</h2>
+                          <span className="px-2 py-0.5 bg-gradient-to-r from-amber-200 to-yellow-400 text-amber-900 text-[10px] font-bold rounded uppercase tracking-wide">
+                            Premium
+                          </span>
+                        </div>
+                        <p className="text-slate-500 font-medium mb-4">{info?.tagline || product.description_ko}</p>
 
-                    {/* 내용 */}
-                    <div className="flex-1">
-                      <h2 className="text-xl font-bold text-slate-800 mb-1">
-                        {product.name}
-                      </h2>
-                      <p className="text-sm text-slate-500 mb-2">
-                        {info?.tagline || product.description_ko}
-                      </p>
-                      
-                      {/* 기능 태그 */}
-                      {info?.features && (
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          {info.features.map((feature, idx) => (
-                            <span
-                              key={idx}
-                              className={`${colors.bg} ${colors.text} text-xs px-2 py-1 rounded-full border ${colors.border.split(' ')[0]}`}
-                            >
+                        <div className="flex flex-wrap gap-2">
+                          {info?.features?.map((feature, idx) => (
+                            <span key={idx} className="px-2.5 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded-md">
                               {feature}
                             </span>
                           ))}
                         </div>
-                      )}
-                    </div>
-
-                    {/* 화살표 */}
-                    <div className={`${colors.text} text-xl self-center`}>
-                      <i className="fas fa-chevron-right"></i>
+                      </div>
+                      <div className="self-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
+                        <i className="fas fa-arrow-right text-slate-400 text-xl"></i>
+                      </div>
                     </div>
                   </div>
                 </button>
@@ -228,84 +195,57 @@ export default function ProductSelectionPage() {
         </div>
       )}
 
-      {/* 단독 제품 */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <span className="px-3 py-1 bg-slate-200 text-slate-600 text-xs font-semibold rounded-full">
-            STANDALONE
+      {/* Standalones Section */}
+      <div className="space-y-6">
+        <div className="flex items-center gap-3 px-2">
+          <span className="h-px flex-1 bg-gradient-to-r from-transparent to-slate-200"></span>
+          <span className="px-3 py-1 bg-slate-200 text-slate-600 text-xs font-bold tracking-wider rounded-full uppercase">
+            Individual Products
           </span>
-          <h2 className="text-lg font-semibold text-slate-700">개별 제품</h2>
+          <span className="h-px flex-1 bg-gradient-to-l from-transparent to-slate-200"></span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {standalones.map((product) => {
-            const colors = PRODUCT_COLORS[product.id] || PRODUCT_COLORS.freshservice;
-            const icon = PRODUCT_ICONS[product.id] || 'fas fa-cube';
+            const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshservice;
             const info = PRODUCT_DESCRIPTIONS[product.id];
 
             return (
               <button
                 key={product.id}
                 onClick={() => handleProductSelect(product.id)}
-                className={`
-                  ${colors.bg} ${colors.border}
-                  border-2 rounded-xl p-5 text-left
-                  transition-all duration-200
-                  hover:shadow-lg hover:scale-[1.02]
-                  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                `}
+                className="group relative text-left h-full"
               >
-                <div className="flex items-start gap-4">
-                  {/* 아이콘 */}
-                  <div className={`${colors.text} text-3xl`}>
-                    <i className={icon}></i>
-                  </div>
+                <div className="absolute inset-0 bg-white rounded-3xl transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary-500/10 border border-slate-200 hover:border-primary-200">
+                  <div className="p-6 h-full flex flex-col">
+                    <div className="flex items-center justify-between mb-6">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-xl shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                        <i className={style.icon}></i>
+                      </div>
+                      <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-300 group-hover:bg-primary-50 group-hover:text-primary-500 transition-colors">
+                        <i className="fas fa-arrow-right text-sm"></i>
+                      </div>
+                    </div>
 
-                  {/* 내용 */}
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-bold text-slate-800 mb-1">
+                    <h2 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-primary-600 transition-colors">
                       {product.name}
                     </h2>
-                    <p className="text-sm text-slate-500 mb-2">
+                    <p className="text-sm text-slate-500 mb-4 flex-1 line-clamp-2">
                       {info?.tagline || product.description_ko}
                     </p>
 
-                    {/* 기능 태그 (처음 3개만) */}
-                    {info?.features && (
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {info.features.slice(0, 3).map((feature, idx) => (
-                          <span
-                            key={idx}
-                            className="text-xs text-slate-500 bg-white/50 px-2 py-0.5 rounded"
-                          >
-                            {feature}
-                          </span>
-                        ))}
-                        {info.features.length > 3 && (
-                          <span className="text-xs text-slate-400">
-                            +{info.features.length - 3}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 화살표 */}
-                  <div className={`${colors.text} text-lg self-center`}>
-                    <i className="fas fa-chevron-right"></i>
+                    <div className="flex flex-wrap gap-1.5 mt-auto">
+                      {info?.features?.slice(0, 3).map((feature, idx) => (
+                        <span key={idx} className="px-2 py-0.5 bg-slate-50 text-slate-500 text-[10px] font-medium rounded border border-slate-100">
+                          {feature}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </button>
             );
           })}
-        </div>
-      </div>
-
-      {/* 하단 안내 */}
-      <div className="mt-10 text-center">
-        <div className="inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-100 px-4 py-2 rounded-full">
-          <i className="fas fa-graduation-cap"></i>
-          <span>각 제품별 5개 모듈, 총 25개 학습 과정 제공</span>
         </div>
       </div>
     </div>
