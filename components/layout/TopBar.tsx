@@ -6,12 +6,11 @@ interface TopBarProps {
   // title prop is no longer used since we have navigation
 }
 
+// 네비게이션은 최소 탭 3개로 단순화: 커리큘럼 / 자료실 / 멘토(챗)
 const navItems = [
-  { path: '/', icon: 'fas fa-home', label: '대시보드' },
-  { path: '/curriculum', icon: 'fas fa-graduation-cap', label: '핵심 기능 학습' },
-  { path: '/scenarios', icon: 'fas fa-tasks', label: '시나리오 학습' },
-  { path: '/knowledge', icon: 'fas fa-comments', label: '제품 지식 챗' },
-  { path: '/documents', icon: 'fas fa-book', label: '지식 베이스' },
+  { path: '/curriculum', icon: 'fas fa-graduation-cap', label: '커리큘럼' },
+  { path: '/documents', icon: 'fas fa-book', label: '자료실' },
+  { path: '/knowledge', icon: 'fas fa-comments', label: '멘토' },
 ];
 
 const adminItems = [

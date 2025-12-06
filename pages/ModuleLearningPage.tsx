@@ -31,11 +31,10 @@ const LEVELS = [
 // 섹션별 아이콘
 const SECTION_ICONS: Record<string, string> = {
   overview: 'fa-lightbulb',
-  core_concepts: 'fa-brain',
-  features: 'fa-cogs',
+  'feature-basic': 'fa-cogs',
+  'feature-advanced': 'fa-rocket',
   practice: 'fa-briefcase',
-  faq: 'fa-question-circle',
-  advanced: 'fa-rocket',
+  quiz: 'fa-check-circle',
 };
 
 const SUGGESTED_QUESTIONS = [
@@ -274,8 +273,8 @@ const ModuleLearningPage: React.FC = () => {
     );
   }
 
-  // 현재 레벨의 섹션들
-  const currentSections = contentData?.sections[currentLevel] || [];
+  // 현재 레벨의 섹션들 (백엔드에서 내려준 sectionType을 그대로 사용)
+  const currentSections = (contentData?.sections[currentLevel] || []).slice().sort((a, b) => a.displayOrder - b.displayOrder);
   const availableLevels = contentData?.levels || ['basic'];
 
   // 퀴즈 결과 화면
@@ -526,8 +525,8 @@ const ModuleLearningPage: React.FC = () => {
       {/* 메인 콘텐츠 영역 */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex gap-8">
-          {/* 왼쪽: 학습 콘텐츠 */}
-          <div className="flex-1 min-w-0">
+          {/* 왼쪽: 학습 콘텐츠 (약 70%) */}
+          <div className="basis-[70%] grow min-w-0">
             {/* 콘텐츠 로딩 */}
             {isLoadingContent ? (
               <div className="bg-white rounded-lg border border-slate-200 p-8 text-center">
@@ -612,8 +611,8 @@ const ModuleLearningPage: React.FC = () => {
             </div>
           </div>
 
-          {/* 오른쪽: AI 멘토 - 고정 사이드바 */}
-          <div className="hidden lg:flex w-[400px] flex-shrink-0 flex-col bg-white rounded-lg border border-slate-200 overflow-hidden sticky top-4 self-start" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
+          {/* 오른쪽: AI 멘토 - 고정 사이드바 (약 30%) */}
+          <div className="hidden lg:flex basis-[30%] max-w-[420px] flex-shrink-0 flex-col bg-white rounded-lg border border-slate-200 overflow-hidden sticky top-4 self-start" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
             {/* 채팅 헤더 */}
             <div className="p-4 bg-slate-900 text-white">
               <div className="flex items-center gap-3">

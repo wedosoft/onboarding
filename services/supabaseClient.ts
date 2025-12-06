@@ -16,7 +16,11 @@ if (!supabaseUrl || !supabaseAnonKey) {
 // Supabase 클라이언트 인스턴스
 export const supabase: SupabaseClient | null =
   supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
+    ? createClient(supabaseUrl, supabaseAnonKey, {
+        db: {
+          schema: 'onboarding',
+        },
+      })
     : null;
 
 // 인증된 사용자 타입
