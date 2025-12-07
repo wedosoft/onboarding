@@ -551,9 +551,9 @@ const ModuleLearningPage: React.FC = () => {
 
   // 학습 화면 (정적 콘텐츠) - Modern Deep Glass Style
   return (
-    <div className="flex h-full">
+    <div className="flex h-full overflow-hidden">
         {/* 왼쪽: 학습 콘텐츠 (70%) */}
-        <div className="flex-1 flex flex-col h-full">
+        <div className="flex-1 flex flex-col h-full min-w-0">
           {/* 컴팩트 히어로 헤더 */}
           <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-3">
             <div className="max-w-5xl mx-auto">
@@ -618,8 +618,8 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 스크롤 가능한 콘텐츠 영역 */}
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-5xl mx-auto">{/* 콘텐츠 로딩 */}
+          <div className="flex-1 overflow-y-auto p-4 min-h-0">
+            <div className="max-w-5xl mx-auto px-2">{/* 콘텐츠 로딩 */}
             {isLoadingContent ? (
               <div className="glass-card rounded-2xl p-12 text-center">
                 <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -739,9 +739,9 @@ const ModuleLearningPage: React.FC = () => {
         </div>
 
         {/* 오른쪽: AI 멘토 채팅 (30%) */}
-        <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-full">
+        <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-full flex-shrink-0">
           {/* 채팅 헤더 */}
-          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                 <i className="fas fa-robot text-white"></i>
@@ -754,7 +754,7 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 채팅 메시지 영역 */}
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
             {chatMessages.length === 0 && (
               <div className="text-center">
                 <div className="inline-block p-3 bg-blue-50 rounded-full mb-3">
@@ -814,7 +814,7 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 채팅 입력 */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-gray-200 flex-shrink-0 bg-white">
             <div className="flex gap-2">
               <input
                 type="text"

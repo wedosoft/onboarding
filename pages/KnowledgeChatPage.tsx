@@ -91,9 +91,9 @@ const KnowledgeChatPage: React.FC = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-6rem)] flex flex-col">
+    <div className="h-full flex flex-col overflow-hidden max-w-[1400px] mx-auto px-4 py-4">
       {/* Header */}
-      <div className="flex-none mb-6">
+      <div className="flex-none mb-4">
         <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
           <h1 className="text-2xl font-bold text-gray-900 mb-1">
             멘토 채팅
@@ -202,6 +202,7 @@ const KnowledgeChatPage: React.FC = () => {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="AI 멘토에게 무엇이든 물어보세요..."
                 disabled={isLoading}
+                data-testid="mentor-chat-input"
                 className="w-full pl-5 pr-12 py-3.5 bg-white border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500 text-slate-700 placeholder-slate-400 transition-all shadow-inner"
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1 text-slate-400">

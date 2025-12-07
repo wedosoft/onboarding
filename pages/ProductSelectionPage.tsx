@@ -123,7 +123,7 @@ export default function ProductSelectionPage() {
   const standalones = products.filter(p => p.product_type !== 'bundle');
 
   return (
-    <div className="space-y-6 pb-12">
+    <div className="space-y-6 pb-12 py-6">
       {/* Header */}
       <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">

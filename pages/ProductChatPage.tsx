@@ -264,6 +264,7 @@ export default function ProductChatPage() {
                 placeholder={`${product.name}에 대해 질문하세요...`}
                 className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isSendingChat}
+                data-testid="product-chat-input"
               />
               <button
                 onClick={handleSendChat}

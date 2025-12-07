@@ -33,9 +33,25 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const authEnabled = isAuthEnabled();
+  const e2eAutoLogin = import.meta.env.VITE_E2E_AUTO_LOGIN === 'true';
+  const e2eUser: AuthUser | null = e2eAutoLogin
+    ? {
+        id: import.meta.env.VITE_E2E_TEST_USER_ID || 'e2e-user',
+        email: import.meta.env.VITE_E2E_TEST_USER_EMAIL || 'playwright@wedosoft.net',
+        name: import.meta.env.VITE_E2E_TEST_USER_NAME || 'Playwright Reviewer',
+        avatar: import.meta.env.VITE_E2E_TEST_USER_AVATAR || null,
+      }
+    : null;
+  const e2eToken = e2eAutoLogin ? (import.meta.env.VITE_E2E_TEST_TOKEN || 'e2e-test-token') : null;
 
   // 초기 사용자 로드
   useEffect(() => {
+    if (e2eAutoLogin && e2eUser) {
+      setUser(e2eUser);
+      setIsLoading(false);
+      return;
+    }
+
     const loadUser = async () => {
       if (!authEnabled) {
         setIsLoading(false);
@@ -70,11 +86,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     loadUser();
-  }, [authEnabled]);
+  }, [authEnabled, e2eAutoLogin, e2eUser]);
 
   // 인증 상태 변경 리스너
   useEffect(() => {
-    if (!authEnabled) {
+    if (e2eAutoLogin || !authEnabled) {
       return;
     }
 
@@ -84,9 +100,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [authEnabled]);
+  }, [authEnabled, e2eAutoLogin]);
 
   const signIn = useCallback(async () => {
+    if (e2eAutoLogin) {
+      setUser(e2eUser);
+      setIsLoading(false);
+      return;
+    }
+
     if (!authEnabled) {
       console.warn('Auth is not enabled');
       return;
@@ -100,9 +122,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
       throw error;
     }
-  }, [authEnabled]);
+  }, [authEnabled, e2eAutoLogin, e2eUser]);
 
   const signOut = useCallback(async () => {
+    if (e2eAutoLogin) {
+      setUser(null);
+      return;
+    }
+
     if (!authEnabled) {
       return;
     }
@@ -114,14 +141,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error('Sign out failed:', error);
       throw error;
     }
-  }, [authEnabled]);
+  }, [authEnabled, e2eAutoLogin]);
 
   const getToken = useCallback(async () => {
+    if (e2eAutoLogin) {
+      return e2eToken;
+    }
+
     if (!authEnabled || !user) {
       return null;
     }
     return getAccessToken();
-  }, [authEnabled, user]);
+  }, [authEnabled, user, e2eAutoLogin, e2eToken]);
 
   return (
     <AuthContext.Provider

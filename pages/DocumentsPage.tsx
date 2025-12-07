@@ -3,7 +3,7 @@ import KnowledgeSection from '../components/KnowledgeSection';
 
 const DocumentsPage: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 py-6">
       {/* Header */}
       <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold text-gray-900 mb-1">

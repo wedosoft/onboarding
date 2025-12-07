@@ -1,6 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
+import SurfaceCard from '../components/layout/SurfaceCard';
+import SectionHeader from '../components/layout/SectionHeader';
 import { getProgressSummary } from '../services/apiClient';
 import { CurriculumModule, ProgressSummary } from '../types';
 
@@ -14,39 +16,42 @@ const MODULE_STYLES: Record<string, { icon: string; gradient: string }> = {
   'omnichannel': { icon: 'fas fa-globe', gradient: 'from-cyan-400 to-blue-500' },
   'knowledge-base': { icon: 'fas fa-book', gradient: 'from-pink-400 to-rose-500' },
   'chatbot': { icon: 'fas fa-robot', gradient: 'from-violet-400 to-purple-500' },
-  // Default fallback
-  'default': { icon: 'fas fa-cube', gradient: 'from-slate-400 to-slate-600' }
+  default: { icon: 'fas fa-layer-group', gradient: 'from-slate-500 to-slate-700' },
 };
 
-const getModuleStyle = (slug: string) => MODULE_STYLES[slug] || MODULE_STYLES['default'];
+const getModuleStyle = (slug: string) => MODULE_STYLES[slug] || MODULE_STYLES.default;
 
-export default function CurriculumModulesPage() {
-  const { productId } = useParams<{ productId: string }>();
+const CurriculumModulesPage: React.FC = () => {
   const navigate = useNavigate();
+  const { productId } = useParams<{ productId: string }>();
+  const sessionId = localStorage.getItem('onboarding_session_id') || '';
 
-  const getOrCreateSessionId = () => {
-    let sessionId = localStorage.getItem('onboarding_session_id');
-    if (!sessionId) {
-      sessionId = crypto.randomUUID();
-      localStorage.setItem('onboarding_session_id', sessionId);
-    }
-    return sessionId;
-  };
-
-  const sessionId = getOrCreateSessionId();
   const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchModules = useCallback(async () => {
+    if (!sessionId) {
+      setError('세션 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+      setIsLoading(false);
+      return;
+    }
+
+    if (!productId) {
+      setError('선택된 제품을 찾을 수 없습니다. 이전 화면으로 돌아가 다시 선택해주세요.');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
     try {
-      setIsLoading(true)
-      setError(null);
-      const summary = await getProgressSummary(sessionId, productId || 'freshservice');
+      const summary = await getProgressSummary(sessionId, productId);
       setProgressSummary(summary);
     } catch (err) {
-      console.error('Failed to fetch curriculum modules:', err);
-      setError('커리큘럼 모듈을 불러오는 중 오류가 발생했습니다.');
+      console.error('Failed to load curriculum modules:', err);
+      setError(err instanceof Error ? err.message : '모듈 정보를 불러오지 못했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -57,12 +62,14 @@ export default function CurriculumModulesPage() {
   }, [fetchModules]);
 
   const handleModuleSelect = (moduleId: string) => {
+    if (!productId) return;
     navigate(`/curriculum/${productId}/${moduleId}`);
   };
 
-  const modules = progressSummary?.modules || [];
+  const modules: CurriculumModule[] = progressSummary?.modules || [];
   const completedCount = progressSummary?.completedModules || 0;
   const completionRate = progressSummary?.completionRate || 0;
+  const displaySessionId = progressSummary?.sessionId || sessionId;
 
   if (isLoading) {
     return (
@@ -75,136 +82,158 @@ export default function CurriculumModulesPage() {
   if (error) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="glass-card p-8 text-center max-w-md">
-          <i className="fas fa-exclamation-triangle text-4xl text-amber-500 mb-4"></i>
-          <p className="text-slate-600 mb-6">{error}</p>
-          <button
-            onClick={fetchModules}
-            className="px-6 py-2 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition"
-          >
-            다시 시도
-          </button>
-        </div>
+        <SurfaceCard className="max-w-md text-center" padding="lg">
+          <div className="space-y-6">
+            <i className="fas fa-exclamation-triangle text-4xl text-amber-500"></i>
+            <p className="text-slate-600">{error}</p>
+            <button
+              onClick={fetchModules}
+              className="px-6 py-3 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 transition"
+            >
+              다시 시도
+            </button>
+          </div>
+        </SurfaceCard>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 pb-12">
-      {/* Header */}
-      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-        <button
-          onClick={() => navigate('/curriculum')}
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition mb-3 text-sm"
-        >
-          <i className="fas fa-arrow-left"></i>
-          <span>제품 선택으로 돌아가기</span>
-        </button>
-        
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">
-              학습 시나리오
-            </h1>
-            <p className="text-sm text-gray-600">
-              단계별 미션을 통해 실무 역량을 키우세요.
-            </p>
-          </div>
-          
-          {/* Progress Summary */}
-          <div className="bg-gray-50 rounded-lg p-4 min-w-[240px] border border-gray-200">
-            <div className="flex justify-between items-end mb-2">
+    <div className="layout-stack pb-12">
+      <SectionHeader
+        title="학습 시나리오"
+        subtitle="단계별 미션을 통해 실무 역량을 키우세요"
+        icon={<i className="fas fa-graduation-cap"></i>}
+        action={(
+          <button
+            onClick={() => navigate('/curriculum')}
+            className="px-4 py-2 rounded-2xl border border-slate-200 text-sm font-medium text-slate-600 hover:text-slate-900"
+          >
+            <i className="fas fa-arrow-left mr-2" />제품 선택으로 돌아가기
+          </button>
+        )}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <SurfaceCard padding="lg" className="lg:col-span-2 flex flex-col gap-6">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3 text-slate-600 text-sm">
+              <span className="w-10 h-10 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center">
+                <i className="fas fa-bullseye" />
+              </span>
               <div>
-                <span className="text-xs font-semibold text-gray-500 uppercase">진행률</span>
-                <p className="text-xl font-bold text-gray-900">{Math.round(completionRate)}%</p>
-              </div>
-              <div className="text-right">
-                <span className="text-sm font-medium text-blue-600">
-                  {completedCount} / {modules.length}
-                </span>
-                <p className="text-xs text-gray-500">모듈 완료</p>
+                <p className="text-xs font-semibold text-slate-500 uppercase">총 모듈</p>
+                <p className="text-xl font-bold text-slate-900">{modules.length}개</p>
               </div>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div
-                className="bg-blue-600 h-full rounded-full transition-all duration-500"
-                style={{ width: `${completionRate}%` }}
-              ></div>
+            <div className="flex items-center gap-3 text-slate-600 text-sm">
+              <span className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i className="fas fa-check" />
+              </span>
+              <div>
+                <p className="text-xs font-semibold text-slate-500 uppercase">완료</p>
+                <p className="text-xl font-bold text-slate-900">{completedCount}개</p>
+              </div>
             </div>
           </div>
-        </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-slate-500">진행률</p>
+              <p className="text-3xl font-semibold text-slate-900">{Math.round(completionRate)}%</p>
+            </div>
+            <div className="w-full bg-slate-100 rounded-full h-3">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-primary-500 to-indigo-600 transition-all"
+                style={{ width: `${completionRate}%` }}
+              />
+            </div>
+          </div>
+        </SurfaceCard>
+
+        <SurfaceCard padding="lg" className="flex flex-col gap-4">
+          <h3 className="text-lg font-semibold text-slate-900">세션 정보</h3>
+          <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 text-sm text-slate-500 break-all">
+            <p className="font-mono text-xs">세션 ID</p>
+            <p className="text-slate-800 font-medium">{displaySessionId || '세션을 확인할 수 없습니다'}</p>
+          </div>
+          <p className="text-xs text-slate-400">
+            세션은 자동 저장됩니다. 다른 기기에서도 동일 계정으로 계속 학습할 수 있어요.
+          </p>
+        </SurfaceCard>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
         {modules.map((mod, index) => {
           const style = getModuleStyle(mod.slug);
           const isCompleted = mod.status === 'completed';
           const isStarted = mod.status === 'learning';
 
           return (
-            <button
+            <SurfaceCard
               key={mod.id}
+              as="button"
+              type="button"
               onClick={() => handleModuleSelect(mod.id)}
-              className="text-left group bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
+              className="text-left group h-full p-0 overflow-hidden border border-slate-100 hover:border-primary-200"
             >
-              {/* Visual Header */}
-              <div className={`h-24 bg-gradient-to-br ${style.gradient} p-4 flex items-center justify-between relative overflow-hidden rounded-t-lg`}>
-                <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-xl"></div>
-                
-                <div className="relative z-10 flex items-center gap-3">
-                  <span className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm text-white text-sm font-bold flex items-center justify-center">
+              <div className={`h-28 bg-gradient-to-br ${style.gradient} p-4 flex items-center justify-between relative overflow-hidden`}>
+                <div className="absolute inset-0 bg-white/10 pointer-events-none" />
+                <div className="relative z-10 flex items-center gap-4">
+                  <span className="w-10 h-10 rounded-2xl bg-white/20 text-white font-semibold flex items-center justify-center">
                     {index + 1}
                   </span>
-                  <div className="text-white text-2xl">
-                    <i className={style.icon}></i>
-                  </div>
+                  <i className={`${style.icon} text-white text-2xl`}></i>
                 </div>
-                
                 {isCompleted && (
-                  <span className="relative z-10 bg-white/90 text-green-600 text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1">
+                  <span className="relative z-10 bg-white/90 text-emerald-600 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
                     <i className="fas fa-check-circle"></i> 완료
                   </span>
                 )}
               </div>
 
-              {/* Content */}
-              <div className="p-5">
-                <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1">
-                  {mod.nameKo}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {mod.description}
-                </p>
+              <div className="p-5 flex flex-col gap-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 line-clamp-1">{mod.nameKo}</h3>
+                  <p className="text-sm text-slate-500 line-clamp-2">{mod.description}</p>
+                </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="inline-flex items-center gap-2 text-slate-500">
                     <i className="far fa-clock"></i>
-                    <span>{mod.estimatedMinutes || 15}분</span>
-                  </div>
-
-                  <div className={`px-3 py-1 rounded text-xs font-semibold ${
-                    isCompleted
-                      ? 'bg-green-100 text-green-700'
-                      : isStarted
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600 group-hover:bg-blue-600 group-hover:text-white'
-                  }`}>
+                    {mod.estimatedMinutes || 15}분 예상
+                  </span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
+                      isCompleted
+                        ? 'bg-emerald-50 text-emerald-600'
+                        : isStarted
+                          ? 'bg-blue-50 text-blue-600'
+                          : 'bg-slate-100 text-slate-600 group-hover:bg-primary-600 group-hover:text-white'
+                    }`}
+                  >
                     {isCompleted ? '복습하기' : isStarted ? '이어하기' : '시작하기'}
-                  </div>
+                  </span>
                 </div>
               </div>
 
-              {/* Progress Bar */}
               {isStarted && !isCompleted && (
-                <div className="h-1 bg-blue-100 rounded-b-lg overflow-hidden">
+                <div className="h-1 bg-blue-50">
                   <div className="h-full bg-blue-500 w-1/3"></div>
                 </div>
               )}
-            </button>
+            </SurfaceCard>
           );
         })}
       </div>
+
+      {modules.length === 0 && (
+        <SurfaceCard className="text-center" padding="lg">
+          <p className="text-slate-500">아직 등록된 학습 모듈이 없습니다. 관리자에게 문의해주세요.</p>
+        </SurfaceCard>
+      )}
     </div>
   );
-}
+};
+
+export default CurriculumModulesPage;
