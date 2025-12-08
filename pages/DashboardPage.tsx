@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { SCENARIOS } from '../constants';
 import { getProgress } from '../services/apiClient';
-import SurfaceCard from '../components/layout/SurfaceCard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import SectionHeader from '../components/layout/SectionHeader';
 
 interface ProgressData {
@@ -85,47 +88,40 @@ const DashboardPage: React.FC = () => {
   ];
 
   const renderHero = () => (
-    <SurfaceCard
-      tone="brand"
-      padding="lg"
-      className="relative overflow-hidden h-full flex flex-col justify-between"
-    >
-      <div className="relative z-10 space-y-4">
-        <p className="text-sm uppercase tracking-widest text-white/70">Onboarding Journey</p>
-        <h2 className="text-3xl lg:text-4xl font-bold">
-          반가워요, {userName}님! 👋
-        </h2>
-        <p className="text-white/80 max-w-2xl text-lg">
-          오늘도 성장 여정을 이어가 볼까요? 현재 전체 온보딩의{' '}
-          <strong className="text-white px-2 py-1 rounded-xl bg-white/20">{completionPercent}%</strong>
-          를 달성했어요.
-        </p>
-      </div>
+    <Card className="relative overflow-hidden h-full flex flex-col justify-between bg-primary text-primary-foreground border-0">
+      <CardContent className="pt-6 space-y-6">
+        <div className="relative z-10 space-y-4">
+          <p className="text-sm uppercase tracking-widest text-primary-foreground/70">Onboarding Journey</p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-primary-foreground">
+            반가워요, {userName}님! 👋
+          </h2>
+          <p className="text-primary-foreground/80 max-w-2xl text-lg">
+            오늘도 성장 여정을 이어가 볼까요? 현재 전체 온보딩의{' '}
+            <Badge variant="secondary" className="px-2 py-1 text-sm">{completionPercent}%</Badge>
+            를 달성했어요.
+          </p>
+        </div>
 
-      <div className="relative z-10 mt-6 space-y-3">
-        <div className="w-full bg-white/20 rounded-full h-3">
-          <div
-            className="h-full rounded-full bg-white shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all"
-            style={{ width: `${completionPercent}%` }}
-          />
+        <div className="relative z-10 space-y-3">
+          <Progress value={completionPercent} className="h-3 bg-primary-foreground/20" />
+          <div className="flex items-center justify-between text-sm text-primary-foreground/80">
+            <span>시작 단계</span>
+            <span>마스터</span>
+          </div>
+          {completionPercent < 100 && (
+            <Link
+              to="/curriculum"
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition"
+            >
+              첫 번째 시나리오 시작하기
+              <i className="fas fa-arrow-right"></i>
+            </Link>
+          )}
         </div>
-        <div className="flex items-center justify-between text-sm text-white/80">
-          <span>시작 단계</span>
-          <span>마스터</span>
-        </div>
-        {completionPercent < 100 && (
-          <Link
-            to="/curriculum"
-            className="inline-flex items-center gap-2 text-sm font-medium text-white/90 hover:text-white"
-          >
-            첫 번째 시나리오 시작하기
-            <i className="fas fa-arrow-right"></i>
-          </Link>
-        )}
-      </div>
+      </CardContent>
 
       <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.4),_transparent_70%)]" />
-    </SurfaceCard>
+    </Card>
   );
 
   return (
@@ -141,87 +137,91 @@ const DashboardPage: React.FC = () => {
           {renderHero()}
         </div>
 
-        <SurfaceCard className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-slate-500">완료한 시나리오</p>
-              <p className="text-4xl font-bold text-slate-900 mt-1">
-                {completedCount}
-                <span className="text-lg text-slate-400 ml-1">/ {totalCount}</span>
-              </p>
+        <Card>
+          <CardContent className="pt-6 flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">완료한 시나리오</p>
+                <p className="text-4xl font-bold text-foreground mt-1">
+                  {completedCount}
+                  <span className="text-lg text-muted-foreground ml-1">/ {totalCount}</span>
+                </p>
+              </div>
+              <span className="w-12 h-12 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center">
+                <i className="fas fa-fire"></i>
+              </span>
             </div>
-            <span className="w-12 h-12 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center">
-              <i className="fas fa-fire"></i>
-            </span>
-          </div>
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <p className="text-sm text-slate-500">진행률</p>
-            <p className="text-2xl font-semibold text-slate-900">{completionPercent}%</p>
-          </div>
-          <Link
-            to="/curriculum"
-            className="w-full py-3 rounded-2xl bg-slate-900 text-white text-center font-medium hover:bg-slate-800 transition"
-          >
-            학습 이어하기
-          </Link>
-        </SurfaceCard>
+            <div className="bg-muted rounded-lg p-4 border border-border">
+              <p className="text-sm text-muted-foreground">진행률</p>
+              <p className="text-2xl font-semibold text-foreground">{completionPercent}%</p>
+            </div>
+            <Button asChild className="w-full">
+              <Link to="/curriculum">
+                학습 이어하기
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {quickLinks.map(link => (
-          <SurfaceCard key={link.title} variant="solid" padding="md" className="hover:-translate-y-1 transition">
-            <Link to={link.to} className="flex flex-col gap-3 h-full">
-              <span className={`w-12 h-12 rounded-2xl flex items-center justify-center ${link.iconBg}`}>
-                <i className={`${link.icon} text-lg`}></i>
-              </span>
-              <div>
-                <p className="text-base font-semibold text-slate-900">{link.title}</p>
-                <p className="text-sm text-slate-500">{link.description}</p>
-              </div>
-              <span className="text-sm font-medium text-primary-600 inline-flex items-center gap-1">
-                바로가기 <i className="fas fa-arrow-right"></i>
-              </span>
-            </Link>
-          </SurfaceCard>
+          <Card key={link.title} className="hover:-translate-y-1 transition-transform card-hover">
+            <CardContent className="pt-6">
+              <Link to={link.to} className="flex flex-col gap-3 h-full">
+                <span className={`w-12 h-12 rounded-lg flex items-center justify-center ${link.iconBg}`}>
+                  <i className={`${link.icon} text-lg`}></i>
+                </span>
+                <div>
+                  <p className="text-base font-semibold text-foreground">{link.title}</p>
+                  <p className="text-sm text-muted-foreground">{link.description}</p>
+                </div>
+                <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                  바로가기 <i className="fas fa-arrow-right"></i>
+                </span>
+              </Link>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
-      <SurfaceCard padding="lg" className="flex flex-col gap-6">
-        <div className="flex items-center gap-2 text-slate-800">
-          <i className="fas fa-history text-slate-400"></i>
-          <h3 className="text-xl font-semibold">최근 활동</h3>
-        </div>
-
-        <div className="space-y-3">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <i className="fas fa-history text-muted-foreground"></i>
+            최근 활동
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
           {recentActivities.length > 0 ? (
             recentActivities.map((activity, idx) => (
               <div
                 key={`${activity.scenarioId}-${idx}`}
-                className="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 hover:border-primary-100 transition"
+                className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/20 transition"
               >
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
                   <i className="fas fa-check"></i>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-slate-800 truncate">
+                  <p className="font-medium text-foreground truncate">
                     {activity.scenario?.title || '알 수 없는 시나리오'}
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-muted-foreground">
                     {activity.completedAt ? new Date(activity.completedAt).toLocaleDateString() : '날짜 정보 없음'} 완료
                   </p>
                 </div>
-                <span className="text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+                <Badge variant="secondary">
                   {SCENARIOS.find(s => s.id === activity.scenarioId)?.category === 'productivity' ? '생산성' : '커뮤니케이션'}
-                </span>
+                </Badge>
               </div>
             ))
           ) : (
-            <div className="text-center py-10 text-slate-400">
+            <div className="text-center py-10 text-muted-foreground">
               <p>아직 활동 내역이 없습니다. 첫 학습을 시작해보세요!</p>
             </div>
           )}
-        </div>
-      </SurfaceCard>
+        </CardContent>
+      </Card>
     </div>
   );
 };

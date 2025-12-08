@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
-import SurfaceCard from '../components/layout/SurfaceCard';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import SectionHeader from '../components/layout/SectionHeader';
 import { getProgressSummary } from '../services/apiClient';
 import { CurriculumModule, ProgressSummary } from '../types';
@@ -82,18 +85,15 @@ const CurriculumModulesPage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <SurfaceCard className="max-w-md text-center" padding="lg">
-          <div className="space-y-6">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center space-y-6">
             <i className="fas fa-exclamation-triangle text-4xl text-amber-500"></i>
-            <p className="text-slate-600">{error}</p>
-            <button
-              onClick={fetchModules}
-              className="px-6 py-3 rounded-2xl bg-slate-900 text-white hover:bg-slate-800 transition"
-            >
+            <p className="text-muted-foreground">{error}</p>
+            <Button onClick={fetchModules}>
               다시 시도
-            </button>
-          </div>
-        </SurfaceCard>
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -105,62 +105,64 @@ const CurriculumModulesPage: React.FC = () => {
         subtitle="단계별 미션을 통해 실무 역량을 키우세요"
         icon={<i className="fas fa-graduation-cap"></i>}
         action={(
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => navigate('/curriculum')}
-            className="px-4 py-2 rounded-2xl border border-slate-200 text-sm font-medium text-slate-600 hover:text-slate-900"
           >
             <i className="fas fa-arrow-left mr-2" />제품 선택으로 돌아가기
-          </button>
+          </Button>
         )}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <SurfaceCard padding="lg" className="lg:col-span-2 flex flex-col gap-6">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-3 text-slate-600 text-sm">
-              <span className="w-10 h-10 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center">
-                <i className="fas fa-bullseye" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase">총 모듈</p>
-                <p className="text-xl font-bold text-slate-900">{modules.length}개</p>
+        <Card className="lg:col-span-2">
+          <CardContent className="pt-6 flex flex-col gap-6">
+            <div className="flex flex-wrap items-center gap-4">
+              <div className="flex items-center gap-3 text-muted-foreground text-sm">
+                <span className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                  <i className="fas fa-bullseye" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase">총 모듈</p>
+                  <p className="text-xl font-bold text-foreground">{modules.length}개</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 text-muted-foreground text-sm">
+                <span className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                  <i className="fas fa-check" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase">완료</p>
+                  <p className="text-xl font-bold text-foreground">{completedCount}개</p>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3 text-slate-600 text-sm">
-              <span className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <i className="fas fa-check" />
-              </span>
-              <div>
-                <p className="text-xs font-semibold text-slate-500 uppercase">완료</p>
-                <p className="text-xl font-bold text-slate-900">{completedCount}개</p>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">진행률</p>
+                <p className="text-3xl font-semibold text-foreground">{Math.round(completionRate)}%</p>
               </div>
+              <Progress value={completionRate} className="h-3" />
             </div>
-          </div>
+          </CardContent>
+        </Card>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-slate-500">진행률</p>
-              <p className="text-3xl font-semibold text-slate-900">{Math.round(completionRate)}%</p>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">세션 정보</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg bg-muted border border-border p-4 text-sm text-muted-foreground break-all">
+              <p className="font-mono text-xs">세션 ID</p>
+              <p className="text-foreground font-medium">{displaySessionId || '세션을 확인할 수 없습니다'}</p>
             </div>
-            <div className="w-full bg-slate-100 rounded-full h-3">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-primary-500 to-indigo-600 transition-all"
-                style={{ width: `${completionRate}%` }}
-              />
-            </div>
-          </div>
-        </SurfaceCard>
-
-        <SurfaceCard padding="lg" className="flex flex-col gap-4">
-          <h3 className="text-lg font-semibold text-slate-900">세션 정보</h3>
-          <div className="rounded-2xl bg-slate-50 border border-slate-100 p-4 text-sm text-slate-500 break-all">
-            <p className="font-mono text-xs">세션 ID</p>
-            <p className="text-slate-800 font-medium">{displaySessionId || '세션을 확인할 수 없습니다'}</p>
-          </div>
-          <p className="text-xs text-slate-400">
-            세션은 자동 저장됩니다. 다른 기기에서도 동일 계정으로 계속 학습할 수 있어요.
-          </p>
-        </SurfaceCard>
+            <p className="text-xs text-muted-foreground">
+              세션은 자동 저장됩니다. 다른 기기에서도 동일 계정으로 계속 학습할 수 있어요.
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -170,67 +172,62 @@ const CurriculumModulesPage: React.FC = () => {
           const isStarted = mod.status === 'learning';
 
           return (
-            <SurfaceCard
+            <Card
               key={mod.id}
-              as="button"
-              type="button"
+              className="text-left group h-full p-0 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
               onClick={() => handleModuleSelect(mod.id)}
-              className="text-left group h-full p-0 overflow-hidden border border-slate-100 hover:border-primary-200"
             >
               <div className={`h-28 bg-gradient-to-br ${style.gradient} p-4 flex items-center justify-between relative overflow-hidden`}>
                 <div className="absolute inset-0 bg-white/10 pointer-events-none" />
                 <div className="relative z-10 flex items-center gap-4">
-                  <span className="w-10 h-10 rounded-2xl bg-white/20 text-white font-semibold flex items-center justify-center">
+                  <span className="w-10 h-10 rounded-lg bg-white/20 text-white font-semibold flex items-center justify-center">
                     {index + 1}
                   </span>
                   <i className={`${style.icon} text-white text-2xl`}></i>
                 </div>
                 {isCompleted && (
-                  <span className="relative z-10 bg-white/90 text-emerald-600 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-                    <i className="fas fa-check-circle"></i> 완료
-                  </span>
+                  <Badge className="relative z-10 bg-white/90 text-emerald-600 hover:bg-white/90">
+                    <i className="fas fa-check-circle mr-1"></i> 완료
+                  </Badge>
                 )}
               </div>
 
-              <div className="p-5 flex flex-col gap-4">
+              <CardContent className="p-5 flex flex-col gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 line-clamp-1">{mod.nameKo}</h3>
-                  <p className="text-sm text-slate-500 line-clamp-2">{mod.description}</p>
+                  <h3 className="text-lg font-semibold text-foreground line-clamp-1">{mod.nameKo}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">{mod.description}</p>
                 </div>
 
                 <div className="flex items-center justify-between text-sm">
-                  <span className="inline-flex items-center gap-2 text-slate-500">
+                  <span className="inline-flex items-center gap-2 text-muted-foreground">
                     <i className="far fa-clock"></i>
                     {mod.estimatedMinutes || 15}분 예상
                   </span>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition ${
-                      isCompleted
-                        ? 'bg-emerald-50 text-emerald-600'
-                        : isStarted
-                          ? 'bg-blue-50 text-blue-600'
-                          : 'bg-slate-100 text-slate-600 group-hover:bg-primary-600 group-hover:text-white'
-                    }`}
+                  <Badge
+                    variant={isCompleted ? "default" : isStarted ? "secondary" : "outline"}
+                    className={`${!isCompleted && !isStarted ? 'group-hover:bg-primary group-hover:text-primary-foreground' : ''}`}
                   >
                     {isCompleted ? '복습하기' : isStarted ? '이어하기' : '시작하기'}
-                  </span>
+                  </Badge>
                 </div>
-              </div>
+              </CardContent>
 
               {isStarted && !isCompleted && (
-                <div className="h-1 bg-blue-50">
+                <div className="h-1 bg-blue-100">
                   <div className="h-full bg-blue-500 w-1/3"></div>
                 </div>
               )}
-            </SurfaceCard>
+            </Card>
           );
         })}
       </div>
 
       {modules.length === 0 && (
-        <SurfaceCard className="text-center" padding="lg">
-          <p className="text-slate-500">아직 등록된 학습 모듈이 없습니다. 관리자에게 문의해주세요.</p>
-        </SurfaceCard>
+        <Card>
+          <CardContent className="pt-6 text-center">
+            <p className="text-muted-foreground">아직 등록된 학습 모듈이 없습니다. 관리자에게 문의해주세요.</p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

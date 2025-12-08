@@ -1,0 +1,728 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+    /* 🎯 타이포그래피 시스템 - Pretendard 기반 */
+    html {
+        font-family: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+        font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        font-variation-settings: "slnt" 0;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* 제목 스타일 체계 */
+    h1,
+    .text-h1 {
+        font-size: 2.5rem;
+        /* 40px */
+        font-weight: 700;
+        line-height: 1.2;
+        letter-spacing: -0.025em;
+    }
+
+    h2,
+    .text-h2 {
+        font-size: 2rem;
+        /* 32px */
+        font-weight: 600;
+        line-height: 1.25;
+        letter-spacing: -0.02em;
+    }
+
+    h3,
+    .text-h3 {
+        font-size: 1.5rem;
+        /* 24px */
+        font-weight: 600;
+        line-height: 1.3;
+        letter-spacing: -0.015em;
+    }
+
+    h4,
+    .text-h4 {
+        font-size: 1.25rem;
+        /* 20px */
+        font-weight: 600;
+        line-height: 1.4;
+        letter-spacing: -0.01em;
+    }
+
+    /* 본문 스타일 */
+    p,
+    .text-body {
+        font-size: 1rem;
+        /* 16px */
+        font-weight: 400;
+        line-height: 1.6;
+        letter-spacing: 0;
+    }
+
+    .text-body-lg {
+        font-size: 1.125rem;
+        /* 18px */
+        font-weight: 400;
+        line-height: 1.7;
+    }
+
+    .text-body-sm {
+        font-size: 0.875rem;
+        /* 14px */
+        font-weight: 400;
+        line-height: 1.5;
+    }
+
+    /* 캡션 및 작은 텍스트 */
+    .text-caption {
+        font-size: 0.75rem;
+        /* 12px */
+        font-weight: 500;
+        line-height: 1.4;
+        letter-spacing: 0.025em;
+    }
+
+    /* 🌙 다크 테마 - 기본 테마 (Enhanced Blue-Gray Monotone) */
+    :root {
+        --background: 0 0% 100%;
+        /* Rich dark blue-gray background */
+        --foreground: 0 0% 3.9%;
+        /* Almost white text */
+
+        --card: 0 0% 100%;
+        /* Dark blue-gray cards */
+        --card-foreground: 0 0% 3.9%;
+        /* Light card text */
+
+        --popover: 0 0% 100%;
+        /* Dark blue-gray popovers */
+        --popover-foreground: 0 0% 3.9%;
+        /* Light popover text */
+
+        --primary: 0 0% 9%;
+        /* #3284D6 - 위두소프트 브랜드 블루 */
+        --primary-foreground: 0 0% 98%;
+        /* Light text on blue */
+
+        --secondary: 0 0% 96.1%;
+        /* Medium dark blue-gray */
+        --secondary-foreground: 0 0% 9%;
+        /* Light text */
+
+        --muted: 0 0% 96.1%;
+        /* Medium dark blue-gray for muted areas */
+        --muted-foreground: 0 0% 45.1%;
+        /* Light blue-gray for muted text - 더 명료하게 */
+
+        --accent: 0 0% 96.1%;
+        /* Medium blue-gray accent - 조금 더 밝고 선명하게 */
+        --accent-foreground: 0 0% 9%;
+        /* Light text on accent */
+
+        --destructive: 0 84.2% 60.2%;
+        /* Red for errors */
+        --destructive-foreground: 0 0% 98%;
+        /* Light text */
+
+        --border: 0 0% 89.8%;
+        /* Medium blue-gray borders - 더 선명한 경계 */
+        --input: 0 0% 89.8%;
+        /* Input borders */
+        --ring: 0 0% 3.9%;
+        /* #3284D6 focus rings - primary와 동일 */
+
+        /* 🎯 Linear.app 스타일 적용 - 버튼 크기별 radius */
+        --radius: 0.5rem;
+        /* 8px - 작은 버튼용 (Linear sm) */
+        --radius-lg: 0.625rem;
+        /* 10px - 기본/큰 버튼용 (Linear default) */
+        --radius-sm: 0.375rem;
+        /* 6px - 매우 작은 요소용 */
+
+        /* 📦 Callout tone tokens */
+        --callout-note: 215 62% 52%;
+        --callout-info: 205 65% 58%;
+        --callout-success: 150 60% 42%;
+        --callout-warning: 38 92% 58%;
+        --callout-danger: 0 84% 60%;
+        --chart-1: 12 76% 61%;
+        --chart-2: 173 58% 39%;
+        --chart-3: 197 37% 24%;
+        --chart-4: 43 74% 66%;
+        --chart-5: 27 87% 67%;
+    }
+
+    /* ☀️ 라이트 테마 */
+    .light {
+        --background: 0 0% 100%;
+        /* White background */
+        --foreground: 222 84% 5%;
+        /* Dark text */
+
+        --card: 0 0% 100%;
+        /* White cards */
+        --card-foreground: 222 84% 5%;
+        /* Dark card text */
+
+        --popover: 0 0% 100%;
+        /* White popovers */
+        --popover-foreground: 222 84% 5%;
+        /* Dark popover text */
+
+        --primary: 215 45% 45%;
+        /* 라이트 모드: 더 선명한 blue-gray */
+        --primary-foreground: 0 0% 100%;
+        /* White text on blue */
+
+        --secondary: 210 40% 94%;
+        /* Light blue-gray */
+        --secondary-foreground: 222 84% 5%;
+        /* Dark text */
+
+        --muted: 210 40% 96%;
+        /* Very light background */
+        --muted-foreground: 215 20% 35%;
+        /* 더 진한 색상으로 가독성 향상 */
+
+        --accent: 210 40% 94%;
+        /* Light accent */
+        --accent-foreground: 222 84% 5%;
+        /* Dark text */
+
+        --destructive: 0 84% 60%;
+        /* Red for errors */
+        --destructive-foreground: 0 0% 100%;
+        /* White text */
+
+        --border: 214 32% 91%;
+        /* Light borders */
+        --input: 214 32% 91%;
+        /* Input borders */
+        --ring: 210 100% 56%;
+        /* Focus rings */
+
+        /* 📦 Callout tone tokens */
+        --callout-note: 215 62% 52%;
+        --callout-info: 205 65% 58%;
+        --callout-success: 150 60% 42%;
+        --callout-warning: 38 92% 58%;
+        --callout-danger: 0 84% 60%;
+    }
+
+    /* 기본 스타일 */
+    * {
+        border-color: hsl(var(--border));
+    }
+
+    body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+    }
+
+    /* 🖱️ 커서 스타일 강제 적용 */
+    a, button, [role="button"], [role="link"] {
+        cursor: pointer !important;
+    }
+
+    a[disabled], button[disabled], button:disabled {
+        cursor: not-allowed !important;
+    }
+
+    /* 🎨 3D 애니메이션 */
+    .perspective-1000 {
+        perspective: 1000px;
+    }
+
+    .transform-gpu {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+    }
+
+    /* 플로팅 애니메이션 */
+    @keyframes float1 {
+
+        0%,
+        100% {
+            transform: rotateY(-15deg) rotateX(10deg) translateZ(50px) translateY(0px);
+        }
+
+        50% {
+            transform: rotateY(-15deg) rotateX(10deg) translateZ(50px) translateY(-20px);
+        }
+    }
+
+    @keyframes float2 {
+
+        0%,
+        100% {
+            transform: rotateY(15deg) rotateX(-5deg) translateZ(30px) translateY(0px);
+        }
+
+        50% {
+            transform: rotateY(15deg) rotateX(-5deg) translateZ(30px) translateY(-15px);
+        }
+    }
+
+    @keyframes float3 {
+
+        0%,
+        100% {
+            transform: rotateY(-10deg) rotateX(15deg) translateZ(20px) translateY(0px);
+        }
+
+        50% {
+            transform: rotateY(-10deg) rotateX(15deg) translateZ(20px) translateY(-25px);
+        }
+    }
+
+    /* 그리드 펄스 효과 */
+    @keyframes gridPulse {
+
+        0%,
+        100% {
+            opacity: 0.3;
+        }
+
+        50% {
+            opacity: 0.6;
+        }
+    }
+
+    /* 호버 효과 */
+    .hero-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 3D 카드 그림자 */
+    .card-3d {
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.1),
+            0 10px 20px rgba(0, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* 커스텀 스크롤바 스타일 */
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: hsl(var(--muted) / 0.1);
+        border-radius: 2px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: hsl(var(--muted-foreground) / 0.3);
+        border-radius: 2px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: hsl(var(--muted-foreground) / 0.5);
+    }
+
+    /* ============================================
+       🎨 디자인 토큰 시스템 - 템플릿화
+       ============================================ */
+
+    /* 📐 타이포그래피 유틸리티 */
+    .heading-hero {
+        @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight;
+    }
+
+    .heading-section {
+        @apply text-2xl md:text-3xl lg:text-4xl font-bold;
+    }
+
+    .heading-subsection {
+        @apply text-xl md:text-2xl lg:text-3xl font-semibold;
+    }
+
+    .heading-card {
+        @apply text-lg md:text-xl font-semibold;
+    }
+
+    .text-body-large {
+        @apply text-lg md:text-xl text-muted-foreground leading-relaxed;
+    }
+
+    .text-body-medium {
+        @apply text-base md:text-lg text-muted-foreground leading-relaxed;
+    }
+
+    /* 📏 섹션 간격 시스템 */
+    .section-spacing {
+        @apply py-12 md:py-16 lg:py-20;
+    }
+
+    .section-spacing-small {
+        @apply py-8 md:py-12 lg:py-16;
+    }
+
+    .section-spacing-large {
+        @apply py-16 md:py-20 lg:py-24;
+    }
+
+    /* 히어로 섹션 전용 간격 (상단 패딩 없음) */
+    .hero-spacing {
+        @apply pt-12 pb-8 md:pt-16 md:pb-12 lg:pt-20 lg:pb-16;
+    }
+
+    /* 🎨 배경 패턴 */
+    .section-bg-primary {
+        @apply bg-background;
+    }
+
+    .section-bg-muted {
+        @apply bg-muted/30;
+    }
+
+    .section-bg-gradient {
+        @apply bg-gradient-to-b from-muted/30 to-background;
+    }
+
+    .section-bg-accent {
+        @apply bg-gradient-to-br from-primary/5 via-transparent to-secondary/5;
+    }
+
+    /* 📦 컨테이너 시스템 */
+    .section-container {
+        @apply container mx-auto;
+    }
+
+    .section-container-narrow {
+        @apply container mx-auto max-w-4xl;
+    }
+
+    .section-container-wide {
+        @apply container mx-auto max-w-7xl;
+    }
+
+    /* 🎯 섹션 헤더 스타일 */
+    .section-header {
+        @apply text-center space-y-4 mb-12 md:mb-16;
+    }
+
+    .section-header-large {
+        @apply text-center space-y-6 mb-16 md:mb-20;
+    }
+
+    /* 🔲 카드 그리드 시스템 */
+    .card-grid-2 {
+        @apply grid md:grid-cols-2 gap-6 md:gap-8;
+    }
+
+    .card-grid-3 {
+        @apply grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8;
+    }
+
+    .card-grid-4 {
+        @apply grid md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8;
+    }
+
+    /* 🎭 공통 카드 스타일 */
+    .card-hover {
+        @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+    }
+
+    .card-bordered {
+        @apply border-2 border-border hover:border-primary/20;
+    }
+
+    /* 🔘 버튼 그룹 */
+    .button-group {
+        @apply flex flex-col sm:flex-row items-center justify-center gap-4 pt-4;
+    }
+
+    /* 📱 반응형 텍스트 정렬 */
+    .text-center-mobile {
+        @apply text-center md:text-left;
+    }
+
+    /* 🔧 대화 목록 너비 제한 - display:table 오버플로우 해결 */
+    .ai-style-change-1,
+    [style*="display:table"][style*="min-width:100%"],
+    [style*="display: table"][style*="min-width: 100%"] {
+        display: block !important;
+        width: 100% !important;
+        min-width: auto !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    /* 📝 블로그 콘텐츠 스타일 */
+    .blog-content {
+        @apply text-base leading-relaxed;
+    }
+
+    .blog-content p {
+        @apply mb-6 text-gray-600 dark:text-gray-400;
+    }
+
+    .blog-content h2 {
+        @apply text-2xl font-semibold mt-10 mb-6 text-gray-900 dark:text-gray-100;
+    }
+
+    .blog-content h3 {
+        @apply text-xl font-semibold mt-8 mb-4 text-gray-900 dark:text-gray-100;
+    }
+
+    .blog-content h4 {
+        @apply text-lg font-semibold mt-6 mb-3 text-gray-900 dark:text-gray-100;
+    }
+
+    .blog-content h5 {
+        @apply text-base font-semibold mt-4 mb-2 text-gray-900 dark:text-gray-100;
+    }
+
+    .blog-content ul {
+        @apply my-6 space-y-2;
+    }
+
+    .blog-content li {
+        @apply text-gray-600 dark:text-gray-400;
+    }
+
+    .blog-content strong {
+        @apply font-semibold text-gray-800 dark:text-gray-200;
+    }
+
+    .blog-content a {
+        @apply text-primary hover:text-primary/80 dark:text-primary/90 underline;
+    }
+
+    .blog-content img {
+        @apply rounded-lg shadow-md my-8;
+    }
+
+    .blog-content code {
+        @apply px-1.5 py-0.5 bg-muted text-foreground rounded text-sm;
+    }
+
+    .blog-content pre {
+        @apply p-4 bg-muted rounded-lg overflow-x-auto my-6;
+    }
+
+    .blog-content blockquote {
+        @apply border-l-4 border-primary pl-4 italic my-6 text-gray-600 dark:text-gray-400;
+    }
+
+    /* Freshdesk 문서 스타일 - fd-callout 박스 */
+    .fd-callout {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.875rem;
+        align-items: flex-start;
+        padding: 1.25rem 1.5rem !important;
+        margin-block: 1.5rem !important;
+        margin-inline: 0 !important;
+    border-radius: var(--radius-lg) !important;
+        border: 1px solid hsl(var(--border)) !important;
+        border-left-width: 4px !important;
+        background-color: hsl(var(--muted) / 0.25) !important;
+        color: hsl(var(--foreground)) !important;
+        box-shadow: 0 8px 26px hsl(var(--border) / 0.22);
+        line-height: 1.65;
+        font-family: inherit !important;
+        font-size: 1rem !important;
+        text-align: left !important;
+        border-style: solid !important;
+        border-right-width: 1px !important;
+        border-top-width: 1px !important;
+        border-bottom-width: 1px !important;
+    }
+
+    .fd-callout__title,
+    .fd-callout strong {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .fd-callout :where(p, ul, ol) {
+        margin: 0 0 0.5rem;
+        color: inherit !important;
+    }
+
+    .fd-callout :where(p, ul, ol):last-child {
+        margin-bottom: 0;
+    }
+
+    .fd-callout :where(ul, ol) {
+        padding-inline-start: 1.125rem;
+    }
+
+    .fd-callout :where(a) {
+        color: inherit !important;
+        text-decoration: underline;
+        text-underline-offset: 0.22rem;
+    }
+
+    .fd-callout__icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 9999px;
+        font-size: 1.125rem;
+        line-height: 1;
+        flex-shrink: 0;
+        margin-top: 0.25rem;
+    }
+
+    .fd-callout__icon svg {
+        width: 1.4rem;
+        height: 1.4rem;
+    }
+
+    .fd-callout--note {
+        border-left-color: hsl(var(--callout-note)) !important;
+        background-color: hsl(var(--callout-note) / 0.18) !important;
+        color: color-mix(in srgb, hsl(var(--callout-note)) 55%, hsl(var(--foreground)) 45%) !important;
+    }
+
+    .fd-callout--note .fd-callout__icon {
+        background-color: hsl(var(--callout-note) / 0.22);
+        color: hsl(var(--callout-note));
+    }
+
+    .fd-callout--info {
+        border-left-color: hsl(var(--callout-info)) !important;
+        background-color: hsl(var(--callout-info) / 0.18) !important;
+        color: color-mix(in srgb, hsl(var(--callout-info)) 55%, hsl(var(--foreground)) 45%) !important;
+    }
+
+    .fd-callout--info .fd-callout__icon {
+        background-color: hsl(var(--callout-info) / 0.22);
+        color: hsl(var(--callout-info));
+    }
+
+    .fd-callout--success {
+        border-left-color: hsl(var(--callout-success)) !important;
+        background-color: hsl(var(--callout-success) / 0.18) !important;
+        color: color-mix(in srgb, hsl(var(--callout-success)) 45%, hsl(var(--foreground)) 55%) !important;
+    }
+
+    .fd-callout--success .fd-callout__icon {
+        background-color: hsl(var(--callout-success) / 0.22);
+        color: hsl(var(--callout-success));
+    }
+
+    .fd-callout--warning {
+        border-left-color: hsl(var(--callout-warning)) !important;
+        background-color: hsl(var(--callout-warning) / 0.24) !important;
+        color: color-mix(in srgb, hsl(var(--callout-warning)) 55%, hsl(var(--foreground)) 45%) !important;
+    }
+
+    .fd-callout--warning .fd-callout__icon {
+        background-color: hsl(var(--callout-warning) / 0.28);
+        color: hsl(var(--callout-warning));
+    }
+
+    .fd-callout--danger {
+        border-left-color: hsl(var(--callout-danger)) !important;
+        background-color: hsl(var(--callout-danger) / 0.18) !important;
+        color: color-mix(in srgb, hsl(var(--callout-danger)) 55%, hsl(var(--foreground)) 45%) !important;
+    }
+
+    .fd-callout--danger .fd-callout__icon {
+        background-color: hsl(var(--callout-danger) / 0.22);
+        color: hsl(var(--callout-danger));
+    }
+
+    /* 🌙 다크모드 문서 콘텐츠 폰트 강제 적용 (인라인 스타일 override) */
+    .dark .prose {
+        color: hsl(var(--foreground)) !important;
+    }
+
+    .dark .prose * {
+        color: inherit !important;
+    }
+
+    .dark .prose h1,
+    .dark .prose h2,
+    .dark .prose h3,
+    .dark .prose h4,
+    .dark .prose h5,
+    .dark .prose h6 {
+        color: hsl(var(--foreground)) !important;
+    }
+
+    .dark .prose p,
+    .dark .prose li,
+    .dark .prose td,
+    .dark .prose th {
+        color: hsl(var(--muted-foreground)) !important;
+    }
+
+    .dark .prose strong,
+    .dark .prose b {
+        color: hsl(var(--foreground)) !important;
+        font-weight: 600 !important;
+    }
+
+    .dark .prose a {
+        color: hsl(var(--primary)) !important;
+    }
+
+    .dark .prose code {
+        color: hsl(var(--foreground)) !important;
+        background-color: hsl(var(--muted)) !important;
+    }
+
+    /* 테이블 스타일 강제 적용 */
+    .dark .prose table {
+        border-color: hsl(var(--border)) !important;
+    }
+
+    .dark .prose thead {
+        background-color: hsl(var(--muted)) !important;
+        border-color: hsl(var(--border)) !important;
+    }
+
+    .dark .prose tbody tr {
+        border-color: hsl(var(--border)) !important;
+    }
+  .dark {
+        --background: 0 0% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 0 0% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 0 0% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 0 0% 9%;
+        --secondary: 0 0% 14.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 0 0% 14.9%;
+        --muted-foreground: 0 0% 63.9%;
+        --accent: 0 0% 14.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 0% 14.9%;
+        --input: 0 0% 14.9%;
+        --ring: 0 0% 83.1%;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 30 80% 55%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
+    }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+    }
+  body {
+    @apply bg-background text-foreground;
+    }
+}

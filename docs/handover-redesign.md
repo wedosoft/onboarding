@@ -1,8 +1,44 @@
 # 온보딩 시스템 재디자인 & LMS 개선 프로젝트 핸드오버 문서
 
 **작성일**: 2025-12-08
+**최종 업데이트**: 2025-12-08 (16:30)
 **프로젝트**: Wedosoft 신입사원 온보딩 시스템 전면 개선
 **목표**: Homepage 디자인 시스템(ShadCN UI) 도입 + LMS 학습 효율성 개선
+
+---
+
+## 🎯 현재 진행 상황 (2025-12-08 기준)
+
+### ✅ Phase 1: 디자인 시스템 기반 구축 - **완료** (100%)
+- ✅ 모든 패키지 설치 완료
+- ✅ Tailwind CSS + HSL 색상 시스템 설정
+- ✅ 테마 프로바이더 통합 (다크/라이트 모드)
+- ✅ index.css 완전 교체 (728줄)
+- ✅ ShadCN UI 컴포넌트 10개 복사
+
+### 🔄 Phase 2: 컴포넌트 마이그레이션 - **진행 중** (33% - 4/12 페이지)
+
+**완료된 페이지 (4개):**
+1. ✅ DashboardPage.tsx (226줄)
+2. ✅ CurriculumModulesPage.tsx (233줄)
+3. ✅ ModuleLearningPage.tsx (848줄) ⭐ 가장 복잡
+4. ✅ ProductSelectionPage.tsx (224줄)
+
+**다음 작업 대상 (8개):**
+5. ⏳ ProductCategoriesPage.tsx - 제품별 카테고리 선택
+6. ⏳ CategoryLearningPage.tsx - 카테고리별 학습
+7. ⏳ ProductChatPage.tsx - 제품별 AI 채팅
+8. ⏳ KnowledgeChatPage.tsx - 지식 베이스 채팅
+9. ⏳ DocumentsPage.tsx - 인수인계 문서
+10. ⏳ ScenariosPage.tsx - 시나리오 학습
+11. ⏳ AdminPage.tsx - 관리자 페이지
+12. ⏳ (추가 페이지 확인 필요)
+
+### ⏸️ Phase 3: 데이터베이스 스키마 확장 - **대기 중**
+- 아직 시작 안함
+
+### ⏸️ Phase 4: LMS 기능 구현 - **대기 중**
+- 아직 시작 안함
 
 ---
 
@@ -808,8 +844,18 @@ bg-indigo-600 → bg-primary
 text-indigo-600 → text-primary
 ```
 
-**2순위: CurriculumModulesPage.tsx** (240줄)
-**3순위: ModuleLearningPage.tsx** (842줄 - Phase 4와 연계)
+**2순위: CurriculumModulesPage.tsx** (240줄) - ✅ 완료 (2025-12-08)
+**3순위: ModuleLearningPage.tsx** (842줄 - Phase 4와 연계) - ✅ 완료 (2025-12-08)
+**4순위: ProductSelectionPage.tsx** (224줄) - ✅ 완료 (2025-12-08)
+
+**다음 작업 대상:**
+- **5순위: ProductCategoriesPage.tsx** - 제품별 카테고리 선택 페이지
+- **6순위: CategoryLearningPage.tsx** - 카테고리별 학습 페이지
+- **7순위: ProductChatPage.tsx** - 제품별 AI 채팅 페이지
+- **8순위: KnowledgeChatPage.tsx** - 지식 베이스 채팅 페이지
+- **9순위: DocumentsPage.tsx** - 인수인계 문서 페이지
+- **10순위: ScenariosPage.tsx** - 시나리오 학습 페이지
+- **11순위: AdminPage.tsx** - 관리자 페이지
 
 ### Phase 3: 데이터베이스 스키마 확장 (Week 3-4, 20시간)
 
@@ -2172,7 +2218,135 @@ GROUP BY module_id;
 
 ---
 
-## 즉시 시작 가이드
+## 🚀 다음 작업자를 위한 즉시 시작 가이드
+
+### ⚡ 빠른 시작 (이미 Phase 1 완료됨)
+
+**현재 상태:**
+- ✅ 디자인 시스템 완전 설치됨
+- ✅ 4개 페이지 마이그레이션 완료
+- ✅ 개발 서버 정상 작동 (port 3000)
+
+**다음 작업:**
+1. ProductCategoriesPage.tsx 마이그레이션
+2. 같은 패턴으로 나머지 7개 페이지 순차 진행
+
+### 📝 작업 패턴 (이미 확립됨)
+
+**모든 페이지 마이그레이션은 동일한 패턴을 따릅니다:**
+
+```typescript
+// 1. Import 추가
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import LoadingSpinner from '../components/LoadingSpinner';
+import SectionHeader from '../components/layout/SectionHeader';
+
+// 2. Loading 화면 변환
+if (isLoading) {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <LoadingSpinner />
+    </div>
+  );
+}
+
+// 3. Error 화면 변환
+if (error) {
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <Card className="max-w-md">
+        <CardContent className="pt-6 text-center space-y-6">
+          <i className="fas fa-exclamation-circle text-4xl text-destructive"></i>
+          <p className="text-muted-foreground">{error}</p>
+          <Button onClick={handleRetry}>다시 시도</Button>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// 4. 메인 레이아웃 변환
+return (
+  <div className="layout-stack pb-12">
+    <SectionHeader
+      title="페이지 제목"
+      subtitle="설명"
+      icon={<i className="fas fa-icon"></i>}
+    />
+
+    {/* 카드 컨텐츠 */}
+    <Card>
+      <CardContent className="p-6">
+        {/* 내용 */}
+      </CardContent>
+    </Card>
+  </div>
+);
+```
+
+**5. 색상 클래스 교체 (찾기/바꾸기):**
+```typescript
+// 배경색
+bg-white → bg-background 또는 bg-card
+bg-slate-50 → bg-muted
+bg-slate-900 → bg-foreground 또는 bg-card
+
+// 텍스트색
+text-slate-900 → text-foreground
+text-slate-600 → text-muted-foreground
+text-slate-500 → text-muted-foreground
+text-gray-900 → text-foreground
+text-gray-600 → text-muted-foreground
+text-gray-500 → text-muted-foreground
+
+// 보더
+border-slate-200 → border-border
+border-gray-200 → border-border
+
+// Primary 색상
+bg-indigo-600 → bg-primary
+text-indigo-600 → text-primary
+hover:bg-indigo-700 → hover:bg-primary/90
+
+// 상태 색상
+text-red-500 → text-destructive
+bg-red-50 → bg-destructive/10
+```
+
+### 🎯 다음 페이지 마이그레이션 가이드
+
+**5번: ProductCategoriesPage.tsx**
+
+1. 파일 읽기:
+```bash
+code /Users/alan/GitHub/onboarding/pages/ProductCategoriesPage.tsx
+```
+
+2. 동일한 패턴으로 변환:
+   - Import 추가 (Card, Button, Badge 등)
+   - Loading/Error 화면 변환
+   - 카테고리 카드를 Card 컴포넌트로 변환
+   - 색상 클래스 semantic token으로 교체
+   - 그라데이션/특수 스타일은 유지
+
+3. 테스트:
+```bash
+npm run dev  # port 3000에서 실행
+```
+
+4. 다음 페이지로 진행
+
+**예상 소요 시간:**
+- 간단한 페이지 (200줄 이하): 30-60분
+- 중간 페이지 (200-400줄): 1-2시간
+- 복잡한 페이지 (400줄 이상): 2-4시간
+
+---
+
+## 즉시 시작 가이드 (원본 - 참고용)
 
 ### Day 1: 환경 설정 (2-3시간)
 
@@ -2236,16 +2410,50 @@ import { Progress } from '@/components/ui/progress';
 // - 반응형 확인 (모바일/태블릿/데스크톱)
 ```
 
-### Week 1 완료 목표
+### ✅ Phase 1 완료 (2025-12-08)
 
 ```markdown
-- [x] 패키지 설치 완료
-- [x] 디자인 시스템 파일 설치
-- [x] Tailwind 설정 완료
-- [x] 테마 프로바이더 통합
-- [x] DashboardPage 마이그레이션 완료
+- [x] 패키지 설치 완료 (모든 @radix-ui, class-variance-authority, clsx, tailwind-merge 등)
+- [x] 디자인 시스템 파일 설치 (lib/utils.ts, lib/design-tokens.ts)
+- [x] Tailwind 설정 완료 (tailwind.config.js, HSL 색상 시스템)
+- [x] 테마 프로바이더 통합 (ThemeProvider.tsx, index.tsx 수정)
+- [x] index.css 완전 교체 (728줄, Pretendard 폰트, 다크/라이트 모드 CSS 변수)
+- [x] ShadCN UI 컴포넌트 10개 복사 (button, card, badge, progress, dialog, radio-group, accordion, alert, separator, tabs)
 - [x] Light/Dark 모드 정상 작동
-- [ ] CurriculumModulesPage 마이그레이션 시작
+```
+
+### 🔄 Phase 2 진행 중 (4/12 페이지 완료)
+
+**✅ 완료된 페이지:**
+1. **DashboardPage.tsx** (226줄) - 2025-12-08 완료
+   - Card, Button, Badge, Progress 컴포넌트로 마이그레이션
+   - Hero 섹션, Quick Links, Recent Activities 완전 변환
+   - 모든 semantic token 적용 (foreground, muted-foreground, border 등)
+
+2. **CurriculumModulesPage.tsx** (233줄) - 2025-12-08 완료
+   - SectionHeader, Card, Button, Progress, Badge 컴포넌트 사용
+   - 모듈 카드 그리드 레이아웃 변환
+   - 진행률 통계 Card로 변환
+
+3. **ModuleLearningPage.tsx** (848줄) - 2025-12-08 완료
+   - 가장 복잡한 페이지 완료 (3개 phase: learning, quiz, result)
+   - AI 채팅 사이드바 UI 개선 (타이핑 인디케이터, 스크롤 최적화)
+   - 아코디언 섹션, 퀴즈 카드, 결과 화면 모두 변환
+
+4. **ProductSelectionPage.tsx** (224줄) - 2025-12-08 완료
+   - Bundle/Standalone 제품 카드 Card 컴포넌트로 변환
+   - SectionHeader, Badge 컴포넌트 사용
+   - 그라데이션 아이콘 유지하면서 semantic token 적용
+
+**⏳ 남은 페이지 (8개):**
+5. ProductCategoriesPage.tsx
+6. CategoryLearningPage.tsx
+7. ProductChatPage.tsx
+8. KnowledgeChatPage.tsx
+9. DocumentsPage.tsx
+10. ScenariosPage.tsx
+11. AdminPage.tsx
+12. (추가 페이지 확인 필요)
 ```
 
 ### 주요 참고 파일 위치
@@ -2267,6 +2475,47 @@ Onboarding (작업 대상):
     ├── services/apiClient.ts        # API 추가 필요
     └── supabase/migrations/         # DB 마이그레이션 추가
 ```
+
+---
+
+## ⚠️ 알려진 이슈 및 해결 내역
+
+### ✅ 해결된 이슈
+
+1. **Missing @radix-ui/react-progress 에러** (2025-12-08 해결)
+   - 문제: Progress 컴포넌트 import 시 패키지 누락
+   - 해결: 모든 Radix UI 의존성 패키지 설치
+   ```bash
+   npm install @radix-ui/react-progress @radix-ui/react-accordion
+   @radix-ui/react-alert-dialog @radix-ui/react-dialog
+   @radix-ui/react-radio-group @radix-ui/react-separator @radix-ui/react-tabs
+   ```
+
+2. **채팅 로봇 이모지 중복 표시** (2025-12-08 해결)
+   - 문제: ModuleLearningPage 채팅에서 로봇 아이콘이 2개 표시됨
+   - 해결: 타이핑 인디케이터에서 아이콘 제거, 메시지 아바타만 유지
+
+3. **채팅 영역 무한 스크롤** (2025-12-08 해결)
+   - 문제: 질문을 계속하면 채팅 영역이 무한정 늘어남
+   - 해결: `max-h-[calc(100vh-300px)]` 추가로 최대 높이 제한
+
+### 🚧 진행 중인 이슈
+
+- 없음 (현재 모든 이슈 해결됨)
+
+### 📌 주의사항
+
+1. **개발 서버는 수동 실행**
+   - AI가 자동으로 서버를 시작하지 않음
+   - 사용자가 직접 `npm run dev`로 port 3000에서 실행
+
+2. **파일 분할 보류**
+   - ModuleLearningPage.tsx (848줄)는 현재 분할하지 않음
+   - 마이그레이션 우선, 리팩토링은 Phase 2 완료 후 고려
+
+3. **그라데이션 스타일 유지**
+   - 제품/모듈 카드의 그라데이션 아이콘은 기존 스타일 유지
+   - 예: `bg-gradient-to-br from-blue-500 to-indigo-600`
 
 ---
 
@@ -2355,5 +2604,5 @@ npx supabase db push   # 마이그레이션 적용
 
 ---
 
-**최종 업데이트**: 2025-12-08
-**다음 업데이트**: Phase 1 완료 후 (Week 1-2)
+**최종 업데이트**: 2025-12-08 (16:30)
+**진행 상황**: Phase 1 완료, Phase 2 진행 중 (4/12 페이지 완료)

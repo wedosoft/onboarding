@@ -2,6 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import LoadingSpinner from '../components/LoadingSpinner';
 import {
   getCurriculumModule,
   getModuleContents,
@@ -255,25 +260,24 @@ const ModuleLearningPage: React.FC = () => {
   // 로딩 중
   if (isLoadingModule) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">모듈 정보를 불러오는 중...</p>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
 
   if (!module) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <i className="fas fa-exclamation-circle text-4xl text-red-500 mb-4"></i>
-          <p className="text-gray-600">모듈을 찾을 수 없습니다.</p>
-          <button onClick={handleGoBack} className="mt-4 text-primary-500 hover:underline">
-            목록으로 돌아가기
-          </button>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center space-y-6">
+            <i className="fas fa-exclamation-circle text-4xl text-destructive"></i>
+            <p className="text-muted-foreground">모듈을 찾을 수 없습니다.</p>
+            <Button onClick={handleGoBack} variant="outline">
+              <i className="fas fa-arrow-left mr-2"></i>목록으로 돌아가기
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -310,23 +314,26 @@ const ModuleLearningPage: React.FC = () => {
             </div>
 
             <div className="mt-8 flex justify-center gap-4">
-              <button
+              <Button
                 onClick={handleGoBack}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl font-bold backdrop-blur-md transition border border-white/10 flex items-center gap-2"
+                variant="outline"
+                size="lg"
+                className="bg-white/10 hover:bg-white/20 text-white border-white/10 backdrop-blur-md"
               >
-                <i className="fas fa-arrow-left"></i> 목록으로
-              </button>
-              <button
+                <i className="fas fa-arrow-left mr-2"></i> 목록으로
+              </Button>
+              <Button
                 onClick={() => {
                   setPhase('learning');
                   setCurrentQuestionIndex(0);
                   setSelectedAnswers({});
                   setResult(null);
                 }}
-                className="px-6 py-3 bg-white text-slate-900 hover:bg-slate-100 rounded-xl font-bold transition shadow-lg shadow-white/10 flex items-center gap-2"
+                size="lg"
+                className="bg-white text-foreground hover:bg-white/90"
               >
-                <i className="fas fa-redo"></i> 다시 학습하기
-              </button>
+                <i className="fas fa-redo mr-2"></i> 다시 학습하기
+              </Button>
             </div>
           </div>
         </div>
@@ -493,40 +500,41 @@ const ModuleLearningPage: React.FC = () => {
               </div>
 
               {/* 하단 네비게이션 */}
-              <div className="mt-10 pt-6 border-t border-slate-100 flex justify-between items-center">
-                <button
+              <div className="mt-10 pt-6 border-t border-border flex justify-between items-center">
+                <Button
                   onClick={() => setCurrentQuestionIndex(prev => Math.max(0, prev - 1))}
                   disabled={currentQuestionIndex === 0}
-                  className="px-5 py-2.5 text-slate-500 hover:text-slate-800 disabled:opacity-30 disabled:cursor-not-allowed font-medium transition flex items-center gap-2"
+                  variant="ghost"
                 >
-                  <i className="fas fa-arrow-left"></i>이전 문제
-                </button>
+                  <i className="fas fa-arrow-left mr-2"></i>이전 문제
+                </Button>
 
                 {currentQuestionIndex < questions.length - 1 ? (
-                  <button
+                  <Button
                     onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
-                    className="px-8 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition font-bold shadow-lg shadow-slate-900/10 flex items-center gap-2"
+                    size="lg"
                   >
-                    다음 문제 <i className="fas fa-arrow-right"></i>
-                  </button>
+                    다음 문제 <i className="fas fa-arrow-right ml-2"></i>
+                  </Button>
                 ) : (
-                  <button
+                  <Button
                     onClick={handleSubmitQuiz}
                     disabled={!allAnswered || isSubmitting}
-                    className="px-8 py-3 bg-gradient-to-r from-primary-600 to-indigo-600 text-white rounded-xl hover:from-primary-500 hover:to-indigo-500 transition font-bold shadow-lg shadow-primary-500/30 disabled:opacity-50 disabled:shadow-none flex items-center gap-2 transform active:scale-95"
+                    size="lg"
+                    className="bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
                         <span>채점 중...</span>
                       </>
                     ) : (
                       <>
-                        <i className="fas fa-flag-checkered"></i>
+                        <i className="fas fa-flag-checkered mr-2"></i>
                         <span>제출하기</span>
                       </>
                     )}
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -621,72 +629,76 @@ const ModuleLearningPage: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-4 min-h-0">
             <div className="max-w-5xl mx-auto px-2">{/* 콘텐츠 로딩 */}
             {isLoadingContent ? (
-              <div className="glass-card rounded-2xl p-12 text-center">
-                <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-slate-500 font-medium">콘텐츠를 불러오는 중...</p>
-              </div>
+              <Card className="p-12 text-center">
+                <LoadingSpinner />
+                <p className="mt-4 text-muted-foreground font-medium">콘텐츠를 불러오는 중...</p>
+              </Card>
             ) : currentSections.length === 0 ? (
-              <div className="glass-card rounded-2xl p-12 text-center">
-                <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <i className="fas fa-book-open text-3xl text-slate-300"></i>
+              <Card className="p-12 text-center">
+                <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
+                  <i className="fas fa-book-open text-3xl text-muted-foreground/50"></i>
                 </div>
-                <p className="text-slate-600 font-bold text-lg mb-2">이 레벨에는 아직 콘텐츠가 없습니다.</p>
-                <p className="text-sm text-slate-400">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
-              </div>
+                <p className="text-foreground font-bold text-lg mb-2">이 레벨에는 아직 콘텐츠가 없습니다.</p>
+                <p className="text-sm text-muted-foreground">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
+              </Card>
             ) : (
               <>
                 {/* 전체 펼치기/접기 */}
                 <div className="flex justify-end mb-4 gap-3">
-                  <button
+                  <Button
                     onClick={() => toggleAllSections(true)}
-                    className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors flex items-center gap-1.5"
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs"
                   >
-                    <i className="fas fa-expand-alt"></i>모두 펼치기
-                  </button>
-                  <button
+                    <i className="fas fa-expand-alt mr-1.5"></i>모두 펼치기
+                  </Button>
+                  <Button
                     onClick={() => toggleAllSections(false)}
-                    className="px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors flex items-center gap-1.5"
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs"
                   >
-                    <i className="fas fa-compress-alt"></i>모두 접기
-                  </button>
+                    <i className="fas fa-compress-alt mr-1.5"></i>모두 접기
+                  </Button>
                 </div>
 
                 {/* 섹션 목록 (아코디언) */}
                 <div className="space-y-4">
                   {currentSections.map((section, index) => (
-                    <div
+                    <Card
                       key={section.id}
-                      className={`glass-card rounded-2xl overflow-hidden transition-all duration-300 border border-white/60
-                        ${expandedSections.has(section.sectionType) ? 'shadow-xl ring-1 ring-primary-500/10' : 'hover:shadow-md'}
+                      className={`overflow-hidden transition-all duration-300
+                        ${expandedSections.has(section.sectionType) ? 'shadow-xl ring-1 ring-primary/10' : 'hover:shadow-md'}
                       `}
                     >
                       {/* 섹션 헤더 */}
                       <button
                         onClick={() => toggleSection(section.sectionType)}
                         className={`w-full px-6 py-5 flex items-center justify-between transition-colors
-                          ${expandedSections.has(section.sectionType) ? 'bg-primary-50/30' : 'hover:bg-white/50'}
+                          ${expandedSections.has(section.sectionType) ? 'bg-primary/5' : 'hover:bg-muted/50'}
                         `}
                       >
                         <div className="flex items-center gap-5">
                           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-lg shadow-sm transition-all
                             ${expandedSections.has(section.sectionType)
-                              ? 'bg-gradient-to-br from-primary-500 to-indigo-600 text-white scale-110'
-                              : 'bg-white text-slate-400 border border-slate-100'}
+                              ? 'bg-gradient-to-br from-primary to-indigo-600 text-white scale-110'
+                              : 'bg-background text-muted-foreground border border-border'}
                           `}>
                             <i className={`fas ${SECTION_ICONS[section.sectionType] || 'fa-file'}`}></i>
                           </div>
                           <div className="text-left">
-                            <h3 className={`font-bold text-lg transition-colors ${expandedSections.has(section.sectionType) ? 'text-primary-800' : 'text-slate-700'}`}>
+                            <h3 className={`font-bold text-lg transition-colors ${expandedSections.has(section.sectionType) ? 'text-primary' : 'text-foreground'}`}>
                               {section.titleKo}
                             </h3>
-                            <p className="text-xs text-slate-400 font-medium mt-0.5">
+                            <p className="text-xs text-muted-foreground font-medium mt-0.5">
                               <i className="far fa-clock mr-1"></i>
                               약 {section.estimatedMinutes}분
                             </p>
                           </div>
                         </div>
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300
-                          ${expandedSections.has(section.sectionType) ? 'bg-primary-100 text-primary-600 rotate-180' : 'bg-slate-100 text-slate-400'}
+                          ${expandedSections.has(section.sectionType) ? 'bg-primary/10 text-primary rotate-180' : 'bg-muted text-muted-foreground'}
                         `}>
                           <i className="fas fa-chevron-down"></i>
                         </div>
@@ -695,16 +707,16 @@ const ModuleLearningPage: React.FC = () => {
                       {/* 섹션 내용 */}
                       {expandedSections.has(section.sectionType) && (
                         <div className="px-8 pb-8 pt-2">
-                          <div className="h-px w-full bg-gradient-to-r from-transparent via-primary-100 to-transparent mb-6"></div>
-                          <div className="prose prose-slate prose-lg max-w-none 
-                            prose-headings:font-display prose-headings:font-bold prose-headings:text-slate-800 
-                            prose-h3:text-primary-700 prose-h3:text-xl
-                            prose-p:text-slate-600 prose-p:leading-relaxed
-                            prose-strong:text-slate-900 prose-strong:font-bold
-                            prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline
+                          <div className="h-px w-full bg-gradient-to-r from-transparent via-primary/20 to-transparent mb-6"></div>
+                          <div className="prose prose-slate prose-lg max-w-none
+                            prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground
+                            prose-h3:text-primary prose-h3:text-xl
+                            prose-p:text-muted-foreground prose-p:leading-relaxed
+                            prose-strong:text-foreground prose-strong:font-bold
+                            prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                             prose-code:text-pink-600 prose-code:bg-pink-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium
-                            prose-pre:bg-slate-900 prose-pre:text-slate-100 prose-pre:rounded-xl prose-pre:shadow-lg
-                            prose-blockquote:border-l-4 prose-blockquote:border-primary-400 prose-blockquote:bg-primary-50/50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+                            prose-pre:bg-foreground prose-pre:text-background prose-pre:rounded-xl prose-pre:shadow-lg
+                            prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
                             prose-img:rounded-xl prose-img:shadow-md
                           ">
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -713,66 +725,68 @@ const ModuleLearningPage: React.FC = () => {
                           </div>
                         </div>
                       )}
-                    </div>
+                    </Card>
                   ))}
                 </div>
               </>
             )}
 
             {/* 자가 점검 버튼 - 모바일용 */}
-            <div className="mt-8 lg:hidden glass-dark rounded-2xl p-6 text-white shadow-xl">
+            <Card className="mt-8 lg:hidden p-6 bg-gradient-to-r from-slate-800 to-slate-900 text-white border-0">
               <div className="flex items-center justify-between gap-4">
                 <div>
-                  <h3 className="font-bold text-lg">학습을 완료하셨나요?</h3>
-                  <p className="text-slate-400 text-sm mt-1">자가 점검 퀴즈로 이해도를 확인해보세요</p>
+                  <h3 className="font-bold text-lg text-white">학습을 완료하셨나요?</h3>
+                  <p className="text-white/60 text-sm mt-1">자가 점검 퀴즈로 이해도를 확인해보세요</p>
                 </div>
-                <button
+                <Button
                   onClick={() => setPhase('quiz')}
-                  className="px-5 py-3 bg-white text-slate-900 rounded-xl font-bold hover:bg-slate-100 transition shadow-lg flex-shrink-0"
+                  size="lg"
+                  className="bg-white text-foreground hover:bg-white/90 flex-shrink-0"
                 >
                   <i className="fas fa-clipboard-check mr-2"></i>시작
-                </button>
+                </Button>
               </div>
-            </div>
+            </Card>
             </div>
           </div>
         </div>
 
         {/* 오른쪽: AI 멘토 채팅 (30%) */}
-        <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-full flex-shrink-0">
+        <div className="w-96 bg-background border-l border-border flex flex-col h-full flex-shrink-0">
           {/* 채팅 헤더 */}
-          <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex-shrink-0">
+          <div className="px-4 py-3 border-b border-border bg-muted flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                 <i className="fas fa-robot text-white"></i>
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">고복수 팀장</h3>
-                <p className="text-xs text-gray-500">실시간 질의응답</p>
+                <h3 className="font-bold text-foreground">고복수 팀장</h3>
+                <p className="text-xs text-muted-foreground">실시간 질의응답</p>
               </div>
             </div>
           </div>
 
           {/* 채팅 메시지 영역 */}
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0">
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0 max-h-[calc(100vh-300px)]">
             {chatMessages.length === 0 && (
               <div className="text-center">
-                <div className="inline-block p-3 bg-blue-50 rounded-full mb-3">
-                  <i className="fas fa-comments text-blue-500 text-2xl"></i>
+                <div className="inline-block p-3 bg-primary/10 rounded-full mb-3">
+                  <i className="fas fa-comments text-primary text-2xl"></i>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-muted-foreground mb-2">
                   학습 내용을 기반으로 답변해드립니다.<br/>
                   궁금한 점을 선택해보세요!
                 </p>
                 <div className="space-y-2">
                   {SUGGESTED_QUESTIONS.map((q, idx) => (
-                    <button
+                    <Button
                       key={idx}
                       onClick={() => handleSendChat(q)}
-                      className="w-full text-left p-3 bg-gray-50 hover:bg-gray-100 rounded-lg text-sm text-gray-700 transition border border-gray-200"
+                      variant="outline"
+                      className="w-full justify-start text-left h-auto py-3"
                     >
                       {q}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </div>
@@ -780,13 +794,13 @@ const ModuleLearningPage: React.FC = () => {
             {chatMessages.map((msg, idx) => (
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1">
+                  <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1">
                     <i className="fas fa-robot"></i>
                   </div>
                 )}
                 <div className={`max-w-[85%] rounded-lg px-4 py-2 text-sm ${msg.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-foreground'
                   }`}>
                   {msg.role === 'assistant' && msg.content ? (
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
@@ -797,15 +811,15 @@ const ModuleLearningPage: React.FC = () => {
               </div>
             ))}
             {isChatLoading && (
-              <div className="flex justify-start">
-                <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs mr-2">
+              <div className="flex justify-start items-start">
+                <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1">
                   <i className="fas fa-robot"></i>
                 </div>
-                <div className="bg-gray-100 rounded-lg px-4 py-2">
+                <div className="bg-muted rounded-lg px-4 py-2.5 min-h-[36px] flex items-center">
                   <div className="flex gap-1.5">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-muted-foreground/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
                 </div>
               </div>
@@ -814,7 +828,7 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 채팅 입력 */}
-          <div className="p-4 border-t border-gray-200 flex-shrink-0 bg-white">
+          <div className="p-4 border-t border-border flex-shrink-0 bg-background">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -822,16 +836,16 @@ const ModuleLearningPage: React.FC = () => {
                 onChange={(e) => setChatInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
                 placeholder="무엇이든 물어보세요..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="flex-1 px-4 py-2 border border-input rounded-lg bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
                 disabled={isChatLoading}
               />
-              <button
+              <Button
                 onClick={() => handleSendChat(chatInput)}
                 disabled={!chatInput.trim() || isChatLoading}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                size="icon"
               >
                 <i className="fas fa-paper-plane"></i>
-              </button>
+              </Button>
             </div>
           </div>
         </div>

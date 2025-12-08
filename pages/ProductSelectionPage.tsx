@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getProducts } from '../services/apiClient';
 import type { Product } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
+import SectionHeader from '../components/layout/SectionHeader';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 // 제품별 아이콘 및 스타일 매핑
 const PRODUCT_STYLES: Record<string, { icon: string; gradient: string; accent: string }> = {
@@ -90,31 +95,27 @@ export default function ProductSelectionPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-500 font-medium animate-pulse">제품 목록을 불러오는 중...</p>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="text-center glass-card p-8 max-w-md mx-auto">
-          <div className="text-red-500 text-6xl mb-4">
-            <i className="fas fa-exclamation-circle"></i>
-          </div>
-          <h3 className="text-xl font-bold text-slate-800 mb-2">오류 발생</h3>
-          <p className="text-slate-600 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition shadow-lg"
-          >
-            다시 시도
-          </button>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center space-y-6">
+            <i className="fas fa-exclamation-circle text-6xl text-destructive"></i>
+            <div>
+              <h3 className="text-xl font-bold text-foreground mb-2">오류 발생</h3>
+              <p className="text-muted-foreground">{error}</p>
+            </div>
+            <Button onClick={() => window.location.reload()} className="w-full">
+              다시 시도
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -123,16 +124,12 @@ export default function ProductSelectionPage() {
   const standalones = products.filter(p => p.product_type !== 'bundle');
 
   return (
-    <div className="space-y-6 pb-12 py-6">
-      {/* Header */}
-      <div className="bg-white rounded-lg p-6 text-center shadow-sm border border-gray-200">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          고복수 팀장의 온보딩 가이드
-        </h1>
-        <p className="text-sm text-gray-600">
-          학습하고 싶은 제품을 선택해주세요
-        </p>
-      </div>
+    <div className="layout-stack pb-12">
+      <SectionHeader
+        title="고복수 팀장의 온보딩 가이드"
+        subtitle="학습하고 싶은 제품을 선택해주세요"
+        icon={<i className="fas fa-box-open"></i>}
+      />
 
       {/* Bundles Section */}
       {bundles.length > 0 && (
@@ -143,36 +140,38 @@ export default function ProductSelectionPage() {
               const info = PRODUCT_DESCRIPTIONS[product.id];
 
               return (
-                <button
+                <Card
                   key={product.id}
+                  className="cursor-pointer hover:border-primary/50 transition-colors"
                   onClick={() => handleProductSelect(product.id)}
-                  className="group relative text-left bg-white p-6 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
                 >
-                  <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-xl`}>
-                      <i className={style.icon}></i>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h2 className="text-lg font-bold text-gray-900">{product.name}</h2>
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wide">
-                          BUNDLE
-                        </span>
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-xl`}>
+                        <i className={style.icon}></i>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3">{info?.tagline || product.description_ko}</p>
-                      <div className="flex flex-wrap gap-2">
-                        {info?.features?.map((feature, idx) => (
-                          <span key={idx} className="px-2 py-1 bg-gray-50 text-gray-600 text-xs rounded border border-gray-200">
-                            {feature}
-                          </span>
-                        ))}
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h2 className="text-lg font-bold text-foreground">{product.name}</h2>
+                          <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                            BUNDLE
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-3">{info?.tagline || product.description_ko}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {info?.features?.map((feature, idx) => (
+                            <span key={idx} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded border border-border">
+                              {feature}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="self-center text-muted-foreground group-hover:text-primary transition-colors">
+                        <i className="fas fa-arrow-right"></i>
                       </div>
                     </div>
-                    <div className="self-center text-gray-400 group-hover:text-blue-600 transition-colors">
-                      <i className="fas fa-arrow-right"></i>
-                    </div>
-                  </div>
-                </button>
+                  </CardContent>
+                </Card>
               );
             })}
           </div>
@@ -181,40 +180,42 @@ export default function ProductSelectionPage() {
 
       {/* Standalones Section */}
       <div className="space-y-4">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide px-2">개별 제품</h2>
+        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-2">개별 제품</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {standalones.map((product) => {
             const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshservice;
             const info = PRODUCT_DESCRIPTIONS[product.id];
 
             return (
-              <button
+              <Card
                 key={product.id}
+                className="cursor-pointer hover:border-primary/50 transition-colors h-full"
                 onClick={() => handleProductSelect(product.id)}
-                className="group text-left bg-white p-5 rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all h-full flex flex-col"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-lg`}>
-                    <i className={style.icon}></i>
+                <CardContent className="p-5 flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-lg`}>
+                      <i className={style.icon}></i>
+                    </div>
+                    <div className="text-muted-foreground group-hover:text-primary transition-colors">
+                      <i className="fas fa-arrow-right text-sm"></i>
+                    </div>
                   </div>
-                  <div className="text-gray-400 group-hover:text-blue-600 transition-colors">
-                    <i className="fas fa-arrow-right text-sm"></i>
+                  <h2 className="text-base font-bold text-foreground mb-1">
+                    {product.name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mb-4 flex-1">
+                    {info?.tagline || product.description_ko}
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {info?.features?.slice(0, 3).map((feature, idx) => (
+                      <span key={idx} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded border border-border">
+                        {feature}
+                      </span>
+                    ))}
                   </div>
-                </div>
-                <h2 className="text-base font-bold text-gray-900 mb-1">
-                  {product.name}
-                </h2>
-                <p className="text-sm text-gray-600 mb-4 flex-1">
-                  {info?.tagline || product.description_ko}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {info?.features?.slice(0, 3).map((feature, idx) => (
-                    <span key={idx} className="px-2 py-1 bg-gray-50 text-gray-600 text-xs rounded border border-gray-200">
-                      {feature}
-                    </span>
-                  ))}
-                </div>
-              </button>
+                </CardContent>
+              </Card>
             );
           })}
         </div>
