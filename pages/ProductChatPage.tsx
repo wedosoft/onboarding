@@ -4,6 +4,9 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getProduct, streamProductChat } from '../services/apiClient';
 import type { Product, ChatMessage } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 export default function ProductChatPage() {
   const navigate = useNavigate();
@@ -114,30 +117,24 @@ export default function ProductChatPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">로딩 중...</p>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 text-6xl mb-4">
-            <i className="fas fa-exclamation-triangle"></i>
-          </div>
-          <p className="text-slate-600 mb-4">제품을 찾을 수 없습니다.</p>
-          <button
-            onClick={() => navigate('/assessment/products')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            제품 목록으로
-          </button>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center space-y-6">
+            <i className="fas fa-exclamation-triangle text-6xl text-destructive"></i>
+            <p className="text-muted-foreground">제품을 찾을 수 없습니다.</p>
+            <Button onClick={() => navigate('/assessment/products')} className="w-full">
+              제품 목록으로
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -145,45 +142,47 @@ export default function ProductChatPage() {
   const suggestedQuestions = getSuggestedQuestions(productId || 'freshservice');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* 헤더 */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
+      <div className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => navigate(`/assessment/products/${productId}`)}
-                className="text-slate-500 hover:text-slate-700"
               >
                 <i className="fas fa-arrow-left"></i>
-              </button>
+              </Button>
               <div>
-                <h1 className="text-xl font-bold text-slate-800">
+                <h1 className="text-xl font-bold text-foreground">
                   {product.name} AI 멘토
                 </h1>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                   {product.name_ko} 전문가에게 질문하세요
                 </p>
               </div>
             </div>
 
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 setChatMessages([]);
                 setChatInput('');
               }}
-              className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <i className="fas fa-redo mr-2"></i>
               대화 초기화
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
       {/* 채팅 영역 */}
       <div className="flex-1 max-w-4xl w-full mx-auto px-4 py-6 flex flex-col">
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col flex-1">
+        <Card className="flex flex-col flex-1">
           {/* 채팅 메시지 */}
           <div
             ref={chatContainerRef}
@@ -192,28 +191,29 @@ export default function ProductChatPage() {
             {chatMessages.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">
-                  <i className="fas fa-robot text-blue-500"></i>
+                  <i className="fas fa-robot text-primary"></i>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-800 mb-2">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   {product.name} 전문가에게 무엇이든 질문하세요
                 </h3>
-                <p className="text-slate-500 text-sm mb-8">
+                <p className="text-muted-foreground text-sm mb-8">
                   제품의 기능, 설정, 사용법 등에 대해 자유롭게 질문해보세요.
                 </p>
 
                 {/* 제안 질문 */}
                 <div className="max-w-2xl mx-auto">
-                  <p className="text-sm text-slate-400 mb-4">추천 질문</p>
+                  <p className="text-sm text-muted-foreground mb-4">추천 질문</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {suggestedQuestions.map((question, index) => (
-                      <button
+                      <Button
                         key={index}
+                        variant="outline"
                         onClick={() => setChatInput(question)}
-                        className="px-4 py-3 bg-slate-50 text-slate-600 rounded-lg text-sm text-left hover:bg-slate-100 transition-colors border border-slate-200"
+                        className="h-auto py-3 text-left justify-start"
                       >
                         <i className="fas fa-lightbulb text-yellow-500 mr-2"></i>
                         {question}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -229,12 +229,17 @@ export default function ProductChatPage() {
                   <div
                     className={`max-w-[80%] rounded-xl px-4 py-3 ${
                       msg.role === 'user'
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-100 text-slate-800'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-foreground'
                     }`}
                   >
                     {msg.role === 'model' ? (
-                      <div className="prose prose-sm prose-slate max-w-none">
+                      <div className="prose prose-sm prose-slate max-w-none
+                        prose-p:text-foreground
+                        prose-strong:text-foreground
+                        prose-a:text-primary
+                        prose-code:text-pink-600 prose-code:bg-pink-50
+                      ">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
                           {msg.content || '...'}
                         </ReactMarkdown>
@@ -249,7 +254,7 @@ export default function ProductChatPage() {
           </div>
 
           {/* 입력창 */}
-          <div className="border-t border-slate-200 p-4">
+          <CardContent className="border-t border-border p-4">
             <div className="flex gap-2">
               <input
                 type="text"
@@ -262,24 +267,25 @@ export default function ProductChatPage() {
                   }
                 }}
                 placeholder={`${product.name}에 대해 질문하세요...`}
-                className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                 disabled={isSendingChat}
                 data-testid="product-chat-input"
               />
-              <button
+              <Button
                 onClick={handleSendChat}
                 disabled={isSendingChat || !chatInput.trim()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+                size="icon"
+                className="h-auto px-6 py-3"
               >
                 {isSendingChat ? (
                   <i className="fas fa-spinner fa-spin"></i>
                 ) : (
                   <i className="fas fa-paper-plane"></i>
                 )}
-              </button>
+              </Button>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

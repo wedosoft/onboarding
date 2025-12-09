@@ -99,52 +99,46 @@ const CurriculumModulesPage: React.FC = () => {
   }
 
   return (
-    <div className="layout-stack pb-12">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
       <SectionHeader
-        title="학습 시나리오"
-        subtitle="단계별 미션을 통해 실무 역량을 키우세요"
-        icon={<i className="fas fa-graduation-cap"></i>}
-        action={(
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => navigate('/curriculum')}
-          >
-            <i className="fas fa-arrow-left mr-2" />제품 선택으로 돌아가기
-          </Button>
-        )}
+        title="학습 커리큘럼"
+        subtitle="단계별로 구성된 학습 모듈을 통해 전문가로 성장하세요."
+        align="left"
+        className="mb-8"
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
         <Card className="lg:col-span-2">
-          <CardContent className="pt-6 flex flex-col gap-6">
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="flex items-center gap-3 text-muted-foreground text-sm">
-                <span className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
-                  <i className="fas fa-bullseye" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase">총 모듈</p>
-                  <p className="text-xl font-bold text-foreground">{modules.length}개</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 text-muted-foreground text-sm">
-                <span className="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                  <i className="fas fa-check" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground uppercase">완료</p>
-                  <p className="text-xl font-bold text-foreground">{completedCount}개</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">진행률</p>
-                <p className="text-3xl font-semibold text-foreground">{Math.round(completionRate)}%</p>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center justify-between">
+              <span>나의 학습 현황</span>
+              <Badge variant="secondary" className="text-sm">
+                {Math.round(completionRate)}% 달성
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>전체 진행률</span>
+                <span>{completedCount} / {modules.length} 모듈 완료</span>
               </div>
               <Progress value={completionRate} className="h-3" />
+            </div>
+
+            <div className="grid grid-cols-3 gap-4 pt-2">
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-primary">{modules.length}</div>
+                <div className="text-xs text-muted-foreground mt-1">전체 모듈</div>
+              </div>
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-emerald-500">{completedCount}</div>
+                <div className="text-xs text-muted-foreground mt-1">완료함</div>
+              </div>
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-blue-500">{modules.length - completedCount}</div>
+                <div className="text-xs text-muted-foreground mt-1">학습 예정</div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -186,7 +180,7 @@ const CurriculumModulesPage: React.FC = () => {
                   <i className={`${style.icon} text-white text-2xl`}></i>
                 </div>
                 {isCompleted && (
-                  <Badge className="relative z-10 bg-white/90 text-emerald-600 hover:bg-white/90">
+                  <Badge className="relative z-10 bg-white/90 text-emerald-500 hover:bg-white/90">
                     <i className="fas fa-check-circle mr-1"></i> 완료
                   </Badge>
                 )}
@@ -213,8 +207,8 @@ const CurriculumModulesPage: React.FC = () => {
               </CardContent>
 
               {isStarted && !isCompleted && (
-                <div className="h-1 bg-blue-100">
-                  <div className="h-full bg-blue-500 w-1/3"></div>
+                <div className="h-1 bg-muted">
+                  <div className="h-full bg-primary w-1/3"></div>
                 </div>
               )}
             </Card>

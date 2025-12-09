@@ -29,11 +29,11 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       <div className={cx('flex w-full gap-4', action ? 'justify-between items-start' : alignmentMap[align])}>
         <div className={cx('flex flex-col gap-2', alignmentMap[align])}>
           <div className="flex items-center gap-3">
-            {icon && <span className="text-primary-500 text-xl">{icon}</span>}
-            <h2 className="text-2xl font-bold text-slate-900">{title}</h2>
+            {icon && <span className="text-primary text-xl">{icon}</span>}
+            <h2 className="text-2xl font-bold text-foreground">{title}</h2>
           </div>
           {subtitle && (
-            <p className="text-sm text-slate-500 max-w-3xl">
+            <p className="text-sm text-muted-foreground max-w-3xl">
               {subtitle}
             </p>
           )}

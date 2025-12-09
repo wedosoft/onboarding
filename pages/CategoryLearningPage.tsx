@@ -9,6 +9,11 @@ import {
   streamProductChat,
 } from '../services/apiClient';
 import type { Product, ProductCategory, ChatMessage } from '../types';
+import LoadingSpinner from '../components/LoadingSpinner';
+import SectionHeader from '../components/layout/SectionHeader';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 type Phase = 'learning' | 'chat';
 
@@ -137,151 +142,130 @@ export default function CategoryLearningPage() {
 
   if (!product || !category) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">로딩 중...</p>
-        </div>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <LoadingSpinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      {/* 헤더 */}
-      <div className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <button
-                onClick={() => navigate(`/assessment/products/${productId}`)}
-                className="text-slate-500 hover:text-slate-700 text-sm mb-1"
-              >
-                <i className="fas fa-arrow-left mr-2"></i>
-                {product.name} 카테고리 목록
-              </button>
-              <h1 className="text-xl font-bold text-slate-800">
-                {category.name}
-              </h1>
-            </div>
+    <div className="layout-stack pb-12">
+      <SectionHeader
+        title={category.name}
+        subtitle={`${product.name} 학습 콘텐츠`}
+        icon={<i className="fas fa-book-open"></i>}
+        action={(
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate(`/assessment/products/${productId}`)}
+          >
+            <i className="fas fa-arrow-left mr-2"></i>카테고리 목록
+          </Button>
+        )}
+      />
 
-            {/* 탭 전환 */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => setPhase('learning')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  phase === 'learning'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <i className="fas fa-book mr-2"></i>
-                학습
-              </button>
-              <button
-                onClick={() => setPhase('chat')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  phase === 'chat'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                }`}
-              >
-                <i className="fas fa-comments mr-2"></i>
-                질문하기
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <Tabs value={phase} onValueChange={(value) => setPhase(value as Phase)} className="w-full">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+          <TabsTrigger value="learning">
+            <i className="fas fa-book mr-2"></i>학습
+          </TabsTrigger>
+          <TabsTrigger value="chat">
+            <i className="fas fa-comments mr-2"></i>질문하기
+          </TabsTrigger>
+        </TabsList>
 
-      {/* 콘텐츠 */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        {phase === 'learning' ? (
-          // 학습 콘텐츠
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-            {contentError ? (
-              <div className="text-center py-12">
-                <div className="text-red-500 text-4xl mb-4">
-                  <i className="fas fa-exclamation-circle"></i>
+        <TabsContent value="learning" className="mt-6">
+          <Card>
+            <CardContent className="p-8">
+              {contentError ? (
+                <div className="text-center py-12 space-y-6">
+                  <i className="fas fa-exclamation-circle text-6xl text-destructive"></i>
+                  <p className="text-muted-foreground">{contentError}</p>
+                  <Button onClick={() => window.location.reload()}>
+                    다시 시도
+                  </Button>
                 </div>
-                <p className="text-slate-600 mb-4">{contentError}</p>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  다시 시도
-                </button>
-              </div>
-            ) : isLoadingContent && !learningContent ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-slate-600">학습 콘텐츠를 생성 중입니다...</p>
-                <p className="text-sm text-slate-400 mt-2">
-                  AI가 문서를 분석하여 맞춤형 학습 자료를 준비하고 있습니다.
-                </p>
-              </div>
-            ) : (
-              <div className="prose prose-slate max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {learningContent}
-                </ReactMarkdown>
-                {isLoadingContent && (
-                  <span className="inline-block w-2 h-5 bg-blue-500 animate-pulse ml-1"></span>
-                )}
-              </div>
-            )}
-
-            {/* 학습 완료 후 액션 */}
-            {!isLoadingContent && learningContent && (
-              <div className="mt-8 pt-8 border-t border-slate-200">
-                <div className="flex items-center justify-between">
-                  <p className="text-slate-600">
-                    <i className="fas fa-check-circle text-green-500 mr-2"></i>
-                    학습 콘텐츠를 모두 읽으셨나요?
-                  </p>
-                  <button
-                    onClick={() => setPhase('chat')}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    <i className="fas fa-comments mr-2"></i>
-                    AI 멘토에게 질문하기
-                  </button>
+              ) : isLoadingContent && !learningContent ? (
+                <div className="text-center py-12 space-y-4">
+                  <LoadingSpinner />
+                  <div>
+                    <p className="text-foreground font-medium">학습 콘텐츠를 생성 중입니다...</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      AI가 문서를 분석하여 맞춤형 학습 자료를 준비하고 있습니다.
+                    </p>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          // 채팅
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[calc(100vh-200px)]">
+              ) : (
+                <div className="prose prose-slate prose-lg max-w-none
+                  prose-headings:font-bold prose-headings:text-foreground
+                  prose-h3:text-primary prose-h3:text-xl
+                  prose-p:text-muted-foreground prose-p:leading-relaxed
+                  prose-strong:text-foreground prose-strong:font-bold
+                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline
+                  prose-code:text-pink-600 prose-code:bg-pink-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium
+                  prose-pre:bg-foreground prose-pre:text-background prose-pre:rounded-xl prose-pre:shadow-lg
+                  prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+                  prose-img:rounded-xl prose-img:shadow-md
+                ">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {learningContent}
+                  </ReactMarkdown>
+                  {isLoadingContent && (
+                    <span className="inline-block w-2 h-5 bg-primary animate-pulse ml-1"></span>
+                  )}
+                </div>
+              )}
+
+              {/* 학습 완료 후 액션 */}
+              {!isLoadingContent && learningContent && (
+                <div className="mt-8 pt-8 border-t border-border">
+                  <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground flex items-center gap-2">
+                      <i className="fas fa-check-circle text-emerald-500"></i>
+                      학습 콘텐츠를 모두 읽으셨나요?
+                    </p>
+                    <Button onClick={() => setPhase('chat')} size="lg">
+                      <i className="fas fa-comments mr-2"></i>
+                      AI 멘토에게 질문하기
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="chat" className="mt-6">
+          <Card className="flex flex-col h-[calc(100vh-300px)]">
             {/* 채팅 메시지 */}
             <div
               ref={chatContainerRef}
-              className="flex-1 overflow-y-auto p-6 space-y-4"
+              className="flex-1 overflow-y-auto p-6 space-y-4 min-h-0"
             >
               {chatMessages.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="text-6xl mb-4">
-                    <i className="fas fa-robot text-blue-500"></i>
+                <div className="text-center py-12 space-y-6">
+                  <i className="fas fa-robot text-6xl text-primary"></i>
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                      {category.name}에 대해 질문해보세요
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      학습 내용과 관련된 질문을 자유롭게 해보세요.
+                    </p>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-800 mb-2">
-                    {category.name}에 대해 질문해보세요
-                  </h3>
-                  <p className="text-slate-500 text-sm mb-6">
-                    학습 내용과 관련된 질문을 자유롭게 해보세요.
-                  </p>
 
                   {/* 제안 질문 */}
                   <div className="flex flex-wrap justify-center gap-2">
                     {suggestedQuestions.map((question, index) => (
-                      <button
+                      <Button
                         key={index}
-                        onClick={() => {
-                          setChatInput(question);
-                        }}
-                        className="px-4 py-2 bg-slate-100 text-slate-600 rounded-full text-sm hover:bg-slate-200 transition-colors"
+                        variant="outline"
+                        onClick={() => setChatInput(question)}
+                        className="text-sm"
                       >
                         {question}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -296,12 +280,17 @@ export default function CategoryLearningPage() {
                     <div
                       className={`max-w-[80%] rounded-xl px-4 py-3 ${
                         msg.role === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-slate-100 text-slate-800'
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted text-foreground'
                       }`}
                     >
                       {msg.role === 'model' ? (
-                        <div className="prose prose-sm prose-slate max-w-none">
+                        <div className="prose prose-sm prose-slate max-w-none
+                          prose-p:text-foreground
+                          prose-strong:text-foreground
+                          prose-a:text-primary
+                          prose-code:text-pink-600 prose-code:bg-pink-50
+                        ">
                           <ReactMarkdown remarkPlugins={[remarkGfm]}>
                             {msg.content || '...'}
                           </ReactMarkdown>
@@ -316,7 +305,7 @@ export default function CategoryLearningPage() {
             </div>
 
             {/* 입력창 */}
-            <div className="border-t border-slate-200 p-4">
+            <CardContent className="border-t border-border p-4">
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -329,25 +318,26 @@ export default function CategoryLearningPage() {
                     }
                   }}
                   placeholder="질문을 입력하세요..."
-                  className="flex-1 px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-3 border border-input rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                   disabled={isSendingChat}
                 />
-                <button
+                <Button
                   onClick={handleSendChat}
                   disabled={isSendingChat || !chatInput.trim()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+                  size="icon"
+                  className="h-auto px-6 py-3"
                 >
                   {isSendingChat ? (
                     <i className="fas fa-spinner fa-spin"></i>
                   ) : (
                     <i className="fas fa-paper-plane"></i>
                   )}
-                </button>
+                </Button>
               </div>
-            </div>
-          </div>
-        )}
-      </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

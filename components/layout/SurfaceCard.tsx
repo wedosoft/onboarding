@@ -17,15 +17,15 @@ export type SurfaceCardProps<T extends ElementType> = {
 } & SurfaceCardOwnProps & ComponentPropsWithoutRef<T>;
 
 const variantClassMap: Record<SurfaceVariant, string> = {
-  solid: 'bg-white border border-slate-100',
-  muted: 'bg-white/70 border border-white/40 backdrop-blur',
-  contrast: 'bg-slate-900 text-white border border-slate-800',
+  solid: 'bg-card border border-border',
+  muted: 'bg-card/70 border border-border/40 backdrop-blur',
+  contrast: 'bg-primary text-primary-foreground border border-primary',
 };
 
 const toneClassMap: Record<SurfaceTone, string> = {
   default: '',
-  brand: 'bg-gradient-to-br from-primary-500 to-primary-700 text-white border-none',
-  accent: 'bg-gradient-to-br from-accent-500/90 to-primary-500/90 text-white border-none',
+  brand: 'bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-none',
+  accent: 'bg-gradient-to-br from-secondary/90 to-primary/90 text-secondary-foreground border-none',
 };
 
 const paddingClassMap = {
@@ -38,7 +38,7 @@ const paddingClassMap = {
 const shadowClassMap = {
   none: '',
   sm: 'shadow-lg/40',
-  md: 'shadow-xl shadow-slate-200/60',
+  md: 'shadow-xl shadow-border/60',
 };
 
 const SurfaceCard = <T extends ElementType = 'section'>(

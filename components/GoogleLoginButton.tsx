@@ -19,8 +19,8 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
 
   if (isLoading) {
     return (
-      <div className={`flex items-center gap-2 px-4 py-2 text-sm text-slate-500 ${className}`}>
-        <div className="w-4 h-4 border-2 border-slate-300 border-t-sky-500 rounded-full animate-spin" />
+      <div className={`flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground ${className}`}>
+        <div className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
         <span>로딩 중...</span>
       </div>
     );
@@ -33,17 +33,17 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
           <img
             src={user.avatar}
             alt={user.name || 'Profile'}
-            className="w-8 h-8 rounded-full border-2 border-primary-500/50 shadow-sm"
+            className="w-8 h-8 rounded-full border-2 border-primary/50 shadow-sm"
           />
         )}
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-200">
+          <span className="text-sm font-medium text-foreground">
             {user.name || user.email}
           </span>
         </div>
         <button
           onClick={signOut}
-          className="ml-2 px-3 py-1 text-xs text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+          className="ml-2 px-3 py-1 text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors"
         >
           로그아웃
         </button>
@@ -54,7 +54,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
   return (
     <button
       onClick={signIn}
-      className={`flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg shadow-sm hover:shadow hover:bg-slate-50 transition-all ${className}`}
+      className={`flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg shadow-sm hover:shadow hover:bg-muted transition-all ${className}`}
     >
       {/* Google Logo SVG */}
       <svg viewBox="0 0 24 24" width="18" height="18" className="flex-shrink-0">
@@ -75,7 +75,7 @@ const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({ className = '' })
           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
         />
       </svg>
-      <span className="text-sm font-medium text-slate-700">
+      <span className="text-sm font-medium text-foreground">
         Google로 로그인
       </span>
     </button>

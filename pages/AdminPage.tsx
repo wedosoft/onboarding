@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { getAllProgress, listDocuments, deleteDocument, SessionSummary, DocumentInfo } from '../services/apiClient';
 import { SCENARIOS } from '../constants';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 type Tab = 'users' | 'documents';
 
@@ -123,104 +128,114 @@ const AdminPage: React.FC = () => {
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="glass-card rounded-xl p-4 shadow-sm border border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
-              <i className="fas fa-users text-blue-500" />
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center">
+                <i className="fas fa-users text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{totalUsers}</p>
+                <p className="text-sm text-muted-foreground">전체 사용자</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-700">{totalUsers}</p>
-              <p className="text-sm text-slate-500">전체 사용자</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="glass-card rounded-xl p-4 shadow-sm border border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
-              <i className="fas fa-user-check text-green-500" />
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-500/10 rounded-lg flex items-center justify-center">
+                <i className="fas fa-user-check text-green-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{activeUsers}</p>
+                <p className="text-sm text-muted-foreground">활성 사용자</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-700">{activeUsers}</p>
-              <p className="text-sm text-slate-500">활성 사용자</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="glass-card rounded-xl p-4 shadow-sm border border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
-              <i className="fas fa-chart-line text-purple-500" />
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-purple-500/10 rounded-lg flex items-center justify-center">
+                <i className="fas fa-chart-line text-purple-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{avgCompletion}%</p>
+                <p className="text-sm text-muted-foreground">평균 진행률</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-700">{avgCompletion}%</p>
-              <p className="text-sm text-slate-500">평균 진행률</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="glass-card rounded-xl p-4 shadow-sm border border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-500/10 rounded-lg flex items-center justify-center">
-              <i className="fas fa-file-alt text-primary-500" />
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <i className="fas fa-file-alt text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{totalDocuments}</p>
+                <p className="text-sm text-muted-foreground">문서 수</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-700">{totalDocuments}</p>
-              <p className="text-sm text-slate-500">문서 수</p>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Tabs */}
-      <div className="glass-card rounded-xl shadow-sm overflow-hidden border border-slate-200">
-        <div className="border-b border-slate-200">
+      <Card>
+        <div className="border-b border-border">
           <nav className="flex">
-            <button
+            <Button
+              variant="ghost"
               onClick={() => setActiveTab('users')}
-              className={`px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'users'
-                  ? 'text-primary-500 border-b-2 border-primary-500'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+              className={`px-6 py-4 text-sm font-medium rounded-none ${activeTab === 'users'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-muted-foreground'
                 }`}
             >
               <i className="fas fa-users mr-2" />
               사용자 진행 현황
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="ghost"
               onClick={() => setActiveTab('documents')}
-              className={`px-6 py-4 text-sm font-medium transition-colors ${activeTab === 'documents'
-                  ? 'text-primary-500 border-b-2 border-primary-500'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-slate-50'
+              className={`px-6 py-4 text-sm font-medium rounded-none ${activeTab === 'documents'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-muted-foreground'
                 }`}
             >
               <i className="fas fa-folder-open mr-2" />
               문서 관리
-            </button>
+            </Button>
           </nav>
         </div>
 
         {/* Search */}
-        <div className="p-4 border-b border-slate-200">
+        <div className="p-4 border-b border-border">
           <input
             type="text"
             placeholder={activeTab === 'users' ? '사용자 검색...' : '문서 검색...'}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full max-w-md px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-slate-700 placeholder-slate-400"
+            className="w-full max-w-md px-4 py-2 bg-muted border border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-ring text-foreground placeholder-muted-foreground"
           />
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <CardContent>
           {isLoading ? (
             <div className="py-8 text-center">
-              <div className="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="mt-2 text-slate-500">로딩 중...</p>
+              <LoadingSpinner />
+              <p className="mt-2 text-muted-foreground">로딩 중...</p>
             </div>
           ) : activeTab === 'users' ? (
             /* Users Tab */
             filteredUsers.length === 0 ? (
-              <div className="py-8 text-center text-slate-500">
+              <div className="py-8 text-center text-muted-foreground">
                 <i className="fas fa-users text-3xl mb-2" />
                 <p>사용자 데이터가 없습니다.</p>
               </div>
@@ -228,62 +243,57 @@ const AdminPage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="text-left text-sm text-slate-500 border-b border-slate-200">
+                    <tr className="text-left text-sm text-muted-foreground border-b border-border">
                       <th className="pb-3 font-medium">사용자</th>
                       <th className="pb-3 font-medium">완료 시나리오</th>
                       <th className="pb-3 font-medium">진행률</th>
                       <th className="pb-3 font-medium">상태</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100">
+                  <tbody className="divide-y divide-border">
                     {filteredUsers.map((user, idx) => (
                       <tr key={idx} className="text-sm">
                         <td className="py-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-bold text-sm">
+                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
                               {user.userName[0].toUpperCase()}
                             </div>
                             <div>
-                              <p className="font-medium text-slate-700">
+                              <p className="font-medium text-foreground">
                                 {user.userName}
                               </p>
                               {user.sessions.length > 1 && (
-                                <p className="text-xs text-slate-500">
+                                <p className="text-xs text-muted-foreground">
                                   {user.sessions.length}개 세션
                                 </p>
                               )}
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 text-slate-600">
+                        <td className="py-3 text-foreground">
                           {user.totalCompleted} / {SCENARIOS.length}
                         </td>
                         <td className="py-3">
                           <div className="flex items-center gap-2">
-                            <div className="w-24 bg-slate-200 rounded-full h-2">
-                              <div
-                                className="bg-primary-500 h-2 rounded-full"
-                                style={{ width: `${user.completionRate}%` }}
-                              />
-                            </div>
-                            <span className="text-slate-600">
+                            <Progress value={user.completionRate} className="w-24 h-2" />
+                            <span className="text-foreground">
                               {user.completionRate}%
                             </span>
                           </div>
                         </td>
                         <td className="py-3">
                           {user.completionRate === 100 ? (
-                            <span className="px-2 py-1 text-xs bg-green-500/20 text-green-600 rounded-full border border-green-500/30">
+                            <Badge variant="default" className="bg-green-500/20 text-green-600 hover:bg-green-500/20 border border-green-500/30">
                               완료
-                            </span>
+                            </Badge>
                           ) : user.totalCompleted > 0 ? (
-                            <span className="px-2 py-1 text-xs bg-blue-500/20 text-blue-600 rounded-full border border-blue-500/30">
+                            <Badge variant="default" className="bg-blue-500/20 text-blue-600 hover:bg-blue-500/20 border border-blue-500/30">
                               진행 중
-                            </span>
+                            </Badge>
                           ) : (
-                            <span className="px-2 py-1 text-xs bg-slate-200 text-slate-500 rounded-full border border-slate-300">
+                            <Badge variant="secondary">
                               시작 전
-                            </span>
+                            </Badge>
                           )}
                         </td>
                       </tr>
@@ -295,7 +305,7 @@ const AdminPage: React.FC = () => {
           ) : (
             /* Documents Tab */
             filteredDocuments.length === 0 ? (
-              <div className="py-8 text-center text-slate-500">
+              <div className="py-8 text-center text-muted-foreground">
                 <i className="fas fa-folder-open text-3xl mb-2" />
                 <p>문서가 없습니다.</p>
               </div>
@@ -309,38 +319,40 @@ const AdminPage: React.FC = () => {
                   return (
                     <div
                       key={doc.name}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200 hover:border-primary-500/30 transition-colors"
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg border border-border hover:border-primary/30 transition-colors"
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-slate-200">
-                          <i className="fas fa-file-alt text-slate-500" />
+                        <div className="w-10 h-10 bg-background rounded-lg flex items-center justify-center border border-border">
+                          <i className="fas fa-file-alt text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-700 truncate">
+                          <p className="font-medium text-foreground truncate">
                             {doc.displayName || doc.name}
                           </p>
-                          <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             {category && <span className="capitalize">{category}</span>}
                             {author && <span>by {author}</span>}
                             {tags && <span>#{tags.split(',')[0]}</span>}
                           </div>
                         </div>
                       </div>
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="icon"
                         onClick={() => handleDeleteDocument(doc.name, doc.displayName || doc.name)}
-                        className="p-2 text-slate-400 hover:text-red-500 transition-colors"
+                        className="text-muted-foreground hover:text-destructive"
                         title="삭제"
                       >
                         <i className="fas fa-trash" />
-                      </button>
+                      </Button>
                     </div>
                   );
                 })}
               </div>
             )
           )}
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

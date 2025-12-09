@@ -38,19 +38,19 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   handlePraise,
 }) => (
   <div
-    className="glass-card bg-dark-900/90 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-out h-full border border-white/10"
+    className="glass-card bg-card/90 rounded-2xl shadow-2xl flex flex-col transition-all duration-300 ease-out h-full border border-border"
     onClick={e => e.stopPropagation()}
   >
     {/* Header */}
-    <header className="p-4 border-b border-white/10 flex justify-between items-center flex-shrink-0 bg-white/5">
-      <h2 className="text-lg font-bold text-primary-400 flex items-center gap-2">
+    <header className="p-4 border-b border-border flex justify-between items-center flex-shrink-0 bg-muted/50">
+      <h2 className="text-lg font-bold text-primary flex items-center gap-2">
         <i className="fa-solid fa-robot"></i>AI 멘토에게 질문하기
       </h2>
       <div className="flex items-center gap-2">
-        <button onClick={() => setIsExpanded(!isExpanded)} className="text-slate-400 hover:text-primary-400 transition-colors" aria-label={isExpanded ? "챗봇 축소" : "챗봇 확장"}>
+        <button onClick={() => setIsExpanded(!isExpanded)} className="text-muted-foreground hover:text-primary transition-colors" aria-label={isExpanded ? "챗봇 축소" : "챗봇 확장"}>
           <i className={`fa-solid ${isExpanded ? 'fa-compress' : 'fa-expand'} text-lg`}></i>
         </button>
-        <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-primary-400 transition-colors" aria-label="챗봇 닫기">
+        <button onClick={() => setIsOpen(false)} className="text-muted-foreground hover:text-primary transition-colors" aria-label="챗봇 닫기">
           <i className="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
@@ -64,16 +64,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
 
         return (
           <div key={index} className={`flex items-end gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'model' && <div className="w-8 h-8 bg-primary-500/10 rounded-full flex items-center justify-center flex-shrink-0 border border-primary-500/20"><i className="fa-solid fa-robot text-primary-400"></i></div>}
-            <div className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user' ? 'bg-primary-500 text-white font-medium rounded-br-lg shadow-md' : 'bg-dark-700 text-slate-200 rounded-bl-lg border border-white/5'}`}>
+            {msg.role === 'model' && <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0 border border-primary/20"><i className="fa-solid fa-robot text-primary"></i></div>}
+            <div className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user' ? 'bg-primary text-primary-foreground font-medium rounded-br-lg shadow-md' : 'bg-muted text-foreground rounded-bl-lg border border-border'}`}>
               {showBouncingDots ? (
                 <div className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                  <span className="h-2 w-2 bg-primary-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                  <span className="h-2 w-2 bg-primary-400 rounded-full animate-bounce"></span>
+                  <span className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                  <span className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                  <span className="h-2 w-2 bg-primary rounded-full animate-bounce"></span>
                 </div>
               ) : (
-                <div className="prose prose-sm prose-invert max-w-none prose-p:text-inherit prose-headings:text-primary-200 prose-strong:text-primary-300 prose-a:text-primary-400">
+                <div className="prose prose-sm max-w-none prose-p:text-inherit prose-headings:text-primary prose-strong:text-primary prose-a:text-primary">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {msg.content}
                   </ReactMarkdown>
@@ -87,36 +87,34 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     </div>
 
     {/* Input */}
-    <form onSubmit={handleSend} className="p-4 border-t border-white/10 flex-shrink-0 bg-white/5">
+    <form onSubmit={handleSend} className="p-4 border-t border-border flex-shrink-0 bg-muted/50">
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={handlePraise}
           disabled={isLoading}
-          className="flex-shrink-0 w-10 h-10 bg-dark-700 text-slate-400 rounded-full flex items-center justify-center hover:bg-primary-500/10 hover:text-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-white/5"
+          className="flex-shrink-0 w-10 h-10 bg-muted text-muted-foreground rounded-full flex items-center justify-center hover:bg-primary/10 hover:text-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors border border-border"
           aria-label="칭찬하기"
         >
           <i className="fa-solid fa-thumbs-up"></i>
         </button>
-        <div className="relative flex-grow">
-          <input
-            ref={inputRef}
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="궁금한 점을 물어보세요..."
-            disabled={isLoading}
-            className="w-full py-2 pl-4 pr-12 bg-dark-800/50 rounded-full border border-white/10 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-transparent transition text-slate-200 placeholder-slate-500"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !input.trim()}
-            className="absolute right-1 top-1/2 -translate-y-1/2 w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center hover:bg-primary-400 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed transition-colors shadow-sm"
-            aria-label="메시지 보내기"
-          >
-            <i className="fa-solid fa-paper-plane text-sm"></i>
-          </button>
-        </div>
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="궁금한 점을 물어보세요..."
+          className="flex-1 bg-background text-foreground placeholder-muted-foreground border border-input rounded-full px-4 py-2 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+          disabled={isLoading}
+        />
+        <button
+          type="submit"
+          disabled={isLoading || !input.trim()}
+          className="flex-shrink-0 w-10 h-10 bg-primary text-primary-foreground rounded-full flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-primary/25"
+          aria-label="전송"
+        >
+          {isLoading ? <i className="fa-solid fa-spinner fa-spin"></i> : <i className="fa-solid fa-paper-plane"></i>}
+        </button>
       </div>
     </form>
   </div>
@@ -133,78 +131,63 @@ const Chatbot: React.FC<ChatbotProps> = ({ history, onSendMessage, isLoading }) 
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Scroll to bottom when new messages are added or loading state changes
   useEffect(() => {
     if (isOpen) {
       scrollToBottom();
+      // Focus input when opened
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [history, isLoading, isOpen]);
-
-  // Focus input when chat window opens
-  useEffect(() => {
-    if (isOpen) {
-      // Use a timeout to allow the transition animation to complete
-      const timer = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 300); // Matches the transition duration
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen]);
-
+  }, [isOpen, history]);
 
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && !isLoading) {
-      onSendMessage(input.trim());
-      setInput('');
-    }
+    if (!input.trim() || isLoading) return;
+    onSendMessage(input);
+    setInput('');
   };
 
   const handlePraise = () => {
-    if (!isLoading) {
-      onSendMessage('오늘 정말 도움이 되었어요!');
-    }
-  };
-
-  const chatWindowProps = {
-    isExpanded,
-    history,
-    isLoading,
-    input,
-    messagesEndRef,
-    inputRef,
-    setIsOpen,
-    setIsExpanded,
-    setInput,
-    handleSend,
-    handlePraise
+    onSendMessage("설명이 정말 이해하기 쉬워요! 감사합니다.");
   };
 
   return (
     <>
-      {/* Chat Window */}
-      <div className={`fixed inset-0 z-40 transition-all duration-300 ease-out ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        {isExpanded ? (
-          // Expanded Modal View
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setIsExpanded(false)}>
-            <div className="w-full max-w-4xl h-[90vh]"><ChatWindow {...chatWindowProps} /></div>
-          </div>
-        ) : (
-          // Floating Popup View
-          <div className={`fixed bottom-24 right-4 sm:right-6 lg:right-8 w-[calc(100%-2rem)] max-w-md h-[70%] max-h-[600px] transition-transform duration-300 ${isOpen ? 'translate-y-0' : 'translate-y-10'}`}>
-            <ChatWindow {...chatWindowProps} />
-          </div>
-        )}
-      </div>
+      {/* Floating Button */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-2xl hover:bg-primary/90 hover:scale-110 transition-all duration-300 z-50 flex items-center justify-center group animate-bounce-subtle"
+          aria-label="AI 멘토 열기"
+        >
+          <i className="fa-solid fa-robot text-2xl group-hover:rotate-12 transition-transform"></i>
+          <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-ping"></span>
+          <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full border-2 border-background"></span>
+        </button>
+      )}
 
-      {/* FAB */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-4 sm:right-6 lg:right-8 w-16 h-16 bg-primary-500 text-white rounded-full shadow-lg shadow-primary-500/30 flex items-center justify-center hover:bg-primary-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-offset-slate-900 transition-all transform hover:scale-110 z-50 border border-primary-400/50"
-        aria-label="AI 멘토와 대화 시작"
-      >
-        <i className={`fa-solid ${isOpen ? 'fa-times' : 'fa-comments'} text-2xl transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}></i>
-      </button>
+      {/* Chat Window Overlay */}
+      {isOpen && (
+        <div className={`fixed z-50 transition-all duration-300 ease-out
+          ${isExpanded
+            ? 'inset-4 md:inset-10'
+            : 'bottom-6 right-6 w-[90vw] h-[600px] max-w-[400px] max-h-[80vh]'
+          }`}
+        >
+          <ChatWindow
+            isExpanded={isExpanded}
+            history={history}
+            isLoading={isLoading}
+            input={input}
+            messagesEndRef={messagesEndRef}
+            inputRef={inputRef}
+            setIsOpen={setIsOpen}
+            setIsExpanded={setIsExpanded}
+            setInput={setInput}
+            handleSend={handleSend}
+            handlePraise={handlePraise}
+          />
+        </div>
+      )}
     </>
   );
 };
