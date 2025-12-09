@@ -81,6 +81,22 @@ const ModuleLearningPage: React.FC = () => {
 
   const sessionId = localStorage.getItem('onboarding_session_id') || '';
 
+  // 퀴즈 시작
+  useEffect(() => {
+    const startQuiz = async () => {
+      if (phase === 'quiz' && questions.length === 0) {
+        try {
+          const data = await getQuizQuestions(moduleId!, currentLevel);
+          setQuestions(data);
+          setQuizStartTime(new Date());
+        } catch (error) {
+          console.error('Failed to load quiz:', error);
+        }
+      }
+    };
+    startQuiz();
+  }, [phase, moduleId, currentLevel, questions.length]);
+
   // Scroll chat to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -398,7 +414,7 @@ const ModuleLearningPage: React.FC = () => {
   if (phase === 'quiz') {
     const currentQuestion = questions[currentQuestionIndex];
     const allAnswered = questions.length > 0 && Object.keys(selectedAnswers).length === questions.length;
-    const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+    const progressPercent = questions.length > 0 ? ((currentQuestionIndex + 1) / questions.length) * 100 : 0;
 
     return (
       <div className="min-h-screen pb-12 -mt-2">
@@ -416,13 +432,13 @@ const ModuleLearningPage: React.FC = () => {
               </button>
               <div>
                 <h1 className="text-xl font-bold text-foreground">자가 점검</h1>
-                <p className="text-muted-foreground text-sm">{module.nameKo}</p>
+                <p className="text-muted-foreground text-sm">{module?.nameKo}</p>
               </div>
             </div>
 
             <div className="flex flex-col items-end">
               <span className="text-foreground font-bold text-lg mb-1">
-                <span className="text-primary">{currentQuestionIndex + 1}</span>
+                <span className="text-primary">{questions.length > 0 ? currentQuestionIndex + 1 : 0}</span>
                 <span className="text-muted-foreground mx-1">/</span>
                 {questions.length}
               </span>

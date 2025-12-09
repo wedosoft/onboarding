@@ -60,28 +60,28 @@ const DashboardPage: React.FC = () => {
     {
       title: 'AI 멘토 질문',
       description: '업무 중 막히는 부분은 실시간으로 멘토에게!',
-      icon: 'fas fa-comments',
+      emoji: '💬',
       to: '/knowledge',
       iconBg: 'bg-violet-100 text-violet-600',
     },
     {
       title: '인수인계 문서',
       description: '팀 지식 저장소에서 필요한 자료를 찾아보세요.',
-      icon: 'fas fa-folder-open',
+      emoji: '📂',
       to: '/documents',
       iconBg: 'bg-blue-100 text-blue-600',
     },
     {
       title: '커리큘럼 실습',
       description: '시나리오 기반 학습으로 현업 감각을 익혀요.',
-      icon: 'fas fa-layer-group',
+      emoji: '📚',
       to: '/curriculum',
       iconBg: 'bg-amber-100 text-amber-600',
     },
     {
       title: '제품 지식 평가',
       description: 'Freshservice AI 멘토와 실습을 진행해보세요.',
-      icon: 'fas fa-rocket',
+      emoji: '🚀',
       to: '/assessment/products',
       iconBg: 'bg-emerald-100 text-emerald-600',
     },
@@ -132,13 +132,13 @@ const DashboardPage: React.FC = () => {
         icon={<i className="fas fa-compass"></i>}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 min-h-[18rem]">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="lg:col-span-3 min-h-[18rem]">
           {renderHero()}
         </div>
 
-        <Card>
-          <CardContent className="pt-6 flex flex-col gap-6">
+        <Card className="lg:col-span-1">
+          <CardContent className="pt-6 flex flex-col gap-6 h-full justify-center">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">완료한 시나리오</p>
@@ -155,7 +155,7 @@ const DashboardPage: React.FC = () => {
               <p className="text-sm text-muted-foreground">진행률</p>
               <p className="text-2xl font-semibold text-foreground">{completionPercent}%</p>
             </div>
-            <Button asChild className="w-full">
+            <Button asChild className="w-full mt-auto">
               <Link to="/curriculum">
                 학습 이어하기
               </Link>
@@ -166,19 +166,24 @@ const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {quickLinks.map(link => (
-          <Card key={link.title} className="hover:-translate-y-1 transition-transform card-hover">
-            <CardContent className="pt-6">
-              <Link to={link.to} className="flex flex-col gap-3 h-full">
-                <span className={`w-12 h-12 rounded-lg flex items-center justify-center ${link.iconBg}`}>
-                  <i className={`${link.icon} text-lg`}></i>
-                </span>
-                <div>
-                  <p className="text-base font-semibold text-foreground">{link.title}</p>
-                  <p className="text-sm text-muted-foreground">{link.description}</p>
+          <Card key={link.title} className="hover:-translate-y-1 transition-transform card-hover h-full border-border/50 shadow-sm hover:shadow-md">
+            <CardContent className="p-7 h-full flex flex-col">
+              <Link to={link.to} className="flex flex-col h-full">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 shadow-sm ${link.iconBg}`}>
+                    {link.emoji}
+                  </div>
+                  <p className="text-lg font-bold text-foreground leading-none whitespace-nowrap">{link.title}</p>
                 </div>
-                <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
-                  바로가기 <i className="fas fa-arrow-right"></i>
-                </span>
+                <p className="text-sm text-muted-foreground mb-6 flex-1 leading-relaxed break-keep">
+                  {link.description}
+                </p>
+                <div className="mt-auto pt-2">
+                  <span className="text-sm font-semibold text-primary inline-flex items-center gap-2 group">
+                    바로가기 
+                    <i className="fas fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+                  </span>
+                </div>
               </Link>
             </CardContent>
           </Card>

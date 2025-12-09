@@ -1,5 +1,5 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Moon, Sun, Compass } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Moon, Sun, Compass, LogOut } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import PageContainer from './PageContainer';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,9 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function TopNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   
   const isActive = (path: string) => {
     if (path === '/') {
@@ -102,6 +103,18 @@ export default function TopNav() {
               <div className="text-sm hidden sm:block">
                 <p className="font-semibold text-foreground leading-none">{user.name || user.email?.split('@')[0]}</p>
               </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={async () => {
+                  await signOut();
+                  navigate('/login');
+                }}
+                className="text-muted-foreground hover:text-destructive ml-1"
+                title="로그아웃"
+              >
+                <LogOut className="w-5 h-5" />
+              </Button>
             </div>
           )}
         </div>

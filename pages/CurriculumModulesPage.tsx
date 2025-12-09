@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import SectionHeader from '../components/layout/SectionHeader';
 import { getProgressSummary } from '../services/apiClient';
 import { CurriculumModule, ProgressSummary } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 // 모듈 아이콘 및 그라데이션 매핑
 const MODULE_STYLES: Record<string, { icon: string; gradient: string }> = {
@@ -28,6 +29,7 @@ const CurriculumModulesPage: React.FC = () => {
   const navigate = useNavigate();
   const { productId } = useParams<{ productId: string }>();
   const sessionId = localStorage.getItem('onboarding_session_id') || '';
+  const { signOut } = useAuth();
 
   const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -89,9 +91,21 @@ const CurriculumModulesPage: React.FC = () => {
           <CardContent className="pt-6 text-center space-y-6">
             <i className="fas fa-exclamation-triangle text-4xl text-amber-500"></i>
             <p className="text-muted-foreground">{error}</p>
-            <Button onClick={fetchModules}>
-              다시 시도
-            </Button>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={fetchModules}>
+                다시 시도
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={async () => {
+                  await signOut();
+                  localStorage.removeItem('onboarding_session_id');
+                  navigate('/');
+                }}
+              >
+                로그아웃
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
