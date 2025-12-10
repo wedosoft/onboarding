@@ -88,6 +88,18 @@ const ModuleChatSidebar: React.FC<ModuleChatSidebarProps> = ({
     }
   };
 
+  // 추천 질문
+  const suggestedQuestions = [
+    `${module.nameKo}의 핵심 기능이 뭐예요?`,
+    `실무에서 어떻게 활용하나요?`,
+    `자주 하는 실수가 있나요?`,
+  ];
+
+  const handleSuggestedQuestion = (question: string) => {
+    setInput(question);
+    inputRef.current?.focus();
+  };
+
   return (
     <aside
       className={`fixed right-0 top-0 h-full bg-background/95 border-l border-border shadow-2xl z-40 
@@ -125,6 +137,21 @@ const ModuleChatSidebar: React.FC<ModuleChatSidebarProps> = ({
             <p className="text-sm text-muted-foreground mb-6">
               {module.nameKo}에 대해 궁금한 점이 있으면<br />편하게 질문해주세요.
             </p>
+            
+            {/* 추천 질문 */}
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground mb-2">추천 질문</p>
+              {suggestedQuestions.map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSuggestedQuestion(q)}
+                  className="block w-full text-left text-sm px-4 py-2 bg-muted/50 rounded-lg border border-border text-muted-foreground hover:bg-primary/10 hover:border-primary/20 hover:text-primary transition-colors"
+                >
+                  <i className="fa-solid fa-arrow-right text-primary mr-2 text-xs"></i>
+                  {q}
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
