@@ -65,7 +65,9 @@ const ModuleChatSidebar: React.FC<ModuleChatSidebarProps> = ({
       let fullResponse = '';
       for await (const event of streamModuleChat(module.id, sessionId, userMessage)) {
         if (event.data?.text) {
-          fullResponse += event.data.text;
+          // 백엔드에서 전체 텍스트를 보내주므로 덮어쓰기 처리
+          fullResponse = event.data.text as string;
+          
           setHistory((prev) => {
             const newHistory = [...prev];
             newHistory[newHistory.length - 1] = { role: 'model', content: fullResponse };

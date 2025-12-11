@@ -75,7 +75,8 @@ const KnowledgeChatPage: React.FC = () => {
       let fullResponse = '';
 
       for await (const chunk of stream) {
-        fullResponse += chunk.text;
+        // 백엔드가 전체 텍스트를 보내는 경우가 있어 누적 대신 덮어쓰기
+        fullResponse = chunk.text;
         setMessages(prev => {
           const updated = [...prev];
           updated[updated.length - 1].content = fullResponse;
