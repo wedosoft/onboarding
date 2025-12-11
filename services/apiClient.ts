@@ -340,65 +340,6 @@ export async function getProgress(sessionId: string): Promise<UserProgress> {
 }
 
 // ============================================
-// 문서 업로드 (인수인계 문서)
-// ============================================
-
-export interface UploadDocumentRequest {
-  file: File;
-  metadata?: Array<{ key: string; stringValue: string }>;
-}
-
-export interface DocumentMetadata {
-  key: string;
-  stringValue: string;
-}
-
-export interface DocumentInfo {
-  name: string;
-  displayName: string;
-  customMetadata?: DocumentMetadata[];
-}
-
-export async function uploadDocument(
-  request: UploadDocumentRequest
-): Promise<DocumentInfo> {
-  const formData = new FormData();
-  formData.append('file', request.file);
-
-  if (request.metadata) {
-    formData.append('metadata', JSON.stringify(request.metadata));
-  }
-
-  const authHeaders = await getAuthHeaders();
-  const response = await fetch(
-    `${API_BASE_URL}/onboarding/documents`,
-    {
-      method: 'POST',
-      body: formData,
-      headers: authHeaders,
-    }
-  );
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Upload failed' }));
-    throw new ApiClientError(error.detail || 'Upload failed', response.status);
-  }
-
-  return response.json();
-}
-
-export async function listDocuments(category?: string): Promise<DocumentInfo[]> {
-  const params = category ? `?category=${encodeURIComponent(category)}` : '';
-  return apiFetch(`/onboarding/documents${params}`);
-}
-
-export async function deleteDocument(documentName: string): Promise<{ success: boolean }> {
-  return apiFetch(`/onboarding/documents/${encodeURIComponent(documentName)}`, {
-    method: 'DELETE',
-  });
-}
-
-// ============================================
 // 관리자 API
 // ============================================
 
