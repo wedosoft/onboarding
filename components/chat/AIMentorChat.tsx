@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Bot, Send, Trash2, MessageSquare } from 'lucide-react';
+import { Bot, Send, MessageSquarePlus, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -97,10 +97,10 @@ const AIMentorChat: React.FC<AIMentorChatProps> = ({
             variant="ghost"
             size="icon"
             onClick={onClearMessages}
-            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            title="대화 내용 지우기"
+            className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10"
+            title="새로운 대화 시작하기"
           >
-            <Trash2 className="w-4 h-4" />
+            <MessageSquarePlus className="w-4 h-4" />
           </Button>
         )}
       </div>
