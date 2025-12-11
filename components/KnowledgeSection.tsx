@@ -164,7 +164,7 @@ const KnowledgeSection: React.FC = () => {
   return (
     <div className="flex h-[calc(100vh-12rem)] gap-6 -mt-2">
       {/* Left List */}
-      <div className="w-1/3 flex flex-col gap-4">
+      <div className="w-[25%] flex flex-col gap-4">
         {/* Actions */}
         <div className="flex gap-2">
           <button
