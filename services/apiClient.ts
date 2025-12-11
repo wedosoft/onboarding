@@ -361,6 +361,48 @@ export async function getAllProgress(): Promise<AllSessionsResponse> {
 }
 
 // ============================================
+// 문서 관리 (File Search)
+// ============================================
+
+export interface DocumentInfo {
+  name: string;
+  displayName: string;
+  customMetadata?: { key: string; stringValue: string }[];
+}
+
+export interface DocumentsListResponse {
+  documents: DocumentInfo[];
+  nextPageToken?: string;
+}
+
+export async function listDocuments(): Promise<DocumentInfo[]> {
+  try {
+    // 1. 스토어 목록 조회
+    const storesResponse = await apiFetch<{ stores: { name: string, displayName: string }[] }>('/file-search/stores');
+    
+    if (!storesResponse.stores || storesResponse.stores.length === 0) {
+      return [];
+    }
+
+    // 2. 'onboarding'이 포함된 스토어 찾기 또는 첫 번째 스토어 사용
+    const store = storesResponse.stores.find(s => s.displayName.toLowerCase().includes('onboarding')) || storesResponse.stores[0];
+    
+    // 3. 문서 목록 조회
+    const response = await apiFetch<DocumentsListResponse>(`/file-search/stores/${encodeURIComponent(store.name)}/documents`);
+    return response.documents || [];
+  } catch (error) {
+    console.error('Failed to list documents:', error);
+    return [];
+  }
+}
+
+export async function deleteDocument(documentName: string): Promise<void> {
+  await apiFetch(`/file-search/documents/${encodeURIComponent(documentName)}`, {
+    method: 'DELETE',
+  });
+}
+
+// ============================================
 // 지식 베이스 (Knowledge Base)
 // ============================================
 
