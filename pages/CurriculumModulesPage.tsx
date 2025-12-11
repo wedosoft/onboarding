@@ -1,26 +1,31 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { 
+  BookOpen, Bot, Database, FileText, Globe, Layout, 
+  Server, Settings, Ticket, CheckCircle, Clock, 
+  PlayCircle, RotateCcw, ArrowRight, Sparkles, Trophy,
+  GraduationCap, BarChart3, AlertTriangle, LogOut
+} from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import SectionHeader from '../components/layout/SectionHeader';
-import { getProgressSummary } from '../services/apiClient';
+import { getProgressSummary, getProducts } from '../services/apiClient';
 import { CurriculumModule, ProgressSummary } from '../types';
 import { useAuth } from '../contexts/AuthContext';
 
 // 모듈 아이콘 및 그라데이션 매핑
-const MODULE_STYLES: Record<string, { icon: string; gradient: string }> = {
-  'ticket-basics': { icon: 'fas fa-ticket-alt', gradient: 'from-blue-400 to-indigo-500' },
-  'service-catalog': { icon: 'fas fa-book-open', gradient: 'from-purple-400 to-fuchsia-500' },
-  'automation': { icon: 'fas fa-robot', gradient: 'from-amber-400 to-orange-500' },
-  'asset-management': { icon: 'fas fa-server', gradient: 'from-slate-700 to-slate-900' },
-  'reporting': { icon: 'fas fa-chart-bar', gradient: 'from-emerald-400 to-teal-500' },
-  'omnichannel': { icon: 'fas fa-globe', gradient: 'from-cyan-400 to-blue-500' },
-  'knowledge-base': { icon: 'fas fa-book', gradient: 'from-pink-400 to-rose-500' },
-  'chatbot': { icon: 'fas fa-robot', gradient: 'from-violet-400 to-purple-500' },
-  default: { icon: 'fas fa-layer-group', gradient: 'from-slate-500 to-slate-700' },
+const MODULE_STYLES: Record<string, { icon: React.ElementType; gradient: string; color: string }> = {
+  'ticket-basics': { icon: Ticket, gradient: 'from-blue-500 to-indigo-600', color: 'text-blue-500' },
+  'service-catalog': { icon: BookOpen, gradient: 'from-purple-500 to-fuchsia-600', color: 'text-purple-500' },
+  'automation': { icon: Bot, gradient: 'from-amber-500 to-orange-600', color: 'text-amber-500' },
+  'asset-management': { icon: Server, gradient: 'from-slate-600 to-slate-800', color: 'text-slate-600' },
+  'reporting': { icon: BarChart3, gradient: 'from-emerald-500 to-teal-600', color: 'text-emerald-500' },
+  'omnichannel': { icon: Globe, gradient: 'from-cyan-500 to-blue-600', color: 'text-cyan-500' },
+  'knowledge-base': { icon: Database, gradient: 'from-pink-500 to-rose-600', color: 'text-pink-500' },
+  'chatbot': { icon: Bot, gradient: 'from-violet-500 to-purple-600', color: 'text-violet-500' },
+  default: { icon: Layout, gradient: 'from-slate-500 to-slate-700', color: 'text-slate-500' },
 };
 
 const getModuleStyle = (slug: string) => MODULE_STYLES[slug] || MODULE_STYLES.default;
@@ -32,6 +37,7 @@ const CurriculumModulesPage: React.FC = () => {
   const { signOut } = useAuth();
 
   const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
+  const [productName, setProductName] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,8 +58,17 @@ const CurriculumModulesPage: React.FC = () => {
     setError(null);
 
     try {
-      const summary = await getProgressSummary(sessionId, productId);
+      const [summary, products] = await Promise.all([
+        getProgressSummary(sessionId, productId),
+        getProducts()
+      ]);
+      
       setProgressSummary(summary);
+      
+      const product = products.find(p => p.id === productId);
+      if (product) {
+        setProductName(product.name);
+      }
     } catch (err) {
       console.error('Failed to load curriculum modules:', err);
       setError(err instanceof Error ? err.message : '모듈 정보를 불러오지 못했습니다.');
@@ -87,12 +102,17 @@ const CurriculumModulesPage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
-        <Card className="max-w-md">
+        <Card className="max-w-md border-destructive/50 shadow-lg">
           <CardContent className="pt-6 text-center space-y-6">
-            <i className="fas fa-exclamation-triangle text-4xl text-amber-500"></i>
-            <p className="text-muted-foreground">{error}</p>
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-8 h-8 text-destructive" />
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold text-foreground">오류가 발생했습니다</h3>
+              <p className="text-muted-foreground">{error}</p>
+            </div>
             <div className="flex gap-3 justify-center">
-              <Button onClick={fetchModules}>
+              <Button onClick={fetchModules} variant="default">
                 다시 시도
               </Button>
               <Button 
@@ -103,6 +123,7 @@ const CurriculumModulesPage: React.FC = () => {
                   navigate('/');
                 }}
               >
+                <LogOut className="w-4 h-4 mr-2" />
                 로그아웃
               </Button>
             </div>
@@ -113,127 +134,140 @@ const CurriculumModulesPage: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <SectionHeader
-        title="학습 커리큘럼"
-        subtitle="단계별로 구성된 학습 모듈을 통해 전문가로 성장하세요."
-        align="left"
-        className="mb-8"
-      />
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      {/* Header Section */}
+      <div className="text-center mb-12 space-y-4">
+        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4 ring-1 ring-primary/20">
+          <GraduationCap className="w-8 h-8 text-primary" />
+        </div>
+        <h1 className="text-4xl font-bold text-foreground tracking-tight">
+          {productName ? `${productName} 커리큘럼` : '학습 커리큘럼'}
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          단계별로 구성된 학습 모듈을 통해 전문가로 성장하세요.
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center justify-between">
-              <span>나의 학습 현황</span>
-              <Badge variant="secondary" className="text-sm">
-                {Math.round(completionRate)}% 달성
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-muted-foreground">
-                <span>전체 진행률</span>
-                <span>{completedCount} / {modules.length} 모듈 완료</span>
-              </div>
-              <Progress value={completionRate} className="h-3" />
+      {/* Progress Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+              <Trophy className="w-6 h-6" />
             </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">전체 진행률</p>
+              <div className="flex items-baseline gap-2">
+                <h3 className="text-2xl font-bold text-foreground">{Math.round(completionRate)}%</h3>
+                <span className="text-xs text-muted-foreground">달성</span>
+              </div>
+            </div>
+            <div className="ml-auto w-24">
+              <Progress value={completionRate} className="h-2" />
+            </div>
+          </CardContent>
+        </Card>
 
-            <div className="grid grid-cols-3 gap-4 pt-2">
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-primary">{modules.length}</div>
-                <div className="text-xs text-muted-foreground mt-1">전체 모듈</div>
-              </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-emerald-500">{completedCount}</div>
-                <div className="text-xs text-muted-foreground mt-1">완료함</div>
-              </div>
-              <div className="text-center p-3 bg-muted rounded-lg">
-                <div className="text-2xl font-bold text-blue-500">{modules.length - completedCount}</div>
-                <div className="text-xs text-muted-foreground mt-1">학습 예정</div>
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">완료한 모듈</p>
+              <div className="flex items-baseline gap-2">
+                <h3 className="text-2xl font-bold text-foreground">{completedCount}</h3>
+                <span className="text-xs text-muted-foreground">/ {modules.length}</span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">세션 정보</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-lg bg-muted border border-border p-4 text-sm text-muted-foreground break-all">
-              <p className="font-mono text-xs">세션 ID</p>
-              <p className="text-foreground font-medium">{displaySessionId || '세션을 확인할 수 없습니다'}</p>
+        <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
+          <CardContent className="p-6 flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+              <Clock className="w-6 h-6" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              세션은 자동 저장됩니다. 다른 기기에서도 동일 계정으로 계속 학습할 수 있어요.
-            </p>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">학습 예정</p>
+              <div className="flex items-baseline gap-2">
+                <h3 className="text-2xl font-bold text-foreground">{modules.length - completedCount}</h3>
+                <span className="text-xs text-muted-foreground">모듈</span>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      {/* Modules Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {modules.map((mod, index) => {
           const style = getModuleStyle(mod.slug);
+          const Icon = style.icon;
           const isCompleted = mod.status === 'completed';
           const isStarted = mod.status === 'learning';
 
           return (
             <Card
               key={mod.id}
-              className="text-left group h-full p-0 overflow-hidden cursor-pointer hover:border-primary/50 transition-colors"
+              className={`group relative overflow-hidden cursor-pointer border-border/50 hover:border-primary/50 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card h-full`}
               onClick={() => handleModuleSelect(mod.id)}
             >
-              <div className={`h-28 bg-gradient-to-br ${style.gradient} p-4 flex items-center justify-between relative overflow-hidden`}>
-                <div className="absolute inset-0 bg-white/10 pointer-events-none" />
-                <div className="relative z-10 flex items-center gap-4">
-                  <span className="w-10 h-10 rounded-lg bg-white/20 text-white font-semibold flex items-center justify-center">
-                    {index + 1}
-                  </span>
-                  <i className={`${style.icon} text-white text-2xl`}></i>
-                </div>
-                {isCompleted && (
-                  <Badge className="relative z-10 bg-white/90 text-emerald-500 hover:bg-white/90">
-                    <i className="fas fa-check-circle mr-1"></i> 완료
-                  </Badge>
-                )}
-              </div>
-
-              <CardContent className="p-5 flex flex-col gap-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground line-clamp-1">{mod.nameKo}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{mod.description}</p>
+              <div className={`absolute inset-0 bg-gradient-to-br ${style.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500`} />
+              
+              <CardContent className="p-6 flex flex-col h-full relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white shadow-md group-hover:shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="text-xs font-mono text-muted-foreground/50">#{String(index + 1).padStart(2, '0')}</span>
+                    {isCompleted && (
+                      <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-emerald-500/20">
+                        <CheckCircle className="w-3 h-3 mr-1" /> 완료
+                      </Badge>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm">
-                  <span className="inline-flex items-center gap-2 text-muted-foreground">
-                    <i className="far fa-clock"></i>
-                    {mod.estimatedMinutes || 15}분 예상
+                <div className="mb-4 flex-1">
+                  <h3 className="text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-1">
+                    {mod.nameKo}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {mod.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-border/50 flex items-center justify-between mt-auto">
+                  <span className="text-xs text-muted-foreground flex items-center">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {mod.estimatedMinutes || 15}분
                   </span>
-                  <Badge
-                    variant={isCompleted ? "default" : isStarted ? "secondary" : "outline"}
-                    className={`${!isCompleted && !isStarted ? 'group-hover:bg-primary group-hover:text-primary-foreground' : ''}`}
-                  >
+                  
+                  <div className={`text-sm font-medium flex items-center transition-colors ${
+                    isCompleted ? 'text-emerald-500' : 
+                    isStarted ? 'text-primary' : 
+                    'text-muted-foreground group-hover:text-primary'
+                  }`}>
                     {isCompleted ? '복습하기' : isStarted ? '이어하기' : '시작하기'}
-                  </Badge>
+                    <ArrowRight className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </div>
               </CardContent>
-
-              {isStarted && !isCompleted && (
-                <div className="h-1 bg-muted">
-                  <div className="h-full bg-primary w-1/3"></div>
-                </div>
-              )}
             </Card>
           );
         })}
       </div>
 
       {modules.length === 0 && (
-        <Card>
-          <CardContent className="pt-6 text-center">
-            <p className="text-muted-foreground">아직 등록된 학습 모듈이 없습니다. 관리자에게 문의해주세요.</p>
+        <Card className="border-dashed">
+          <CardContent className="pt-12 pb-12 text-center">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Layout className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-lg font-medium text-foreground mb-2">등록된 모듈이 없습니다</h3>
+            <p className="text-muted-foreground">관리자에게 문의해주세요.</p>
           </CardContent>
         </Card>
       )}

@@ -7,33 +7,48 @@ import SectionHeader from '../components/layout/SectionHeader';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { 
+  Settings, 
+  Headphones, 
+  Layers, 
+  BarChart3, 
+  MessageSquare, 
+  ArrowRight, 
+  Box,
+  Sparkles
+} from 'lucide-react';
 
 // 제품별 아이콘 및 스타일 매핑
-const PRODUCT_STYLES: Record<string, { icon: string; gradient: string; accent: string }> = {
+const PRODUCT_STYLES: Record<string, { icon: React.ElementType; gradient: string; accent: string; shadow: string }> = {
   freshservice: {
-    icon: 'fas fa-cog',
+    icon: Settings,
     gradient: 'from-blue-500 to-indigo-600',
-    accent: 'bg-blue-500',
+    accent: 'text-blue-600',
+    shadow: 'shadow-blue-500/20',
   },
   freshdesk: {
-    icon: 'fas fa-headset',
+    icon: Headphones,
     gradient: 'from-emerald-400 to-teal-600',
-    accent: 'bg-emerald-500',
+    accent: 'text-emerald-600',
+    shadow: 'shadow-emerald-500/20',
   },
   freshdesk_omni: {
-    icon: 'fas fa-layer-group',
+    icon: Layers,
     gradient: 'from-cyan-400 to-blue-600',
-    accent: 'bg-cyan-500',
+    accent: 'text-cyan-600',
+    shadow: 'shadow-cyan-500/20',
   },
   freshsales: {
-    icon: 'fas fa-chart-line',
+    icon: BarChart3,
     gradient: 'from-violet-500 to-purple-600',
-    accent: 'bg-violet-500',
+    accent: 'text-violet-600',
+    shadow: 'shadow-violet-500/20',
   },
   freshchat: {
-    icon: 'fas fa-comments',
+    icon: MessageSquare,
     gradient: 'from-orange-400 to-pink-500',
-    accent: 'bg-orange-500',
+    accent: 'text-orange-600',
+    shadow: 'shadow-orange-500/20',
   },
 };
 
@@ -122,103 +137,65 @@ export default function ProductSelectionPage() {
 
   const bundles = products.filter(p => p.product_type === 'bundle');
   const standalones = products.filter(p => p.product_type !== 'bundle');
+  const allProducts = [...bundles, ...standalones];
 
   return (
-    <div className="layout-stack pb-12">
-      <SectionHeader
-        title="고복수 팀장의 온보딩 가이드"
-        subtitle="학습하고 싶은 제품을 선택해주세요"
-        icon={<i className="fas fa-box-open"></i>}
-      />
-
-      {/* Bundles Section */}
-      {bundles.length > 0 && (
-        <div className="space-y-4">
-          <div className="max-w-4xl mx-auto">
-            {bundles.map((product) => {
-              const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshdesk_omni;
-              const info = PRODUCT_DESCRIPTIONS[product.id];
-
-              return (
-                <Card
-                  key={product.id}
-                  className="cursor-pointer hover:border-primary/50 transition-colors"
-                  onClick={() => handleProductSelect(product.id)}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-xl`}>
-                        <i className={style.icon}></i>
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h2 className="text-lg font-bold text-foreground">{product.name}</h2>
-                          <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
-                            BUNDLE
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mb-3">{info?.tagline || product.description_ko}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {info?.features?.map((feature, idx) => (
-                            <span key={idx} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded border border-border">
-                              {feature}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="self-center text-muted-foreground group-hover:text-primary transition-colors">
-                        <i className="fas fa-arrow-right"></i>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="text-center mb-12 space-y-4">
+        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4 ring-1 ring-primary/20">
+          <Box className="w-8 h-8 text-primary" />
         </div>
-      )}
+        <h1 className="text-4xl font-bold text-foreground tracking-tight">
+          제품별 커리큘럼
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          학습하고 싶은 제품을 선택하여 전문가로 성장하세요.
+        </p>
+      </div>
 
-      {/* Standalones Section */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide px-2">개별 제품</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {standalones.map((product) => {
-            const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshservice;
-            const info = PRODUCT_DESCRIPTIONS[product.id];
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {allProducts.map((product) => {
+          const style = PRODUCT_STYLES[product.id] || PRODUCT_STYLES.freshservice;
+          const info = PRODUCT_DESCRIPTIONS[product.id];
+          const Icon = style.icon;
+          const isBundle = product.product_type === 'bundle';
 
-            return (
-              <Card
-                key={product.id}
-                className="cursor-pointer hover:border-primary/50 transition-colors h-full"
-                onClick={() => handleProductSelect(product.id)}
-              >
-                <CardContent className="p-5 flex flex-col h-full">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white text-lg`}>
-                      <i className={style.icon}></i>
-                    </div>
-                    <div className="text-muted-foreground group-hover:text-primary transition-colors">
-                      <i className="fas fa-arrow-right text-sm"></i>
-                    </div>
+          return (
+            <Card
+              key={product.id}
+              className={`group relative overflow-hidden cursor-pointer border-border/50 hover:border-primary/50 shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card h-full ${isBundle ? style.shadow : ''}`}
+              onClick={() => handleProductSelect(product.id)}
+            >
+              <div className={`absolute inset-0 bg-gradient-to-br ${style.gradient} opacity-0 group-hover:opacity-[0.03] transition-opacity duration-500`} />
+              
+              <CardContent className="p-5 flex flex-col h-full relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center text-white shadow-md group-hover:shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h2 className="text-base font-bold text-foreground mb-1">
+                  {isBundle && (
+                    <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 px-1.5 py-0.5 text-[10px]">
+                      BUNDLE
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="mb-2">
+                  <h2 className="text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors truncate">
                     {product.name}
                   </h2>
-                  <p className="text-sm text-muted-foreground mb-4 flex-1">
+                  <p className="text-xs text-muted-foreground line-clamp-1 font-medium">
                     {info?.tagline || product.description_ko}
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {info?.features?.slice(0, 3).map((feature, idx) => (
-                      <span key={idx} className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded border border-border">
-                        {feature}
-                      </span>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                </div>
+
+                <div className="mt-auto pt-4 flex items-center justify-end text-muted-foreground group-hover:text-primary transition-colors">
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

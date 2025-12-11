@@ -2,6 +2,12 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { 
+  ArrowLeft, ArrowRight, Bot, Check, CheckCircle, ChevronRight, 
+  ClipboardCheck, Clock, HelpCircle, Leaf, Lightbulb, MessageSquare, 
+  RotateCcw, Send, Settings, Sprout, Trash2, TreeDeciduous, X,
+  Rocket, Briefcase, BookOpen, Quote
+} from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -28,18 +34,18 @@ interface ChatMessage {
 
 // 레벨별 정보
 const LEVELS = [
-  { id: 'basic', name: '기초', icon: 'fa-seedling', description: '핵심 개념과 기본 사용법' },
-  { id: 'intermediate', name: '중급', icon: 'fa-leaf', description: 'ITIL 기반 심화 학습' },
-  { id: 'advanced', name: '고급', icon: 'fa-tree', description: '자동화와 API 활용' },
+  { id: 'basic', name: '기초', icon: Sprout, description: '핵심 개념과 기본 사용법' },
+  { id: 'intermediate', name: '중급', icon: Leaf, description: 'ITIL 기반 심화 학습' },
+  { id: 'advanced', name: '고급', icon: TreeDeciduous, description: '자동화와 API 활용' },
 ];
 
 // 섹션별 아이콘
-const SECTION_ICONS: Record<string, string> = {
-  overview: 'fa-lightbulb',
-  'feature-basic': 'fa-cogs',
-  'feature-advanced': 'fa-rocket',
-  practice: 'fa-briefcase',
-  quiz: 'fa-check-circle',
+const SECTION_ICONS: Record<string, React.ElementType> = {
+  overview: Lightbulb,
+  'feature-basic': Settings,
+  'feature-advanced': Rocket,
+  practice: Briefcase,
+  quiz: CheckCircle,
 };
 
 const SUGGESTED_QUESTIONS = [
@@ -269,10 +275,12 @@ const ModuleLearningPage: React.FC = () => {
       <div className="min-h-[60vh] flex items-center justify-center">
         <Card className="max-w-md">
           <CardContent className="pt-6 text-center space-y-6">
-            <i className="fas fa-exclamation-circle text-4xl text-destructive"></i>
+            <div className="w-16 h-16 bg-destructive/10 rounded-full flex items-center justify-center mx-auto">
+              <HelpCircle className="w-8 h-8 text-destructive" />
+            </div>
             <p className="text-muted-foreground">모듈을 찾을 수 없습니다.</p>
             <Button onClick={handleGoBack} variant="outline">
-              <i className="fas fa-arrow-left mr-2"></i>목록으로 돌아가기
+              <ArrowLeft className="w-4 h-4 mr-2" />목록으로 돌아가기
             </Button>
           </CardContent>
         </Card>
@@ -306,7 +314,7 @@ const ModuleLearningPage: React.FC = () => {
                   <span className="text-2xl text-muted-foreground ml-1">점</span>
                 </div>
                 <div className="flex items-center justify-center gap-2 text-emerald-500 font-medium bg-emerald-500/10 py-1 px-3 rounded-full mx-auto w-fit border border-emerald-500/20">
-                  <i className="fas fa-check-circle"></i>
+                  <CheckCircle className="w-4 h-4" />
                   <span>{result.correctCount}개 정답 / {result.totalQuestions}문항</span>
                 </div>
               </div>
@@ -319,7 +327,7 @@ const ModuleLearningPage: React.FC = () => {
                 size="lg"
                 className="bg-background/50 hover:bg-background/80 text-foreground border-border backdrop-blur-md"
               >
-                <i className="fas fa-arrow-left mr-2"></i> 목록으로
+                <ArrowLeft className="w-4 h-4 mr-2" /> 목록으로
               </Button>
               <Button
                 onClick={() => {
@@ -331,7 +339,7 @@ const ModuleLearningPage: React.FC = () => {
                 size="lg"
                 className="bg-card text-foreground hover:bg-card/90 border border-border"
               >
-                <i className="fas fa-redo mr-2"></i> 다시 학습하기
+                <RotateCcw className="w-4 h-4 mr-2" /> 다시 학습하기
               </Button>
             </div>
           </div>
@@ -365,9 +373,9 @@ const ModuleLearningPage: React.FC = () => {
                     </span>
                   </div>
                   {isCorrect ? (
-                    <i className="fas fa-check text-emerald-500 text-xl"></i>
+                    <Check className="w-5 h-5 text-emerald-500" />
                   ) : (
-                    <i className="fas fa-times text-rose-500 text-xl"></i>
+                    <X className="w-5 h-5 text-rose-500" />
                   )}
                 </div>
 
@@ -394,7 +402,7 @@ const ModuleLearningPage: React.FC = () => {
 
                   {r.explanation && (
                     <div className="bg-muted/50 rounded-xl p-4 text-sm text-muted-foreground border border-border flex items-start gap-3">
-                      <i className="fas fa-lightbulb text-amber-500 mt-0.5"></i>
+                      <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                       <div>
                         <span className="font-bold text-foreground block mb-1">해설</span>
                         {r.explanation}
@@ -428,7 +436,7 @@ const ModuleLearningPage: React.FC = () => {
                 onClick={() => setPhase('learning')}
                 className="w-10 h-10 rounded-full bg-background/50 hover:bg-background/80 flex items-center justify-center text-foreground transition backdrop-blur-md"
               >
-                <i className="fas fa-arrow-left"></i>
+                <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
                 <h1 className="text-xl font-bold text-foreground">자가 점검</h1>
@@ -469,7 +477,7 @@ const ModuleLearningPage: React.FC = () => {
 
                 {currentQuestion.context && (
                   <div className="bg-muted/50 p-4 rounded-xl border border-border text-muted-foreground text-sm mb-8 italic flex items-start gap-3">
-                    <i className="fas fa-quote-left text-muted-foreground/50 text-xl"></i>
+                    <Quote className="w-5 h-5 text-muted-foreground/50 flex-shrink-0" />
                     {currentQuestion.context}
                   </div>
                 )}
@@ -489,7 +497,7 @@ const ModuleLearningPage: React.FC = () => {
                       >
                         <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors
                           ${isSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-border group-hover:border-primary/50'}`}>
-                          {isSelected && <i className="fas fa-check text-xs"></i>}
+                          {isSelected && <Check className="w-3 h-3" />}
                         </div>
                         <span className="font-medium">{choice.text}</span>
                       </button>
@@ -505,7 +513,7 @@ const ModuleLearningPage: React.FC = () => {
                   disabled={currentQuestionIndex === 0}
                   variant="ghost"
                 >
-                  <i className="fas fa-arrow-left mr-2"></i>이전 문제
+                  <ArrowLeft className="w-4 h-4 mr-2" />이전 문제
                 </Button>
 
                 {currentQuestionIndex < questions.length - 1 ? (
@@ -513,7 +521,7 @@ const ModuleLearningPage: React.FC = () => {
                     onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
                     size="lg"
                   >
-                    다음 문제 <i className="fas fa-arrow-right ml-2"></i>
+                    다음 문제 <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 ) : (
                   <Button
@@ -529,7 +537,7 @@ const ModuleLearningPage: React.FC = () => {
                       </>
                     ) : (
                       <>
-                        <i className="fas fa-flag-checkered mr-2"></i>
+                        <ClipboardCheck className="w-4 h-4 mr-2" />
                         <span>제출하기</span>
                       </>
                     )}
@@ -544,7 +552,7 @@ const ModuleLearningPage: React.FC = () => {
                 <div className="absolute inset-0 border-4 border-muted rounded-full"></div>
                 <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                 <div className="absolute inset-0 flex items-center justify-center text-primary">
-                  <i className="fas fa-question text-xl"></i>
+                  <HelpCircle className="w-8 h-8" />
                 </div>
               </div>
               <h3 className="text-xl font-bold text-foreground mb-2">문제를 준비하고 있습니다</h3>
@@ -569,14 +577,15 @@ const ModuleLearningPage: React.FC = () => {
                   onClick={handleGoBack}
                   className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  <i className="fas fa-arrow-left"></i>
+                  <ArrowLeft className="w-4 h-4" />
                   <span>목록으로</span>
                 </button>
                 
                 {/* 레벨 & 자가점검 탭 */}
                 <div className="flex gap-1 bg-muted/50 p-1 rounded-lg">
                   {availableLevels.map((level) => {
-                    const levelInfo = LEVELS.find(l => l.id === level) || { name: level };
+                    const levelInfo = LEVELS.find(l => l.id === level) || { name: level, icon: Sprout };
+                    const LevelIcon = levelInfo.icon;
                     const isActive = currentLevel === level;
                     return (
                       <button
@@ -584,12 +593,13 @@ const ModuleLearningPage: React.FC = () => {
                         onClick={() => {
                           setCurrentLevel(level);
                         }}
-                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 ${
+                        className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
                           isActive 
                             ? 'bg-background text-foreground shadow-sm' 
                             : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
                         }`}
                       >
+                        <LevelIcon className="w-3 h-3" />
                         {levelInfo.name}
                       </button>
                     );
@@ -597,9 +607,10 @@ const ModuleLearningPage: React.FC = () => {
                   <div className="w-px bg-border mx-1 my-1"></div>
                   <button
                     onClick={() => setPhase('quiz')}
-                    className="px-3 py-1 text-muted-foreground hover:text-foreground hover:bg-background/50 rounded-md text-xs font-medium transition-all duration-200"
+                    className="px-3 py-1 text-muted-foreground hover:text-foreground hover:bg-background/50 rounded-md text-xs font-medium transition-all duration-200 flex items-center gap-1.5"
                   >
-                    <i className="fas fa-clipboard-check mr-1"></i>자가 점검
+                    <ClipboardCheck className="w-3 h-3" />
+                    자가 점검
                   </button>
                 </div>
               </div>
@@ -611,11 +622,11 @@ const ModuleLearningPage: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-4 text-xs text-muted-foreground ml-6 flex-shrink-0">
                   <span className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded">
-                    <i className="fas fa-clock text-primary/70"></i>
+                    <Clock className="w-3 h-3 text-primary/70" />
                     약 {module.estimatedMinutes}분
                   </span>
                   <span className="flex items-center gap-1 bg-muted/30 px-2 py-1 rounded">
-                    <i className={`fas ${LEVELS.find(l => l.id === currentLevel)?.icon || 'fa-book'} text-primary/70`}></i>
+                    <BookOpen className="w-3 h-3 text-primary/70" />
                     핵심 개념
                   </span>
                 </div>
@@ -634,7 +645,7 @@ const ModuleLearningPage: React.FC = () => {
             ) : currentSections.length === 0 ? (
               <Card className="p-12 text-center">
                 <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
-                  <i className="fas fa-book-open text-3xl text-muted-foreground/50"></i>
+                  <BookOpen className="w-10 h-10 text-muted-foreground/50" />
                 </div>
                 <p className="text-foreground font-bold text-lg mb-2">이 레벨에는 아직 콘텐츠가 없습니다.</p>
                 <p className="text-sm text-muted-foreground">다른 레벨을 선택하거나 AI 멘토에게 질문해보세요.</p>
@@ -660,14 +671,17 @@ const ModuleLearningPage: React.FC = () => {
                     {/* 섹션 헤더 */}
                     <div className="px-8 py-6 border-b border-border bg-card/50 flex items-center gap-5">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm ring-4 ring-primary/10">
-                        <i className={`fas ${SECTION_ICONS[activeSection.sectionType] || 'fa-file'}`}></i>
+                        {(() => {
+                          const Icon = SECTION_ICONS[activeSection.sectionType] || BookOpen;
+                          return <Icon className="w-6 h-6" />;
+                        })()}
                       </div>
                       <div>
                         <h3 className="font-bold text-xl text-foreground">
                           {activeSection.titleKo}
                         </h3>
-                        <p className="text-sm text-muted-foreground font-medium mt-0.5">
-                          <i className="far fa-clock mr-1"></i>
+                        <p className="text-sm text-muted-foreground font-medium mt-0.5 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
                           약 {activeSection.estimatedMinutes}분
                         </p>
                       </div>
@@ -700,7 +714,7 @@ const ModuleLearningPage: React.FC = () => {
                         disabled={currentSectionIndex === 0}
                         className="gap-2"
                       >
-                        <i className="fas fa-arrow-left"></i> 이전
+                        <ArrowLeft className="w-4 h-4" /> 이전
                       </Button>
 
                       {currentSectionIndex < currentSections.length - 1 ? (
@@ -708,14 +722,14 @@ const ModuleLearningPage: React.FC = () => {
                           onClick={() => setCurrentSectionIndex(prev => prev + 1)}
                           className="gap-2"
                         >
-                          다음 <i className="fas fa-arrow-right"></i>
+                          다음 <ArrowRight className="w-4 h-4" />
                         </Button>
                       ) : (
                         <Button
                           onClick={() => setPhase('quiz')}
                           className="gap-2 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500"
                         >
-                          자가 점검 시작 <i className="fas fa-clipboard-check"></i>
+                          자가 점검 시작 <ClipboardCheck className="w-4 h-4" />
                         </Button>
                       )}
                     </div>
@@ -734,7 +748,7 @@ const ModuleLearningPage: React.FC = () => {
             <div className="flex items-center gap-4 w-full">
               <div className="relative">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-background">
-                  <i className="fas fa-robot text-white text-lg"></i>
+                  <Bot className="w-6 h-6 text-white" />
                 </div>
                 <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-background rounded-full"></div>
               </div>
@@ -752,7 +766,7 @@ const ModuleLearningPage: React.FC = () => {
                 onClick={() => setChatMessages([])}
                 title="대화 내용 지우기"
               >
-                <i className="fas fa-trash-alt"></i>
+                <Trash2 className="w-4 h-4" />
               </Button>
             </div>
           </div>
@@ -762,7 +776,7 @@ const ModuleLearningPage: React.FC = () => {
             {chatMessages.length === 0 && (
               <div className="text-center mt-8 px-4">
                 <div className="inline-block p-4 bg-primary/5 rounded-2xl mb-4 ring-1 ring-primary/10">
-                  <i className="fas fa-comments text-primary text-3xl"></i>
+                  <MessageSquare className="w-8 h-8 text-primary" />
                 </div>
                 <h4 className="font-bold text-foreground mb-2">무엇이든 물어보세요!</h4>
                 <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
@@ -787,7 +801,7 @@ const ModuleLearningPage: React.FC = () => {
               <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
                 {msg.role === 'assistant' && (
                   <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1 shadow-sm">
-                    <i className="fas fa-robot"></i>
+                    <Bot className="w-4 h-4" />
                   </div>
                 )}
                 <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-sm shadow-sm ${msg.role === 'user'
@@ -805,7 +819,7 @@ const ModuleLearningPage: React.FC = () => {
             {isChatLoading && (
               <div className="flex justify-start items-start animate-fade-in">
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1 shadow-sm">
-                  <i className="fas fa-robot"></i>
+                  <Bot className="w-4 h-4" />
                 </div>
                 <div className="bg-white dark:bg-muted rounded-2xl rounded-tl-none px-5 py-4 min-h-[36px] flex items-center border border-border shadow-sm">
                   <div className="flex gap-1.5">
@@ -837,7 +851,7 @@ const ModuleLearningPage: React.FC = () => {
                 size="icon"
                 className="absolute right-1.5 top-1.5 h-9 w-9 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
               >
-                <i className="fas fa-paper-plane text-xs"></i>
+                <Send className="w-4 h-4" />
               </Button>
             </div>
             <p className="text-[10px] text-muted-foreground text-center mt-2 opacity-70">

@@ -9,12 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Send, Bot, User, ArrowUp, ArrowRight, RotateCcw, Loader2, Sparkles } from 'lucide-react';
 
 const suggestedQuestions = [
-  '신입 사원으로서 첫 주에 집중해야 할 것은?',
-  '효과적인 1:1 미팅 준비 방법은?',
-  '업무 우선순위를 정하는 좋은 방법은?',
-  '팀 내 커뮤니케이션을 잘하려면?',
-  '우리 회사의 핵심 가치는 무엇인가요?',
-  '연차 사용 규정이 어떻게 되나요?',
+  'Freshdesk Omni의 주요 기능은 무엇인가요?',
+  'Freshservice에서 티켓을 생성하는 방법은?',
+  'Freshdesk와 Freshchat의 차이점은 무엇인가요?',
+  'SLA 정책을 설정하는 방법이 궁금해요.',
+  '자동화 규칙(Automation Rule)은 어떻게 동작하나요?',
+  '고객 포털을 커스터마이징 할 수 있나요?',
 ];
 
 const KnowledgeChatPage: React.FC = () => {
@@ -110,11 +110,11 @@ const KnowledgeChatPage: React.FC = () => {
             <span className="text-4xl">🐢</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-foreground">
-            무엇이든 물어보세요
+            제품 관련 질문을 해보세요
           </h1>
           <p className="text-muted-foreground text-lg max-w-md mx-auto">
-            AI 시니어 멘토가 {userName}님의 온보딩을 도와드립니다.<br/>
-            회사 생활, 업무, 규정 등 궁금한 점을 자유롭게 질문하세요.
+            AI 시니어 멘토가 {userName}님의 제품 학습을 도와드립니다.<br/>
+            Freshdesk, Freshservice 등 우리 제품에 대해 궁금한 점을 자유롭게 질문하세요.
           </p>
         </div>
 
