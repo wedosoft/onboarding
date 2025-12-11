@@ -196,7 +196,7 @@ const AIMentorChat: React.FC<AIMentorChatProps> = ({
       </div>
 
       {/* 입력 영역 */}
-      <div className="p-4 border-t border-border bg-background flex-shrink-0">
+      <div className="p-4 border-t border-border bg-background flex-shrink-0 h-[103px]">
         <div className="flex gap-2 relative">
           <input
             type="text"
@@ -204,7 +204,7 @@ const AIMentorChat: React.FC<AIMentorChatProps> = ({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="flex-1 pl-4 pr-12 py-3 border border-input rounded-xl bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+            className="flex-1 pl-4 pr-12 py-3 border border-input rounded-xl bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all h-[46px]"
             disabled={isLoading}
           />
           <Button

@@ -24,10 +24,20 @@ export default function TopNav() {
         {/* 로고 & 메인 네비게이션 */}
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Compass className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg text-foreground">고복수 팀장의 온보딩</span>
+            <img 
+              src="/logo-light.png" 
+              alt="고복수 팀장의 온보딩" 
+              width={140} 
+              height={40} 
+              className="h-8 md:h-10 w-auto block dark:hidden" 
+            />
+            <img 
+              src="/logo-dark.png" 
+              alt="고복수 팀장의 온보딩" 
+              width={140} 
+              height={40} 
+              className="h-8 md:h-10 w-auto hidden dark:block" 
+            />
           </Link>
           
           <div className="flex items-center gap-1">

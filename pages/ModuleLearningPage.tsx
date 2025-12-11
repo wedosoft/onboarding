@@ -657,7 +657,7 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 스크롤 가능한 콘텐츠 영역 */}
-          <div className="flex-1 overflow-y-auto p-0 min-h-0 bg-background">
+          <div className="flex-1 overflow-hidden p-0 min-h-0 bg-background">
             <div className="h-full flex flex-col">
             {isLoadingContent ? (
               <Card className="p-12 text-center shadow-none border-0 rounded-none">
@@ -736,12 +736,12 @@ const ModuleLearningPage: React.FC = () => {
                     </div>
 
                     {/* 네비게이션 버튼 */}
-                    <div className="px-4 py-3 border-t border-border bg-muted/30 flex justify-between items-center flex-shrink-0">
+                    <div className="p-4 border-t border-border bg-background flex justify-between items-start flex-shrink-0 h-[103px]">
                       <Button
                         variant="outline"
                         onClick={() => setCurrentSectionIndex(prev => Math.max(0, prev - 1))}
                         disabled={currentSectionIndex === 0}
-                        className="gap-2"
+                        className="gap-2 h-[46px]"
                       >
                         <ArrowLeft className="w-4 h-4" /> 이전
                       </Button>
@@ -749,14 +749,14 @@ const ModuleLearningPage: React.FC = () => {
                       {currentSectionIndex < currentSections.length - 1 ? (
                         <Button
                           onClick={() => setCurrentSectionIndex(prev => prev + 1)}
-                          className="gap-2"
+                          className="gap-2 h-[46px]"
                         >
                           다음 <ArrowRight className="w-4 h-4" />
                         </Button>
                       ) : (
                         <Button
                           onClick={() => setPhase('quiz')}
-                          className="gap-2 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500"
+                          className="gap-2 h-[46px] bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500"
                         >
                           자가 점검 시작 <ClipboardCheck className="w-4 h-4" />
                         </Button>
