@@ -441,6 +441,14 @@ export interface CreateKnowledgeArticleRequest {
   structuredSummary: string;
 }
 
+export interface UpdateKnowledgeArticleRequest {
+  title?: string;
+  author?: string;
+  category?: string;
+  rawContent?: string;
+  structuredSummary?: string;
+}
+
 /**
  * AI를 사용하여 지식 콘텐츠 구조화
  */
@@ -466,6 +474,16 @@ export async function getKnowledgeArticles(category?: string): Promise<Knowledge
 export async function createKnowledgeArticle(request: CreateKnowledgeArticleRequest): Promise<KnowledgeArticle> {
   return apiFetch<KnowledgeArticle>('/onboarding/knowledge', {
     method: 'POST',
+    body: JSON.stringify(request),
+  });
+}
+
+/**
+ * 지식 아티클 수정
+ */
+export async function updateKnowledgeArticle(articleId: string, request: UpdateKnowledgeArticleRequest): Promise<KnowledgeArticle> {
+  return apiFetch<KnowledgeArticle>(`/onboarding/knowledge/${encodeURIComponent(articleId)}`, {
+    method: 'PUT',
     body: JSON.stringify(request),
   });
 }
