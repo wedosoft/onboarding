@@ -524,6 +524,7 @@ const ModuleLearningPage: React.FC = () => {
                   <Button
                     onClick={() => setCurrentQuestionIndex(prev => prev + 1)}
                     size="lg"
+                    disabled={!selectedAnswers[currentQuestion.id]}
                   >
                     다음 문제 <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
