@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
+import PageHeader from '@/components/layout/PageHeader';
 import { getProgressSummary, getProducts } from '../services/apiClient';
 import { CurriculumModule, ProgressSummary } from '../types';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,8 +34,7 @@ const getModuleStyle = (slug: string) => MODULE_STYLES[slug] || MODULE_STYLES.de
 const CurriculumModulesPage: React.FC = () => {
   const navigate = useNavigate();
   const { productId } = useParams<{ productId: string }>();
-  const sessionId = localStorage.getItem('onboarding_session_id') || '';
-  const { signOut } = useAuth();
+  const { signOut, sessionId, isSessionReady } = useAuth();
 
   const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
   const [productName, setProductName] = useState<string>('');
@@ -42,6 +42,11 @@ const CurriculumModulesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchModules = useCallback(async () => {
+    // 세션이 준비되지 않았으면 대기
+    if (!isSessionReady) {
+      return;
+    }
+
     if (!sessionId) {
       setError('세션 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
       setIsLoading(false);
@@ -75,7 +80,7 @@ const CurriculumModulesPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [productId, sessionId]);
+  }, [productId, sessionId, isSessionReady]);
 
   useEffect(() => {
     fetchModules();
@@ -134,22 +139,27 @@ const CurriculumModulesPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header Section */}
-      <div className="text-center mb-12 space-y-4">
-        <div className="inline-flex items-center justify-center p-3 bg-primary/10 rounded-2xl mb-4 ring-1 ring-primary/20">
-          <GraduationCap className="w-8 h-8 text-primary" />
-        </div>
-        <h1 className="text-4xl font-bold text-foreground tracking-tight">
-          {productName ? `${productName} 커리큘럼` : '학습 커리큘럼'}
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          단계별로 구성된 학습 모듈을 통해 전문가로 성장하세요.
-        </p>
-      </div>
+    <div className="min-h-full">
+      {/* 통합 페이지 헤더 */}
+      <PageHeader
+        title={productName ? `${productName} 커리큘럼` : '학습 커리큘럼'}
+        description="단계별로 구성된 학습 모듈을 통해 전문가로 성장하세요."
+        icon={<GraduationCap className="w-6 h-6" />}
+        breadcrumbs={[
+          { label: '커리큘럼', href: '/curriculum' },
+          { label: productName || '제품' }
+        ]}
+        actions={
+          <Badge variant="outline" className="text-sm px-3 py-1">
+            <Trophy className="w-4 h-4 mr-1.5 text-primary" />
+            {Math.round(completionRate)}% 완료
+          </Badge>
+        }
+      />
 
-      {/* Progress Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 py-8">
+        {/* Progress Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
         <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm">
           <CardContent className="p-6 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
@@ -271,6 +281,7 @@ const CurriculumModulesPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 };

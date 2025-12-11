@@ -13,6 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PageHeader from '@/components/layout/PageHeader';
+import ContentWithSidebar from '@/components/layout/ContentWithSidebar';
+import TabNav from '@/components/layout/TabNav';
+import AIMentorChat from '@/components/chat/AIMentorChat';
+import { useAuth } from '../contexts/AuthContext';
 import {
   getCurriculumModule,
   getModuleContents,
@@ -58,6 +63,7 @@ const ModuleLearningPage: React.FC = () => {
   const navigate = useNavigate();
   const { productId, moduleId } = useParams<{ productId: string; moduleId: string }>();
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const { sessionId } = useAuth();
 
   // Module state
   const [module, setModule] = useState<CurriculumModule | null>(null);
@@ -85,14 +91,12 @@ const ModuleLearningPage: React.FC = () => {
   const [result, setResult] = useState<QuizSubmitResponse | null>(null);
   const [quizStartTime, setQuizStartTime] = useState<Date | null>(null);
 
-  const sessionId = localStorage.getItem('onboarding_session_id') || '';
-
   // 퀴즈 시작
   useEffect(() => {
     const startQuiz = async () => {
       if (phase === 'quiz' && questions.length === 0) {
         try {
-          const data = await getQuizQuestions(moduleId!, currentLevel);
+          const data = await getQuizQuestions(moduleId!);
           setQuestions(data);
           setQuizStartTime(new Date());
         } catch (error) {
@@ -564,14 +568,32 @@ const ModuleLearningPage: React.FC = () => {
     );
   }
 
+  // 이모지 제거 유틸리티
+  const stripEmoji = (text: string): string => {
+    return text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}]/gu, '').trim();
+  };
+
   // 학습 화면 (정적 콘텐츠) - Modern Deep Glass Style
   return (
-    <div className="flex h-full overflow-hidden">
-        {/* 왼쪽: 학습 콘텐츠 (70%) */}
-        <div className="flex-1 flex flex-col h-full min-w-0">
+    <ContentWithSidebar
+      sidebar={
+        <AIMentorChat
+          messages={chatMessages}
+          onSendMessage={handleSendChat}
+          isLoading={isChatLoading}
+          onClearMessages={() => setChatMessages([])}
+          suggestedQuestions={SUGGESTED_QUESTIONS}
+          mentorName="고복수 팀장"
+        />
+      }
+      sidebarWidth="lg"
+      collapsible={false}
+      className="h-[calc(100vh-10rem)]"
+    >
+      <div className="flex-1 flex flex-col h-full min-w-0">
           {/* 컴팩트 히어로 헤더 - 높이 고정 및 정렬 */}
-          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4 border-b border-border h-[100px] flex flex-col justify-center">
-            <div className="max-w-5xl mx-auto w-full">
+          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-3 border-b border-border flex flex-col justify-center flex-shrink-0">
+            <div className="w-full">
               <div className="flex items-center justify-between mb-2">
                 <button
                   onClick={handleGoBack}
@@ -635,15 +657,15 @@ const ModuleLearningPage: React.FC = () => {
           </div>
 
           {/* 스크롤 가능한 콘텐츠 영역 */}
-          <div className="flex-1 overflow-y-auto p-6 min-h-0 bg-muted/10">
-            <div className="max-w-5xl mx-auto px-2 h-full flex flex-col">
+          <div className="flex-1 overflow-y-auto p-0 min-h-0 bg-background">
+            <div className="h-full flex flex-col">
             {isLoadingContent ? (
-              <Card className="p-12 text-center">
+              <Card className="p-12 text-center shadow-none border-0 rounded-none">
                 <LoadingSpinner />
                 <p className="mt-4 text-muted-foreground font-medium">콘텐츠를 불러오는 중...</p>
               </Card>
             ) : currentSections.length === 0 ? (
-              <Card className="p-12 text-center">
+              <Card className="p-12 text-center shadow-none border-0 rounded-none">
                 <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mx-auto mb-6">
                   <BookOpen className="w-10 h-10 text-muted-foreground/50" />
                 </div>
@@ -653,7 +675,7 @@ const ModuleLearningPage: React.FC = () => {
             ) : (
               <>
                 {/* 섹션 진행 상태 표시 */}
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-6 px-4 flex items-center justify-between">
                   <div className="text-sm font-medium text-muted-foreground">
                     Step {currentSectionIndex + 1} of {currentSections.length}
                   </div>
@@ -665,49 +687,56 @@ const ModuleLearningPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 활성 섹션 카드 (단일 뷰) */}
+                {/* 활성 섹션 카드 (단일 뷰) - 고정 높이로 일관성 유지 */}
                 {activeSection && (
-                  <Card className="flex-1 flex flex-col overflow-hidden shadow-lg ring-1 ring-primary/5 border-0 bg-card/50 backdrop-blur-sm">
-                    {/* 섹션 헤더 */}
-                    <div className="px-8 py-6 border-b border-border bg-card/50 flex items-center gap-5">
-                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary to-indigo-600 text-white flex items-center justify-center text-lg shadow-sm ring-4 ring-primary/10">
+                  <Card className="flex-1 flex flex-col overflow-hidden shadow-none border-0 rounded-none bg-card min-h-[500px]">
+                    {/* 섹션 헤더 - 간결하게 */}
+                    <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center gap-3 flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                         {(() => {
                           const Icon = SECTION_ICONS[activeSection.sectionType] || BookOpen;
-                          return <Icon className="w-6 h-6" />;
+                          return <Icon className="w-5 h-5" />;
                         })()}
                       </div>
-                      <div>
-                        <h3 className="font-bold text-xl text-foreground">
-                          {activeSection.titleKo}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-lg text-foreground truncate">
+                          {stripEmoji(activeSection.titleKo)}
                         </h3>
-                        <p className="text-sm text-muted-foreground font-medium mt-0.5 flex items-center gap-1">
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           약 {activeSection.estimatedMinutes}분
                         </p>
                       </div>
                     </div>
 
-                    {/* 섹션 내용 */}
-                    <div className="flex-1 overflow-y-auto px-8 py-8 bg-card">
-                      <div className="prose prose-slate prose-lg max-w-none
-                        prose-headings:font-display prose-headings:font-bold prose-headings:text-foreground
-                        prose-h3:text-primary prose-h3:text-xl
-                        prose-p:text-muted-foreground prose-p:leading-relaxed
-                        prose-strong:text-foreground prose-strong:font-bold
+                    {/* 섹션 내용 - 스크롤 가능, 고정 영역 */}
+                    <div className="flex-1 overflow-y-auto px-4 py-4 bg-card">
+                      <article className="prose prose-sm sm:prose-base max-w-none
+                        dark:prose-invert
+                        prose-headings:font-semibold prose-headings:text-foreground prose-headings:mt-6 prose-headings:mb-3
+                        prose-h2:text-xl prose-h2:border-b prose-h2:border-border prose-h2:pb-2
+                        prose-h3:text-lg prose-h3:text-foreground
+                        prose-h4:text-base prose-h4:text-foreground
+                        prose-p:text-foreground/80 prose-p:leading-relaxed prose-p:my-3
+                        prose-strong:text-foreground prose-strong:font-semibold
                         prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-                        prose-code:text-pink-600 prose-code:bg-pink-50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:font-medium
-                        prose-pre:bg-foreground prose-pre:text-background prose-pre:rounded-xl prose-pre:shadow-lg
-                        prose-blockquote:border-l-4 prose-blockquote:border-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
-                        prose-img:rounded-xl prose-img:shadow-md
+                        prose-ul:my-3 prose-ul:pl-4 prose-ol:my-3 prose-ol:pl-4
+                        prose-li:text-foreground/80 prose-li:my-1
+                        prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                        prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:rounded-lg prose-pre:my-4
+                        prose-blockquote:border-l-4 prose-blockquote:border-primary/50 prose-blockquote:bg-muted/50 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:rounded-r prose-blockquote:not-italic prose-blockquote:text-foreground/70
+                        prose-table:border prose-table:border-border prose-th:bg-muted prose-th:px-3 prose-th:py-2 prose-td:px-3 prose-td:py-2 prose-td:border prose-td:border-border
+                        prose-img:rounded-lg prose-img:shadow-sm prose-img:my-4
+                        prose-hr:border-border prose-hr:my-6
                       ">
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {activeSection.contentMd}
+                          {stripEmoji(activeSection.contentMd)}
                         </ReactMarkdown>
-                      </div>
+                      </article>
                     </div>
 
                     {/* 네비게이션 버튼 */}
-                    <div className="p-6 border-t border-border bg-muted/30 flex justify-between items-center">
+                    <div className="px-4 py-3 border-t border-border bg-muted/30 flex justify-between items-center flex-shrink-0">
                       <Button
                         variant="outline"
                         onClick={() => setCurrentSectionIndex(prev => Math.max(0, prev - 1))}
@@ -737,129 +766,10 @@ const ModuleLearningPage: React.FC = () => {
                 )}
               </>
             )}
-            </div>
-          </div>
-        </div>
-
-        {/* 오른쪽: AI 멘토 채팅 (30%) */}
-        <div className="w-96 bg-background border-l border-border flex flex-col h-full flex-shrink-0 shadow-xl shadow-black/5 z-10">
-          {/* 채팅 헤더 - 높이 고정 및 정렬 */}
-          <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4 border-b border-border h-[100px] flex items-center">
-            <div className="flex items-center gap-4 w-full">
-              <div className="relative">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md ring-2 ring-background">
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-background rounded-full"></div>
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-foreground text-lg">고복수 팀장</h3>
-                <p className="text-xs text-muted-foreground flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  실시간 답변 중
-                </p>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors" 
-                onClick={() => setChatMessages([])}
-                title="대화 내용 지우기"
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* 채팅 메시지 영역 */}
-          <div className="flex-1 p-4 space-y-4 overflow-y-auto min-h-0 max-h-[calc(100vh-300px)] bg-muted/5">
-            {chatMessages.length === 0 && (
-              <div className="text-center mt-8 px-4">
-                <div className="inline-block p-4 bg-primary/5 rounded-2xl mb-4 ring-1 ring-primary/10">
-                  <MessageSquare className="w-8 h-8 text-primary" />
-                </div>
-                <h4 className="font-bold text-foreground mb-2">무엇이든 물어보세요!</h4>
-                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-                  학습 내용에 대해 궁금한 점이 있으신가요?<br/>
-                  AI 멘토가 즉시 답변해드립니다.
-                </p>
-                <div className="space-y-2">
-                  {SUGGESTED_QUESTIONS.map((q, idx) => (
-                    <Button
-                      key={idx}
-                      onClick={() => handleSendChat(q)}
-                      variant="outline"
-                      className="w-full justify-start text-left h-auto py-3 text-sm bg-background hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-all"
-                    >
-                      <span className="mr-2 opacity-50">Q.</span> {q}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            )}
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}>
-                {msg.role === 'assistant' && (
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1 shadow-sm">
-                    <Bot className="w-4 h-4" />
-                  </div>
-                )}
-                <div className={`max-w-[85%] rounded-2xl px-5 py-3 text-sm shadow-sm ${msg.role === 'user'
-                  ? 'bg-primary text-primary-foreground rounded-tr-none'
-                  : 'bg-white dark:bg-muted text-foreground border border-border rounded-tl-none'
-                  }`}>
-                  {msg.role === 'assistant' && msg.content ? (
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
-                  ) : (
-                    msg.content
-                  )}
-                </div>
-              </div>
-            ))}
-            {isChatLoading && (
-              <div className="flex justify-start items-start animate-fade-in">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-xs mr-2 flex-shrink-0 mt-1 shadow-sm">
-                  <Bot className="w-4 h-4" />
-                </div>
-                <div className="bg-white dark:bg-muted rounded-2xl rounded-tl-none px-5 py-4 min-h-[36px] flex items-center border border-border shadow-sm">
-                  <div className="flex gap-1.5">
-                    <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* 채팅 입력 */}
-          <div className="p-4 border-t border-border flex-shrink-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="flex gap-2 relative">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendChat(chatInput)}
-                placeholder="질문을 입력하세요..."
-                className="flex-1 pl-4 pr-12 py-3 border border-input rounded-xl bg-muted/50 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                disabled={isChatLoading}
-              />
-              <Button
-                onClick={() => handleSendChat(chatInput)}
-                disabled={!chatInput.trim() || isChatLoading}
-                size="icon"
-                className="absolute right-1.5 top-1.5 h-9 w-9 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all shadow-sm"
-              >
-                <Send className="w-4 h-4" />
-              </Button>
-            </div>
-            <p className="text-[10px] text-muted-foreground text-center mt-2 opacity-70">
-              AI 멘토는 실수를 할 수 있습니다. 중요한 정보는 확인이 필요합니다.
-            </p>
           </div>
         </div>
       </div>
+    </ContentWithSidebar>
   );
 };
 

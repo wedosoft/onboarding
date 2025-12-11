@@ -154,6 +154,14 @@
         --chart-3: 197 37% 24%;
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
+
+        /* 🎨 시맨틱 컬러 토큰 (통합 디자인 시스템) */
+        --success: 160 84% 39%;         /* emerald-500 */
+        --success-foreground: 0 0% 100%;
+        --warning: 38 92% 50%;          /* amber-500 */
+        --warning-foreground: 0 0% 0%;
+        --info: 199 89% 48%;            /* sky-500 */
+        --info-foreground: 0 0% 100%;
     }
 
     /* ☀️ 라이트 테마 */
@@ -211,6 +219,60 @@
         --callout-success: 150 60% 42%;
         --callout-warning: 38 92% 58%;
         --callout-danger: 0 84% 60%;
+
+        /* 🎨 시맨틱 컬러 토큰 (통합 디자인 시스템) */
+        --success: 160 84% 39%;         /* emerald-500 */
+        --success-foreground: 0 0% 100%;
+        --warning: 38 92% 50%;          /* amber-500 */
+        --warning-foreground: 0 0% 0%;
+        --info: 199 89% 48%;            /* sky-500 */
+        --info-foreground: 0 0% 100%;
+    }
+
+    /* 다크 테마 */
+    .dark {
+        --background: 222 47% 11%;
+        --foreground: 210 40% 98%;
+
+        --card: 222 47% 13%;
+        --card-foreground: 210 40% 98%;
+
+        --popover: 222 47% 13%;
+        --popover-foreground: 210 40% 98%;
+
+        --primary: 210 70% 51%;
+        --primary-foreground: 0 0% 98%;
+
+        --secondary: 217 33% 17%;
+        --secondary-foreground: 210 40% 98%;
+
+        --muted: 217 33% 17%;
+        --muted-foreground: 215 20% 65%;
+
+        --accent: 217 33% 17%;
+        --accent-foreground: 210 40% 98%;
+
+        --destructive: 0 63% 31%;
+        --destructive-foreground: 210 40% 98%;
+
+        --border: 217 33% 17%;
+        --input: 217 33% 17%;
+        --ring: 210 70% 51%;
+
+        /* 📦 Callout tone tokens (dark) */
+        --callout-note: 215 62% 52%;
+        --callout-info: 205 65% 58%;
+        --callout-success: 150 60% 42%;
+        --callout-warning: 38 92% 58%;
+        --callout-danger: 0 84% 60%;
+
+        /* 🎨 시맨틱 컬러 토큰 (다크 모드) */
+        --success: 160 84% 39%;
+        --success-foreground: 0 0% 100%;
+        --warning: 38 92% 50%;
+        --warning-foreground: 0 0% 0%;
+        --info: 199 89% 48%;
+        --info-foreground: 0 0% 100%;
     }
 
     /* 기본 스타일 */
