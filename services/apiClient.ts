@@ -561,43 +561,6 @@ export async function getProductStats(productId: string): Promise<ProductStats> 
   );
 }
 
-// ============================================
-// File Search 문서 타입 및 조회
-// ============================================
-
-export interface DocumentMetadata {
-  key: string;
-  stringValue: string;
-}
-
-export interface DocumentInfo {
-  name: string;
-  displayName?: string;
-  customMetadata?: DocumentMetadata[];
-}
-
-const FILE_SEARCH_STORE = import.meta.env.VITE_GEMINI_STORE_COMMON;
-
-export async function listDocuments(): Promise<DocumentInfo[]> {
-  if (!FILE_SEARCH_STORE) {
-    throw new ApiClientError('VITE_GEMINI_STORE_COMMON is not configured', 500);
-  }
-  const resp = await apiFetch<{ documents: DocumentInfo[]; nextPageToken?: string }>(
-    `/file-search/stores/${encodeURIComponent(FILE_SEARCH_STORE)}/documents`
-  );
-  return resp.documents || [];
-}
-
-// ============================================
-// 관리자: 저장된 문서 삭제 (백엔드 프록시)
-// ============================================
-
-export async function deleteDocument(objectName: string): Promise<{ success: boolean }> {
-  return apiFetch<{ success: boolean }>(`/documents/${encodeURIComponent(objectName)}`, {
-    method: 'DELETE',
-  });
-}
-
 /**
  * 카테고리별 학습 콘텐츠 스트리밍
  */
