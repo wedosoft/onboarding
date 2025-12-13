@@ -209,31 +209,24 @@ const KnowledgeSection: React.FC = () => {
                     setSelectedArticle(article);
                     setIsFormOpen(false);
                   }}
-                  className={`group p-4 rounded-2xl border cursor-pointer transition-all duration-200 hover:scale-[1.01] hover:shadow-md
+                  className={`group p-3 rounded-xl border cursor-pointer transition-all duration-200 hover:shadow-sm
                     ${selectedArticle?.id === article.id && !isFormOpen
-                      ? 'bg-card border-primary shadow-md ring-1 ring-primary/10'
+                      ? 'bg-card border-primary shadow-sm ring-1 ring-primary/10'
                       : 'bg-card/60 border-border/40 hover:bg-card hover:border-border'
                     }`}
                 >
-                  <div className="flex justify-between items-start mb-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded font-bold ${catInfo.color}`}>
+                  <div className="flex items-center gap-2 mb-1 text-xs text-muted-foreground">
+                    <span className={`text-[10px] px-2 py-0.5 rounded ${catInfo.color}`}>
                       {catInfo.label}
                     </span>
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(article.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <h4 className={`font-bold text-base mb-1 line-clamp-1 ${selectedArticle?.id === article.id ? 'text-primary' : 'text-foreground'}`}>
-                    {article.title}
-                  </h4>
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center text-[8px] text-muted-foreground font-bold">
-                      {article.author[0]}
+                    <div className="ml-auto flex items-center gap-2 text-[11px] text-muted-foreground">
+                      <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                      <span>• {article.author}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {article.author}
-                    </span>
                   </div>
+                  <p className={`text-sm line-clamp-1 ${selectedArticle?.id === article.id ? 'text-primary' : 'text-foreground'}`}>
+                    {article.title}
+                  </p>
                 </div>
               );
             })
@@ -264,7 +257,7 @@ const KnowledgeSection: React.FC = () => {
               </p>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 space-y-4">
+            <div className="flex-1 overflow-hidden flex flex-col px-8 space-y-4">
               {/* Title */}
               <div>
                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">
@@ -308,12 +301,12 @@ const KnowledgeSection: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col min-h-[200px]">
+              <div className="flex flex-col flex-1 min-h-0">
                 <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">
                   내용
                 </label>
                 <textarea
-                  className="flex-1 w-full p-4 bg-muted/50 border border-border rounded-xl focus:ring-2 focus:ring-ring focus:border-primary focus:bg-card resize-none text-foreground placeholder-muted-foreground transition leading-relaxed text-sm min-h-[200px]"
+                  className="flex-1 w-full p-4 bg-muted/50 border border-border rounded-xl focus:ring-2 focus:ring-ring focus:border-primary focus:bg-card resize-none text-foreground placeholder-muted-foreground transition leading-relaxed text-sm min-h-[320px]"
                   placeholder="공유하고 싶은 지식을 자유롭게 작성해주세요..."
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
