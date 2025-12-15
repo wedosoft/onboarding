@@ -25,10 +25,11 @@ type Tab = 'users' | 'documents';
 // 사용자별 통합 데이터
 interface UserSummary {
   userName: string;
-  sessions: SessionSummary[];
+  sessionsCount: number;
   totalCompleted: number;
   completionRate: number;
   lastSessionId: string;
+  lastActivity?: string;
 }
 
 const AdminPage: React.FC = () => {
@@ -50,23 +51,83 @@ const AdminPage: React.FC = () => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
   const [scenarioProgress, setScenarioProgress] = useState<UserProgress | null>(null);
+  const [showSessionPicker, setShowSessionPicker] = useState(false);
+  const [visibleUserCount, setVisibleUserCount] = useState(50);
   const [curriculumSummaries, setCurriculumSummaries] = useState<
     Array<{ productId: string; productName: string; summary: ProgressSummary | null; error?: string }>
   >([]);
 
+  const USERS_CACHE_KEY = 'admin.usersProgress.v1';
+  const USERS_CACHE_TTL_MS = 5 * 60 * 1000; // 5분
+
+  const readUsersCache = ():
+    | { sessions: SessionSummary[]; cachedAt: number }
+    | null => {
+    try {
+      const raw = localStorage.getItem(USERS_CACHE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as { sessions?: SessionSummary[]; cachedAt?: number };
+      if (!Array.isArray(parsed.sessions) || typeof parsed.cachedAt !== 'number') return null;
+      return { sessions: parsed.sessions, cachedAt: parsed.cachedAt };
+    } catch {
+      return null;
+    }
+  };
+
+  const writeUsersCache = (nextSessions: SessionSummary[]) => {
+    try {
+      localStorage.setItem(
+        USERS_CACHE_KEY,
+        JSON.stringify({ sessions: nextSessions, cachedAt: Date.now() })
+      );
+    } catch {
+      // ignore quota / private mode
+    }
+  };
+
+  const getProductDisplayName = (productId: string, candidate?: string) => {
+    const overrides: Record<string, string> = {
+      freshservice: 'Freshservice',
+      freshdesk: 'Freshdesk',
+      freshdesk_omni: 'Freshdesk Omni',
+      freshsales: 'Freshsales',
+      freshchat: 'Freshchat',
+    };
+    const trimmed = (candidate || '').trim();
+    if (trimmed && trimmed !== productId) return trimmed;
+    return overrides[productId] || productId.replace(/_/g, ' ');
+  };
+
   const loadUserProgress = useCallback(async (force = false) => {
     if (!force && usersLoaded) return;
+
+    // 캐시가 있으면 즉시 표시(체감 개선) 후 백그라운드 동기화
+    if (!force) {
+      const cached = readUsersCache();
+      if (cached && Date.now() - cached.cachedAt <= USERS_CACHE_TTL_MS && sessions.length === 0) {
+        setSessions(cached.sessions);
+        setUsersLoaded(true);
+      }
+    }
+
     setIsUsersLoading(true);
     try {
+      const t0 = import.meta.env.DEV ? performance.now() : 0;
       const data = await getAllProgress();
+      if (import.meta.env.DEV) {
+        const ms = Math.round(performance.now() - t0);
+        // eslint-disable-next-line no-console
+        console.debug(`[Admin] getAllProgress: ${ms}ms`);
+      }
       setSessions(data.sessions || []);
+      writeUsersCache(data.sessions || []);
       setUsersLoaded(true);
     } catch (error) {
       console.error('Failed to load user progress:', error);
     } finally {
       setIsUsersLoading(false);
     }
-  }, [usersLoaded]);
+  }, [usersLoaded, sessions.length]);
 
   const loadDocuments = useCallback(async (force = false) => {
     if (!force && documentsLoaded) return;
@@ -117,9 +178,16 @@ const AdminPage: React.FC = () => {
     return d.toLocaleString('ko-KR');
   };
 
+  const toTime = (value?: string | null) => {
+    if (!value) return 0;
+    const t = new Date(value).getTime();
+    return Number.isNaN(t) ? 0 : t;
+  };
+
   const openUserDetail = async (user: UserSummary) => {
     setSelectedUser(user);
     setSelectedSessionId(user.lastSessionId);
+    setShowSessionPicker(false);
     setIsDetailOpen(true);
   };
 
@@ -141,10 +209,10 @@ const AdminPage: React.FC = () => {
         .map((p) => ({
           id: String(p.id),
           name: String(p.name || p.name_ko || p.id),
-          isBundle: p.product_type === 'bundle',
+          productType: p.product_type as string | undefined,
         }))
-        // 번들 상품은 개별 커리큘럼이 없을 수 있어 제외(필요하면 제거 가능)
-        .filter((p) => !p.isBundle);
+        // 번들/단품 모두 포함: 대표 화면에서 특정 코스(Freshdesk Omni 등)도 확인 가능
+        .filter((p) => !!p.id);
 
       const curriculumPromise = Promise.all(
         productList.map(async (p) => {
@@ -185,31 +253,72 @@ const AdminPage: React.FC = () => {
 
       if (userMap.has(userName)) {
         const existing = userMap.get(userName)!;
-        existing.sessions.push(session);
-        // 가장 높은 완료 수 사용
+        existing.sessionsCount += 1;
+
+        // 진행률(완료 시나리오)은 '가장 많이 완료한 값' 기준으로 표시
         if (session.completedCount > existing.totalCompleted) {
           existing.totalCompleted = session.completedCount;
           existing.completionRate = session.completionRate;
+        }
+
+        // 상세보기 기본 세션은 '최근 활동' 기준으로 선택
+        const currentLast = toTime(existing.lastActivity);
+        const nextLast = toTime(session.lastActivity);
+        if (nextLast >= currentLast) {
+          existing.lastActivity = session.lastActivity;
           existing.lastSessionId = session.sessionId;
         }
       } else {
         userMap.set(userName, {
           userName,
-          sessions: [session],
+          sessionsCount: 1,
           totalCompleted: session.completedCount,
           completionRate: session.completionRate,
           lastSessionId: session.sessionId,
+          lastActivity: session.lastActivity,
         });
       }
     });
 
-    return Array.from(userMap.values()).sort((a, b) => b.completionRate - a.completionRate);
+    return Array.from(userMap.values()).sort((a, b) => {
+      // 1) 진행률 높은 순
+      const byRate = b.completionRate - a.completionRate;
+      if (byRate !== 0) return byRate;
+      // 2) 최근 활동 높은 순
+      return toTime(b.lastActivity) - toTime(a.lastActivity);
+    });
   }, [sessions]);
+
+  const selectedSessionsSorted = useMemo(() => {
+    if (!selectedUser?.userName) return [];
+    const name = selectedUser.userName;
+    const list = sessions.filter((s) => (s.userName || '익명') === name);
+    list.sort((a, b) => toTime(b.lastActivity) - toTime(a.lastActivity));
+    return list;
+  }, [selectedUser?.userName, sessions]);
+
+  const sessionSelectLimit = 30;
+  const selectedSessionsForSelect = selectedSessionsSorted.slice(0, sessionSelectLimit);
+  const hiddenSessionCount = Math.max(0, selectedSessionsSorted.length - selectedSessionsForSelect.length);
+
+  const formatSessionLabel = (s: SessionSummary) => {
+    const head = s.sessionId?.slice(0, 8) || 'session';
+    const tail = s.sessionId?.slice(-4) || '';
+    const activity = s.lastActivity ? formatDateTime(s.lastActivity) : '활동 기록 없음';
+    return `${head}…${tail} · ${activity}`;
+  };
 
   // Filter users by search
   const filteredUsers = userSummaries.filter(u =>
     u.userName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  useEffect(() => {
+    // 검색 조건 변경 시 렌더 부담을 줄이기 위해 표시 개수 초기화
+    setVisibleUserCount(50);
+  }, [searchQuery, activeTab]);
+
+  const displayedUsers = filteredUsers.slice(0, visibleUserCount);
 
   // Filter documents by search
   const filteredDocuments = documents.filter(doc => {
@@ -228,7 +337,7 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="w-full max-w-7xl mx-auto space-y-8 px-2 sm:px-4">
       {/* Tabs */}
       <Card>
         <div className="border-b border-border">
@@ -303,37 +412,40 @@ const AdminPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
-                    {filteredUsers.map((user, idx) => (
+                    {displayedUsers.map((user, idx) => (
                       <tr key={idx} className="text-sm">
-                        <td className="py-3">
+                        <td className="py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
+                            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
                               {user.userName[0].toUpperCase()}
                             </div>
                             <div>
                               <p className="font-medium text-foreground">
                                 {user.userName}
                               </p>
-                              {user.sessions.length > 1 && (
-                                <p className="text-xs text-muted-foreground">
-                                  {user.sessions.length}개 세션
-                                </p>
-                              )}
+                              <div className="text-xs text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1">
+                                <span>최근 활동: {formatDateTime(user.lastActivity)}</span>
+                                {user.sessionsCount > 1 ? (
+                                  <span title="세션은 사용자가 앱을 시작/로그인할 때 생성되는 방문(세션) 기록입니다. 브라우저/기기/재로그인/테스트에 따라 많아질 수 있습니다.">
+                                    세션 기록: {user.sessionsCount}개
+                                  </span>
+                                ) : null}
+                              </div>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 text-foreground">
+                        <td className="py-4 text-foreground">
                           {user.totalCompleted} / {SCENARIOS.length}
                         </td>
-                        <td className="py-3">
+                        <td className="py-4">
                           <div className="flex items-center gap-2">
-                            <Progress value={user.completionRate} className="w-24 h-2" />
+                            <Progress value={user.completionRate} className="w-32 h-2" />
                             <span className="text-foreground">
                               {user.completionRate}%
                             </span>
                           </div>
                         </td>
-                        <td className="py-3">
+                        <td className="py-4">
                           {user.completionRate === 100 ? (
                             <Badge variant="default" className="bg-green-500/20 text-green-600 hover:bg-green-500/20 border border-green-500/30">
                               완료
@@ -348,7 +460,7 @@ const AdminPage: React.FC = () => {
                             </Badge>
                           )}
                         </td>
-                        <td className="py-3 text-right">
+                        <td className="py-4 text-right">
                           <Button
                             variant="outline"
                             size="sm"
@@ -361,6 +473,21 @@ const AdminPage: React.FC = () => {
                     ))}
                   </tbody>
                 </table>
+
+                {filteredUsers.length > displayedUsers.length ? (
+                  <div className="py-4 flex items-center justify-between">
+                    <div className="text-xs text-muted-foreground">
+                      {displayedUsers.length} / {filteredUsers.length}명 표시 중
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setVisibleUserCount((n) => Math.min(filteredUsers.length, n + 50))}
+                    >
+                      더 보기
+                    </Button>
+                  </div>
+                ) : null}
               </div>
             )
           ) : (
@@ -422,7 +549,7 @@ const AdminPage: React.FC = () => {
 
       {/* 상세 모니터링 다이얼로그 */}
       <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
-        <DialogContent className="max-w-5xl">
+        <DialogContent className="max-w-none w-[min(96vw,1280px)] max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>사용자 진행 현황 상세</DialogTitle>
             <DialogDescription>
@@ -430,31 +557,72 @@ const AdminPage: React.FC = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
-            <div className="flex items-start justify-between gap-4">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <div className="text-sm text-muted-foreground">사용자</div>
                 <div className="text-base font-semibold text-foreground">{selectedUser?.userName || '-'}</div>
+                {selectedUser?.lastActivity ? (
+                  <div className="text-xs text-muted-foreground">최근 활동: {formatDateTime(selectedUser.lastActivity)}</div>
+                ) : null}
               </div>
 
               <div className="space-y-1">
-                <div className="text-sm text-muted-foreground">세션</div>
-                <div className="flex items-center gap-2">
-                  <select
-                    value={selectedSessionId}
-                    onChange={(e) => setSelectedSessionId(e.target.value)}
-                    className="h-9 px-3 bg-muted border border-input rounded-md text-sm"
-                  >
-                    {(selectedUser?.sessions || []).map((s) => (
-                      <option key={s.sessionId} value={s.sessionId}>
-                        {s.sessionId.slice(0, 8)}… ({formatDateTime(s.lastActivity)})
-                      </option>
-                    ))}
-                  </select>
-                  <Button variant="outline" size="sm" onClick={loadDetail} disabled={detailLoading}>
-                    새로고침
-                  </Button>
-                </div>
+                <div className="text-sm text-muted-foreground">기준 세션</div>
+
+                {!showSessionPicker ? (
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                    <div className="h-9 px-3 bg-muted border border-input rounded-md text-sm flex items-center w-full">
+                      <span className="text-foreground truncate">
+                        {selectedSessionId ? `${selectedSessionId.slice(0, 8)}…${selectedSessionId.slice(-4)}` : '-'}
+                      </span>
+                    </div>
+                    {(selectedUser?.sessionsCount || 0) > 1 ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowSessionPicker(true)}
+                        title="세션 변경(고급)"
+                      >
+                        세션 변경
+                      </Button>
+                    ) : null}
+                    <Button variant="outline" size="sm" onClick={loadDetail} disabled={detailLoading}>
+                      새로고침
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+                      <select
+                        value={selectedSessionId}
+                        onChange={(e) => setSelectedSessionId(e.target.value)}
+                        className="h-9 px-3 bg-muted border border-input rounded-md text-sm w-full"
+                      >
+                        {selectedSessionsForSelect.map((s) => (
+                          <option key={s.sessionId} value={s.sessionId}>
+                            {formatSessionLabel(s)}
+                          </option>
+                        ))}
+                      </select>
+                      <Button variant="outline" size="sm" onClick={() => setShowSessionPicker(false)}>
+                        닫기
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={loadDetail} disabled={detailLoading}>
+                        새로고침
+                      </Button>
+                    </div>
+                    {hiddenSessionCount > 0 ? (
+                      <div className="text-xs text-muted-foreground">
+                        세션이 너무 많아 최근 {sessionSelectLimit}개만 표시합니다. (숨김 {hiddenSessionCount}개)
+                      </div>
+                    ) : null}
+                    <div className="text-xs text-muted-foreground">
+                      세션은 사용자가 앱을 시작/로그인할 때 생성되는 방문 기록입니다. 대표 확인용으로는 기본 세션만 봐도 충분하며,
+                      데이터가 안 보일 때만 세션을 바꿔 확인하면 됩니다.
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -466,17 +634,20 @@ const AdminPage: React.FC = () => {
 
             {detailLoading ? (
               <div className="py-10 text-center">
-                <LoadingSpinner />
-                <p className="mt-2 text-muted-foreground">상세 데이터를 불러오는 중...</p>
+                <LoadingSpinner message="상세 데이터를 불러오는 중..." />
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                 {/* 시나리오 진행 */}
                 <Card className="h-fit">
                   <CardContent className="pt-6 space-y-4">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-foreground">온보딩 시나리오</h3>
                       <Badge variant="outline">세션 기준</Badge>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground">
+                      참고: 상단 목록의 진행률은 <b>온보딩 시나리오(12개)</b> 기준입니다. 사용자가 커리큘럼(제품 모듈)만 진행했다면 여기 값은 0%일 수 있습니다.
                     </div>
 
                     {scenarioProgress ? (
@@ -544,7 +715,8 @@ const AdminPage: React.FC = () => {
                     {curriculumSummaries.length === 0 ? (
                       <div className="text-sm text-muted-foreground">커리큘럼 진도 데이터가 없습니다.</div>
                     ) : (
-                      <Accordion type="single" collapsible className="w-full">
+                      <div className="max-h-[52vh] overflow-y-auto pr-1">
+                        <Accordion type="single" collapsible className="w-full">
                         {curriculumSummaries.map((p) => {
                           const rate = p.summary?.completionRate || 0;
                           const completed = p.summary?.completedModules || 0;
@@ -555,7 +727,7 @@ const AdminPage: React.FC = () => {
                               <AccordionTrigger>
                                 <div className="flex items-center justify-between w-full pr-3">
                                   <div className="min-w-0">
-                                    <div className="font-medium text-foreground truncate">{p.productName}</div>
+                                    <div className="font-medium text-foreground truncate">{getProductDisplayName(p.productId, p.productName)}</div>
                                     <div className="text-xs text-muted-foreground truncate">{p.productId}</div>
                                   </div>
                                   <div className="flex items-center gap-3">
@@ -638,7 +810,8 @@ const AdminPage: React.FC = () => {
                             </AccordionItem>
                           );
                         })}
-                      </Accordion>
+                        </Accordion>
+                      </div>
                     )}
                   </CardContent>
                 </Card>
