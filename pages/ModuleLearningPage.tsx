@@ -75,6 +75,9 @@ const ModuleLearningPage: React.FC = () => {
   const [currentLevel, setCurrentLevel] = useState<string>('basic');
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
 
+  // 레벨별 완료 상태 (자가점검 잠금 해제에 사용)
+  const [completedLevels, setCompletedLevels] = useState<Record<string, boolean>>({});
+
   // Phase (자가 점검)
   const [phase, setPhase] = useState<Phase>('learning');
 
@@ -91,21 +94,35 @@ const ModuleLearningPage: React.FC = () => {
   const [result, setResult] = useState<QuizSubmitResponse | null>(null);
   const [quizStartTime, setQuizStartTime] = useState<Date | null>(null);
 
-  // 퀴즈 시작
+  // 퀴즈 로드 (phase=quiz일 때만)
+  // - 서버에서 잘못된 모듈의 문제가 섞여 내려오는 경우(피드백) 클라이언트에서 최소한의 방어 필터링을 적용
   useEffect(() => {
-    const startQuiz = async () => {
-      if (phase === 'quiz' && questions.length === 0) {
-        try {
-          const data = await getQuizQuestions(moduleId!);
-          setQuestions(data);
-          setQuizStartTime(new Date());
-        } catch (error) {
-          console.error('Failed to load quiz:', error);
+    const loadQuestions = async () => {
+      if (!moduleId) return;
+      try {
+        const data = await getQuizQuestions(moduleId);
+        const filtered = data.filter(q => q.moduleId === moduleId);
+        if (filtered.length !== data.length) {
+          console.warn('[Quiz] Filtered mismatched questions', {
+            moduleId,
+            received: data.length,
+            kept: filtered.length,
+          });
         }
+        setQuestions(filtered);
+        setCurrentQuestionIndex(0);
+        setSelectedAnswers({});
+        setQuizStartTime(new Date());
+      } catch (error) {
+        console.error('Failed to load questions:', error);
+        setQuestions([]);
       }
     };
-    startQuiz();
-  }, [phase, moduleId, currentLevel, questions.length]);
+
+    if (phase === 'quiz') {
+      loadQuestions();
+    }
+  }, [moduleId, phase]);
 
   // Scroll chat to bottom
   useEffect(() => {
@@ -168,24 +185,7 @@ const ModuleLearningPage: React.FC = () => {
     startLearning();
   }, [moduleId, sessionId]);
 
-  // 자가 점검 문제 로드
-  useEffect(() => {
-    const loadQuestions = async () => {
-      if (!moduleId) return;
-      try {
-        const data = await getQuizQuestions(moduleId);
-        setQuestions(data);
-        setCurrentQuestionIndex(0);
-        setSelectedAnswers({});
-        setQuizStartTime(new Date());
-      } catch (error) {
-        console.error('Failed to load questions:', error);
-      }
-    };
-    if (phase === 'quiz') {
-      loadQuestions();
-    }
-  }, [moduleId, phase]);
+
 
   // 채팅 메시지 전송
   const handleSendChat = useCallback(async (message: string) => {
@@ -252,6 +252,17 @@ const ModuleLearningPage: React.FC = () => {
         startedAt: quizStartTime?.toISOString()
       });
       setResult(response);
+
+      // 자가 점검 완료를 모듈 진도에 반영 (커리큘럼 진행률/완료 배지 업데이트)
+      try {
+        await updateModuleProgress(moduleId, sessionId, {
+          status: 'completed',
+          learningCompleted: true,
+        });
+      } catch (e) {
+        console.warn('Failed to update module completion status:', e);
+      }
+
       setPhase('result');
     } catch (error) {
       console.error('Failed to submit quiz:', error);
@@ -260,9 +271,9 @@ const ModuleLearningPage: React.FC = () => {
     }
   };
 
-  // 모듈 목록으로 돌아가기
+  // 모듈 목록으로 돌아가기 (목록 페이지에서 즉시 새로고침 트리거)
   const handleGoBack = () => {
-    navigate(`/curriculum/${productId}`);
+    navigate(`/curriculum/${productId}`, { state: { refresh: Date.now() } });
   };
 
   // 로딩 중
@@ -296,6 +307,36 @@ const ModuleLearningPage: React.FC = () => {
   const currentSections = (contentData?.sections[currentLevel] || []).slice().sort((a, b) => a.displayOrder - b.displayOrder);
   const availableLevels = contentData?.levels || ['basic'];
   const activeSection = currentSections[currentSectionIndex];
+
+  // 레벨 순서(기초->중급->고급)로 정렬
+  const orderedLevels = availableLevels
+    .slice()
+    .sort((a, b) => {
+      const order = ['basic', 'intermediate', 'advanced'];
+      return order.indexOf(a) - order.indexOf(b);
+    });
+
+  const levelsWithContent = orderedLevels.filter((lvl) => (contentData?.sections[lvl]?.length || 0) > 0);
+  const isQuizUnlocked = levelsWithContent.every((lvl) => completedLevels[lvl]);
+
+  // 현재 레벨 마지막 섹션까지 도달하면 해당 레벨 완료로 마킹
+  useEffect(() => {
+    if (!currentLevel) return;
+    if (currentSections.length === 0) return;
+    if (currentSectionIndex !== currentSections.length - 1) return;
+
+    setCompletedLevels((prev) => {
+      if (prev[currentLevel]) return prev;
+      return { ...prev, [currentLevel]: true };
+    });
+  }, [currentLevel, currentSectionIndex, currentSections.length]);
+
+  const nextIncompleteLevel = levelsWithContent.find((lvl) => !completedLevels[lvl]);
+  const nextLevelInOrder = (() => {
+    const idx = orderedLevels.indexOf(currentLevel);
+    if (idx < 0) return undefined;
+    return orderedLevels[idx + 1];
+  })();
 
   // 퀴즈 결과 화면 - Modern Deep Glass Style
   if (phase === 'result' && result) {
@@ -629,8 +670,25 @@ const ModuleLearningPage: React.FC = () => {
                   })}
                   <div className="w-px bg-border mx-1 my-1"></div>
                   <button
-                    onClick={() => setPhase('quiz')}
-                    className="px-3 py-1 text-muted-foreground hover:text-foreground hover:bg-background/50 rounded-md text-xs font-medium transition-all duration-200 flex items-center gap-1.5"
+                    onClick={() => {
+                      if (isQuizUnlocked) {
+                        setPhase('quiz');
+                        return;
+                      }
+
+                      // 아직 모든 레벨 학습을 끝내지 않았다면, 미완료 레벨로 안내
+                      if (nextIncompleteLevel) {
+                        setCurrentLevel(nextIncompleteLevel);
+                        setCurrentSectionIndex(0);
+                      }
+                    }}
+                    disabled={!isQuizUnlocked}
+                    title={!isQuizUnlocked ? '기초/중급/고급 학습을 모두 완료하면 자가 점검이 열립니다.' : '자가 점검 시작'}
+                    className={`px-3 py-1 rounded-md text-xs font-medium transition-all duration-200 flex items-center gap-1.5 \
+                      ${isQuizUnlocked
+                        ? 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                        : 'text-muted-foreground/50 cursor-not-allowed'
+                      }`}
                   >
                     <ClipboardCheck className="w-3 h-3" />
                     자가 점검
@@ -756,10 +814,33 @@ const ModuleLearningPage: React.FC = () => {
                         </Button>
                       ) : (
                         <Button
-                          onClick={() => setPhase('quiz')}
-                          className="gap-2 h-[46px] bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500"
+                          onClick={() => {
+                            // 1) 아직 모든 레벨을 끝내지 않았다면: 다음 레벨(또는 미완료 레벨)로 이동
+                            if (!isQuizUnlocked) {
+                              const target = nextLevelInOrder || nextIncompleteLevel;
+                              if (target) {
+                                setCurrentLevel(target);
+                                setCurrentSectionIndex(0);
+                              }
+                              return;
+                            }
+
+                            // 2) 모든 레벨 완료: 자가 점검 시작
+                            setPhase('quiz');
+                          }}
+                          className={`gap-2 h-[46px] ${isQuizUnlocked
+                            ? 'bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-500'
+                            : 'bg-muted text-muted-foreground hover:bg-muted'
+                          }`}
                         >
-                          자가 점검 시작 <ClipboardCheck className="w-4 h-4" />
+                          {isQuizUnlocked
+                            ? (
+                              <>자가 점검 시작 <ClipboardCheck className="w-4 h-4" /></>
+                            )
+                            : (
+                              <>다음 학습으로 <ArrowRight className="w-4 h-4" /></>
+                            )
+                          }
                         </Button>
                       )}
                     </div>

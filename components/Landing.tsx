@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, MessageSquare, FolderOpen, BookCheck } from 'lucide-react';
+import { MessageSquare, FolderOpen, BookCheck } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -10,6 +10,9 @@ interface LandingProps {
 
 const Landing: React.FC<LandingProps> = ({ onStart }) => {
   const { isLoading, signIn } = useAuth();
+
+  // 로그인 화면 로고
+  const logoSrc = '/logo.svg';
 
   // 로딩 중
   if (isLoading) {
@@ -30,9 +33,15 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
 
         {/* Logo */}
         <div className="text-center mb-8 relative z-10">
-          <div className="flex justify-center items-center mb-4">
-            <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform">
-              <Compass className="w-10 h-10 text-primary-foreground" />
+          <div className="flex justify-center items-center mb-6">
+            <div className="flex items-center justify-center">
+              <img
+                src={logoSrc}
+                alt="WE DO SOFT"
+                className="h-16 w-auto object-contain"
+                loading="eager"
+                decoding="async"
+              />
             </div>
           </div>
           <h1 className="text-4xl font-bold text-foreground mb-2">

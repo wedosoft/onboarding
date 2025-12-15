@@ -6,7 +6,8 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       server: {
-        port: 3000,
+        // VS Code(또는 확장)가 3000 포트를 점유하는 경우가 있어 기본 Vite 포트로 사용합니다.
+        port: 5173,
         host: '0.0.0.0',
       },
       plugins: [react()],

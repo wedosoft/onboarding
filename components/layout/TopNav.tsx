@@ -1,15 +1,17 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Moon, Sun, Compass, LogOut } from 'lucide-react';
+import { Moon, Sun, LogOut } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import PageContainer from './PageContainer';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
+import { isAdminEmail } from '@/lib/authz';
 
 export default function TopNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
   
   const isActive = (path: string) => {
     if (path === '/') {
@@ -19,7 +21,7 @@ export default function TopNav() {
   };
   
   return (
-    <nav className="bg-card border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-card/95">
+    <nav className="border-b border-border sticky top-0 z-50 backdrop-blur-sm bg-card/95">
       <PageContainer width="wide" className="h-16 flex items-center justify-between">
         {/* 로고 & 메인 네비게이션 */}
         <div className="flex items-center gap-8">
@@ -81,6 +83,19 @@ export default function TopNav() {
             >
               멘토 채팅
             </Link>
+
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition ${
+                  isActive('/admin')
+                    ? 'text-primary-foreground bg-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`}
+              >
+                관리자
+              </Link>
+            )}
           </div>
         </div>
         

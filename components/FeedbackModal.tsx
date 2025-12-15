@@ -55,7 +55,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({
         <div className="p-6 sm:p-8 overflow-y-auto">
           {isLoading ? (
             <div className="flex items-center justify-center h-48">
-              <LoadingSpinner />
+              <LoadingSpinner message="AI 멘토가 분석 중입니다..." />
             </div>
           ) : (
             <div className="prose max-w-none text-foreground prose-headings:text-primary prose-strong:text-primary prose-blockquote:border-primary prose-blockquote:bg-primary/10 prose-code:text-primary">

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
+import { isAdminEmail } from './lib/authz';
 
 // Layout
 import MainLayout from './components/layout/MainLayout';
@@ -48,7 +49,7 @@ const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
 
   // 관리자 체크
-  const isAdmin = user?.email === 'alan@wedosoft.net';
+  const isAdmin = isAdminEmail(user?.email);
 
   if (!isAdmin) {
     return <Navigate to="/" replace />;

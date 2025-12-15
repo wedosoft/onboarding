@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { isAdminEmail } from '@/lib/authz';
 
 interface TopBarProps {
   // title prop is no longer used since we have navigation
@@ -21,7 +22,7 @@ const TopBar: React.FC<TopBarProps> = () => {
   const { user, signOut } = useAuth();
 
   // 관리자 체크
-  const isAdmin = user?.email === 'alan@wedosoft.net';
+  const isAdmin = isAdminEmail(user?.email);
 
   return (
     <header className="h-16 glass border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-40">

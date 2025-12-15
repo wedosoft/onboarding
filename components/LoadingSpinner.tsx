@@ -1,7 +1,12 @@
 
 import React from 'react';
 
-const LoadingSpinner: React.FC = () => {
+interface LoadingSpinnerProps {
+  /** 기본값: "로딩 중..." */
+  message?: string | null;
+}
+
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = '로딩 중...' }) => {
   return (
     <div className="flex flex-col items-center justify-center gap-3 p-4">
       <div
@@ -9,7 +14,7 @@ const LoadingSpinner: React.FC = () => {
         role="status"
         aria-label="로딩 중"
       ></div>
-      <p className="text-primary-400 font-semibold">AI 멘토가 분석 중입니다...</p>
+      {message ? <p className="text-primary-400 font-semibold">{message}</p> : null}
     </div>
   );
 };

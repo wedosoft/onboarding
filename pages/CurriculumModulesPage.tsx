@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { 
   BookOpen, Bot, Database, FileText, Globe, Layout, 
   Server, Settings, Ticket, CheckCircle, Clock, 
@@ -33,6 +33,7 @@ const getModuleStyle = (slug: string) => MODULE_STYLES[slug] || MODULE_STYLES.de
 
 const CurriculumModulesPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { productId } = useParams<{ productId: string }>();
   const { signOut, sessionId, isSessionReady } = useAuth();
 
@@ -85,6 +86,14 @@ const CurriculumModulesPage: React.FC = () => {
   useEffect(() => {
     fetchModules();
   }, [fetchModules]);
+
+  // 모듈 학습/자가점검 완료 후 목록으로 돌아올 때 즉시 진행률 새로고침
+  useEffect(() => {
+    const refresh = (location.state as { refresh?: number } | null)?.refresh;
+    if (!refresh) return;
+    fetchModules();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.state]);
 
   const handleModuleSelect = (moduleId: string) => {
     if (!productId) return;

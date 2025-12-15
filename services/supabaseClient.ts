@@ -54,10 +54,32 @@ export async function signInWithGoogle(): Promise<void> {
     throw new Error('Supabase not configured');
   }
 
+  // Supabase는 보안상 허용된 URL로만 redirectTo를 받아줍니다.
+  // 로컬 개발 시 서버(Site URL)로 튀는 경우, Supabase Dashboard의 URL allowlist에
+  // http://localhost:5173 (및 필요한 경로)를 추가해야 합니다.
+  const envRedirectTo = import.meta.env.VITE_AUTH_REDIRECT_TO;
+  const redirectTo = (() => {
+    if (envRedirectTo && envRedirectTo.trim().length > 0) {
+      // env 값이 절대 URL이면 그대로, 상대 경로면 현재 origin 기준으로 보정
+      const value = envRedirectTo.trim();
+      if (/^https?:\/\//i.test(value)) {
+        return value;
+      }
+      return new URL(value.startsWith('/') ? value : `/${value}`, window.location.origin).toString();
+    }
+
+    // 기본값: 로그인 시작 페이지(현재 pathname)로 복귀
+    // (hash/query는 OAuth 과정에서 오염될 수 있어 pathname만 사용)
+    const path = window.location.pathname && window.location.pathname.length > 0
+      ? window.location.pathname
+      : '/';
+    return new URL(path, window.location.origin).toString();
+  })();
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/`,
+      redirectTo,
     },
   });
 

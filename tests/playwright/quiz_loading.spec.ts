@@ -11,7 +11,7 @@ test('Quiz generation loads successfully for module without content', async ({ p
   try {
     await expect(page.locator('h1')).toBeVisible({ timeout: 10000 });
   } catch (e) {
-    const isLoading = await page.getByText('AI 멘토가 분석 중입니다...').isVisible();
+    const isLoading = await page.getByLabel('로딩 중').isVisible();
     const isError = await page.getByText('모듈을 찾을 수 없습니다').isVisible();
     console.log(`Debug: Loading=${isLoading}, Error=${isError}`);
     
