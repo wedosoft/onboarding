@@ -43,8 +43,10 @@ const CurriculumModulesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchModules = useCallback(async () => {
-    // 세션이 준비되지 않았으면 대기
+    // 세션이 준비되지 않았으면 로딩 상태만 유지하고 대기
     if (!isSessionReady) {
+      setIsLoading(true);
+      setError(null);
       return;
     }
 

@@ -185,7 +185,18 @@ const ModuleLearningPage: React.FC = () => {
     startLearning();
   }, [moduleId, sessionId]);
 
+  // 현재 레벨 마지막 섹션까지 도달하면 해당 레벨 완료로 마킹
+  useEffect(() => {
+    if (!currentLevel || !contentData) return;
+    const currentSections = (contentData.sections[currentLevel] || []).slice().sort((a, b) => a.displayOrder - b.displayOrder);
+    if (currentSections.length === 0) return;
+    if (currentSectionIndex !== currentSections.length - 1) return;
 
+    setCompletedLevels((prev) => {
+      if (prev[currentLevel]) return prev;
+      return { ...prev, [currentLevel]: true };
+    });
+  }, [currentLevel, currentSectionIndex, contentData]);
 
   // 채팅 메시지 전송
   const handleSendChat = useCallback(async (message: string) => {
@@ -318,18 +329,6 @@ const ModuleLearningPage: React.FC = () => {
 
   const levelsWithContent = orderedLevels.filter((lvl) => (contentData?.sections[lvl]?.length || 0) > 0);
   const isQuizUnlocked = levelsWithContent.every((lvl) => completedLevels[lvl]);
-
-  // 현재 레벨 마지막 섹션까지 도달하면 해당 레벨 완료로 마킹
-  useEffect(() => {
-    if (!currentLevel) return;
-    if (currentSections.length === 0) return;
-    if (currentSectionIndex !== currentSections.length - 1) return;
-
-    setCompletedLevels((prev) => {
-      if (prev[currentLevel]) return prev;
-      return { ...prev, [currentLevel]: true };
-    });
-  }, [currentLevel, currentSectionIndex, currentSections.length]);
 
   const nextIncompleteLevel = levelsWithContent.find((lvl) => !completedLevels[lvl]);
   const nextLevelInOrder = (() => {

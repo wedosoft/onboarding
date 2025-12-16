@@ -54,8 +54,9 @@ const AdminPage: React.FC = () => {
   const [showSessionPicker, setShowSessionPicker] = useState(false);
   const [visibleUserCount, setVisibleUserCount] = useState(50);
   const [curriculumSummaries, setCurriculumSummaries] = useState<
-    Array<{ productId: string; productName: string; summary: ProgressSummary | null; error?: string }>
+    Array<{ productId: string; productName: string; summary: ProgressSummary | null; error?: string; loading?: boolean }>
   >([]);
+  const [loadedProducts, setLoadedProducts] = useState<Set<string>>(new Set());
 
   const USERS_CACHE_KEY = 'admin.usersProgress.v1';
   const USERS_CACHE_TTL_MS = 5 * 60 * 1000; // 5분
@@ -198,12 +199,14 @@ const AdminPage: React.FC = () => {
     setDetailError(null);
     setScenarioProgress(null);
     setCurriculumSummaries([]);
+    setLoadedProducts(new Set());
 
     try {
-      // 1) 시나리오 기반 온보딩 진행
-      const scenarioPromise = getProgress(selectedSessionId);
+      // 1) 시나리오 기반 온보딩 진행만 즉시 로드
+      const scenario = await getProgress(selectedSessionId);
+      setScenarioProgress(scenario);
 
-      // 2) 커리큘럼 진행(제품별)
+      // 2) 제품 목록만 가져와서 빈 상태로 초기화 (지연 로딩 준비)
       const products = await getProducts();
       const productList = (products as any[])
         .map((p) => ({
@@ -211,26 +214,16 @@ const AdminPage: React.FC = () => {
           name: String(p.name || p.name_ko || p.id),
           productType: p.product_type as string | undefined,
         }))
-        // 번들/단품 모두 포함: 대표 화면에서 특정 코스(Freshdesk Omni 등)도 확인 가능
         .filter((p) => !!p.id);
 
-      const curriculumPromise = Promise.all(
-        productList.map(async (p) => {
-          try {
-            const summary = await getProgressSummary(selectedSessionId, p.id);
-            return { productId: p.id, productName: p.name, summary };
-          } catch (e) {
-            const msg = e instanceof Error ? e.message : '진도 조회 실패';
-            return { productId: p.id, productName: p.name, summary: null, error: msg };
-          }
-        })
-      );
-
-      const [scenario, curriculum] = await Promise.all([scenarioPromise, curriculumPromise]);
-      setScenarioProgress(scenario);
-      // 완료율이 높은 제품부터 정렬
+      // 제품 목록만 설정 (데이터는 Accordion 펼칠 때 로드)
       setCurriculumSummaries(
-        curriculum.sort((a, b) => (b.summary?.completionRate || 0) - (a.summary?.completionRate || 0))
+        productList.map(p => ({
+          productId: p.id,
+          productName: p.name,
+          summary: null,
+          loading: false,
+        }))
       );
     } catch (e) {
       setDetailError(e instanceof Error ? e.message : '상세 정보를 불러오지 못했습니다.');
@@ -238,6 +231,37 @@ const AdminPage: React.FC = () => {
       setDetailLoading(false);
     }
   }, [selectedSessionId]);
+
+  // 개별 제품 커리큘럼 로드 (Accordion 펼칠 때 호출)
+  const loadProductCurriculum = useCallback(async (productId: string) => {
+    if (!selectedSessionId || loadedProducts.has(productId)) return;
+
+    // 로딩 상태 설정
+    setCurriculumSummaries(prev =>
+      prev.map(p => p.productId === productId ? { ...p, loading: true } : p)
+    );
+
+    try {
+      const summary = await getProgressSummary(selectedSessionId, productId);
+
+      setCurriculumSummaries(prev =>
+        prev.map(p => p.productId === productId
+          ? { ...p, summary, loading: false, error: undefined }
+          : p
+        )
+      );
+
+      setLoadedProducts(prev => new Set(prev).add(productId));
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : '진도 조회 실패';
+      setCurriculumSummaries(prev =>
+        prev.map(p => p.productId === productId
+          ? { ...p, summary: null, loading: false, error: msg }
+          : p
+        )
+      );
+    }
+  }, [selectedSessionId, loadedProducts]);
 
   useEffect(() => {
     if (!isDetailOpen) return;
@@ -716,7 +740,14 @@ const AdminPage: React.FC = () => {
                       <div className="text-sm text-muted-foreground">커리큘럼 진도 데이터가 없습니다.</div>
                     ) : (
                       <div className="max-h-[52vh] overflow-y-auto pr-1">
-                        <Accordion type="single" collapsible className="w-full">
+                        <Accordion
+                          type="single"
+                          collapsible
+                          className="w-full"
+                          onValueChange={(value) => {
+                            if (value) loadProductCurriculum(value);
+                          }}
+                        >
                         {curriculumSummaries.map((p) => {
                           const rate = p.summary?.completionRate || 0;
                           const completed = p.summary?.completedModules || 0;
@@ -744,13 +775,15 @@ const AdminPage: React.FC = () => {
                                 </div>
                               </AccordionTrigger>
                               <AccordionContent>
-                                {p.error && (
+                                {p.loading ? (
+                                  <div className="py-6 text-center">
+                                    <LoadingSpinner message="진도 데이터를 불러오는 중..." />
+                                  </div>
+                                ) : p.error ? (
                                   <div className="mb-3 p-2 rounded-md bg-destructive/10 border border-destructive/30 text-sm text-destructive">
                                     {p.error}
                                   </div>
-                                )}
-
-                                {!p.summary ? (
+                                ) : !p.summary ? (
                                   <div className="text-sm text-muted-foreground">요약 데이터를 불러오지 못했습니다.</div>
                                 ) : (
                                   <div className="space-y-3">

@@ -15,8 +15,6 @@ import {
 } from '../services/supabaseClient';
 import { createSession } from '../services/apiClient';
 
-const SESSION_STORAGE_KEY = 'onboarding_session_id';
-
 interface AuthContextType {
   user: AuthUser | null;
   isLoading: boolean;
@@ -37,8 +35,8 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [sessionId, setSessionId] = useState<string | null>(() => localStorage.getItem(SESSION_STORAGE_KEY));
-  const [isSessionReady, setIsSessionReady] = useState(() => !!localStorage.getItem(SESSION_STORAGE_KEY));
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [isSessionReady, setIsSessionReady] = useState(false);
   const sessionInitRef = useRef(false); // 세션 초기화 진행 중 플래그
   const authEnabled = isAuthEnabled();
   const e2eAutoLogin = import.meta.env.VITE_E2E_AUTO_LOGIN === 'true';
@@ -110,28 +108,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return unsubscribe;
   }, [authEnabled, e2eAutoLogin]);
 
-  // 사용자 로그인 시 세션 생성
+  // 사용자 로그인 시 세션 조회/생성 (localStorage 제거)
   useEffect(() => {
     const initSession = async () => {
       // 로그아웃한 경우
       if (!user) {
-        const existingSession = localStorage.getItem(SESSION_STORAGE_KEY);
-        if (existingSession) {
-          localStorage.removeItem(SESSION_STORAGE_KEY);
-          setSessionId(null);
-          setIsSessionReady(false);
-        }
+        setSessionId(null);
+        setIsSessionReady(false);
         sessionInitRef.current = false;
         return;
       }
 
-      // 이미 세션이 존재하면 스킵
-      const existingSession = localStorage.getItem(SESSION_STORAGE_KEY);
-      if (existingSession) {
-        if (!sessionId || !isSessionReady) {
-          setSessionId(existingSession);
-          setIsSessionReady(true);
-        }
+      // 이미 세션이 있으면 스킵
+      if (sessionId && isSessionReady) {
         return;
       }
 
@@ -140,29 +129,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return;
       }
 
-      // 새 세션 생성
+      // 백엔드에서 세션 조회 또는 생성
       sessionInitRef.current = true;
       try {
         const userName = user.name || user.email?.split('@')[0] || '신입사원';
-        console.log('[AuthContext] Creating new session for:', userName);
+        console.log('[AuthContext] Getting or creating session for:', userName);
         const response = await createSession(userName);
-        localStorage.setItem(SESSION_STORAGE_KEY, response.sessionId);
         setSessionId(response.sessionId);
         setIsSessionReady(true);
-        console.log('[AuthContext] Session created:', response.sessionId);
+        console.log('[AuthContext] Session ready:', response.sessionId, response.message);
       } catch (error) {
-        console.error('[AuthContext] Failed to create session:', error);
-        // 폴백: 로컬 세션 ID 생성
-        const fallbackId = `local-${user.id}-${Date.now()}`;
-        localStorage.setItem(SESSION_STORAGE_KEY, fallbackId);
-        setSessionId(fallbackId);
-        setIsSessionReady(true);
-        console.log('[AuthContext] Fallback session created:', fallbackId);
+        console.error('[AuthContext] Failed to get/create session:', error);
+        setSessionId(null);
+        setIsSessionReady(false);
+      } finally {
+        sessionInitRef.current = false;
       }
     };
 
     initSession();
-  }, [user]); // user만 의존성으로 - sessionId/isSessionReady 제거
+  }, [user, sessionId, isSessionReady])
 
   const signIn = useCallback(async () => {
     if (e2eAutoLogin) {
@@ -189,7 +175,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signOut = useCallback(async () => {
     if (e2eAutoLogin) {
       setUser(null);
-      localStorage.removeItem(SESSION_STORAGE_KEY);
+      setSessionId(null);
+      setIsSessionReady(false);
       return;
     }
 
@@ -200,7 +187,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       await supabaseSignOut();
       setUser(null);
-      localStorage.removeItem(SESSION_STORAGE_KEY);
+      setSessionId(null);
+      setIsSessionReady(false);
     } catch (error) {
       console.error('Sign out failed:', error);
       throw error;
