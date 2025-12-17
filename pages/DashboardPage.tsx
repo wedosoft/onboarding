@@ -1,60 +1,185 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { SCENARIOS } from '../constants';
-import { getProgress } from '../services/apiClient';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { getProducts, getProgressSummary } from '../services/apiClient';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import SectionHeader from '../components/layout/SectionHeader';
+import type { CurriculumModule } from '../types';
 
-interface ProgressData {
-  completedScenarios: Array<{
-    scenarioId: string;
-    choiceId: string;
-    completedAt: string | null;
-  }>;
-  totalScenarios: number;
-  completionRate: number;
+interface RecentActivity {
+  moduleId: string;
+  moduleName: string;
+  completedAt: string;
+  productName?: string;
+  productId?: string;
+}
+
+interface DashboardProgress {
+  totalModules: number;
+  completedModules: number;
+  completionPercent: number;
+  recentActivities: RecentActivity[];
+  continueProductId?: string;
 }
 
 const DashboardPage: React.FC = () => {
-  const { user } = useAuth();
-  const [progress, setProgress] = useState<ProgressData | null>(null);
+  const { user, sessionId, isSessionReady } = useAuth();
+  const [progress, setProgress] = useState<DashboardProgress | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const userName = user?.name || user?.email?.split('@')[0] || '신입사원';
 
   useEffect(() => {
     const loadProgress = async () => {
+      if (!isSessionReady) {
+        setIsLoading(true);
+        return;
+      }
+
+      if (!sessionId) {
+        setError('세션 정보를 찾을 수 없습니다. 다시 로그인해주세요.');
+        setProgress(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
       try {
-        const sessionId = localStorage.getItem('onboarding_session_id');
-        if (sessionId) {
-          const data = await getProgress(sessionId);
-          setProgress(data);
+        setError(null);
+
+        const products = await getProducts();
+
+        // 백엔드가 제품 목록을 DB에서 못 읽고 fallback이 비어있는 경우를 대비해 최소 1개 제품으로 진행률 계산
+        if (!products || products.length === 0) {
+          const summary = await getProgressSummary(sessionId);
+          const totalModules = summary.totalModules ?? summary.modules?.length ?? 0;
+          const completedModules = summary.completedModules ?? 0;
+          const completionPercent =
+            totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
+
+          const recentActivities: RecentActivity[] = (summary.modules || [])
+            .filter(m => m.status === 'completed' && Boolean(m.completedAt))
+            .sort((a, b) => {
+              const aTime = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+              const bTime = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+              return bTime - aTime;
+            })
+            .slice(0, 3)
+            .map(m => ({
+              moduleId: m.id,
+              moduleName: m.nameKo,
+              completedAt: m.completedAt as string,
+              productId: m.targetProductId,
+              productName: m.targetProductName,
+            }));
+
+          setProgress({
+            totalModules,
+            completedModules,
+            completionPercent,
+            recentActivities,
+            continueProductId: summary.modules?.find(m => m.status === 'learning')?.targetProductId,
+          });
+          return;
         }
+
+        const summaries = await Promise.allSettled(
+          products.map(p => getProgressSummary(sessionId, p.id))
+        );
+
+        const fulfilled = summaries
+          .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof getProgressSummary>>> => r.status === 'fulfilled')
+          .map(r => r.value);
+
+        if (fulfilled.length === 0) {
+          throw new Error('No progress summaries returned');
+        }
+
+        const allModules: CurriculumModule[] = fulfilled.flatMap(s => s.modules || []);
+        const totalModules = fulfilled.reduce((acc, s) => acc + (s.totalModules ?? s.modules?.length ?? 0), 0);
+        const completedModules = fulfilled.reduce((acc, s) => acc + (s.completedModules ?? 0), 0);
+        const completionPercent =
+          totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
+
+        const productNameById = new Map(products.map(p => [p.id, p.name]));
+
+        const recentActivities: RecentActivity[] = allModules
+          .filter(m => m.status === 'completed' && Boolean(m.completedAt))
+          .sort((a, b) => {
+            const aTime = a.completedAt ? new Date(a.completedAt).getTime() : 0;
+            const bTime = b.completedAt ? new Date(b.completedAt).getTime() : 0;
+            return bTime - aTime;
+          })
+          .slice(0, 3)
+          .map(m => ({
+            moduleId: m.id,
+            moduleName: m.nameKo,
+            completedAt: m.completedAt as string,
+            productId: m.targetProductId,
+            productName: m.targetProductName || productNameById.get(m.targetProductId),
+          }));
+
+        const continueProductId =
+          recentActivities[0]?.productId ||
+          fulfilled.find(s => (s.inProgressModules || 0) > 0)?.modules?.find(m => m.status === 'learning')?.targetProductId ||
+          products[0]?.id;
+
+        setProgress({
+          totalModules,
+          completedModules,
+          completionPercent,
+          recentActivities,
+          continueProductId,
+        });
       } catch (error) {
         console.error('Failed to load progress:', error);
+        setError('진행 상황을 불러오지 못했습니다.');
+        setProgress(null);
       } finally {
         setIsLoading(false);
       }
     };
 
     loadProgress();
-  }, []);
+  }, [isSessionReady, sessionId]);
 
-  const completedCount = progress?.completedScenarios?.length || 0;
-  const totalCount = SCENARIOS.length;
-  const completionPercent = Math.round((completedCount / totalCount) * 100);
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
 
-  // Recent 3 activities
-  const recentActivities = progress?.completedScenarios
-    ? [...progress.completedScenarios].reverse().slice(0, 3).map(item => {
-      const scenario = SCENARIOS.find(s => s.id === item.scenarioId);
-      return { ...item, scenario };
-    })
-    : [];
+  if (error) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <Card className="max-w-md">
+          <CardContent className="pt-6 text-center space-y-6">
+            <i className="fas fa-exclamation-circle text-6xl text-destructive"></i>
+            <div>
+              <h3 className="text-xl font-bold text-foreground mb-2">오류 발생</h3>
+              <p className="text-muted-foreground">{error}</p>
+            </div>
+            <Button onClick={() => window.location.reload()} className="w-full">
+              다시 시도
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  const completedCount = progress?.completedModules || 0;
+  const totalCount = progress?.totalModules || 0;
+  const completionPercent = progress?.completionPercent || 0;
+  const recentActivities = progress?.recentActivities || [];
 
   const quickLinks = [
     {
@@ -96,7 +221,7 @@ const DashboardPage: React.FC = () => {
             반가워요, {userName}님! 👋
           </h2>
           <p className="text-primary-foreground/80 max-w-2xl text-lg">
-            오늘도 성장 여정을 이어가 볼까요? 현재 전체 온보딩의{' '}
+            오늘도 성장 여정을 이어가 볼까요? 현재 전체 커리큘럼의{' '}
             <Badge variant="secondary" className="px-2 py-1 text-sm">{completionPercent}%</Badge>
             를 달성했어요.
           </p>
@@ -110,10 +235,10 @@ const DashboardPage: React.FC = () => {
           </div>
           {completionPercent < 100 && (
             <Link
-              to="/curriculum"
+              to={progress?.continueProductId ? `/curriculum/${progress.continueProductId}` : '/curriculum'}
               className="inline-flex items-center gap-2 text-sm font-medium text-primary-foreground/90 hover:text-primary-foreground transition"
             >
-              첫 번째 시나리오 시작하기
+              학습 이어하기
               <i className="fas fa-arrow-right"></i>
             </Link>
           )}
@@ -141,7 +266,7 @@ const DashboardPage: React.FC = () => {
           <CardContent className="pt-6 flex flex-col gap-6 h-full justify-center">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">완료한 시나리오</p>
+                <p className="text-sm text-muted-foreground">완료한 모듈</p>
                 <p className="text-4xl font-bold text-foreground mt-1">
                   {completedCount}
                   <span className="text-lg text-muted-foreground ml-1">/ {totalCount}</span>
@@ -201,7 +326,7 @@ const DashboardPage: React.FC = () => {
           {recentActivities.length > 0 ? (
             recentActivities.map((activity, idx) => (
               <div
-                key={`${activity.scenarioId}-${idx}`}
+                key={`${activity.moduleId}-${idx}`}
                 className="flex items-center gap-4 p-4 rounded-lg border border-border hover:border-primary/20 transition"
               >
                 <div className="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
@@ -209,14 +334,14 @@ const DashboardPage: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium text-foreground truncate">
-                    {activity.scenario?.title || '알 수 없는 시나리오'}
+                    {activity.moduleName || '알 수 없는 모듈'}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {activity.completedAt ? new Date(activity.completedAt).toLocaleDateString() : '날짜 정보 없음'} 완료
                   </p>
                 </div>
                 <Badge variant="secondary">
-                  {SCENARIOS.find(s => s.id === activity.scenarioId)?.category === 'productivity' ? '생산성' : '커뮤니케이션'}
+                  {activity.productName || '커리큘럼'}
                 </Badge>
               </div>
             ))
