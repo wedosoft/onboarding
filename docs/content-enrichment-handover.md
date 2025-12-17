@@ -59,6 +59,31 @@ supabase db reset  # 로컬에서만
 
 ---
 
+## ✅ 추가 완료 (2025-12-17)
+
+### 2. Freshdesk Automation 모듈 - 콘텐츠 보완 ✅
+
+**파일:** `supabase/migrations/20251217000000_update_freshdesk_automation_content_enriched.sql`  
+- **Module ID:** `7d8d329c-384a-4040-bb88-f9cdb9e0682d`  
+- **대상 제품:** Freshdesk (`targetProductId = freshdesk`)  
+
+**구성(7단계):**
+1. Overview Basic
+2. Overview Intermediate
+3. Overview Advanced
+4. Feature Basic
+5. Feature Advanced
+6. Practice
+7. Quiz Guide
+
+**검증(HTTP):**
+```bash
+curl -sS 'https://api.wedosoft.net/api/curriculum/modules/7d8d329c-384a-4040-bb88-f9cdb9e0682d' | jq .
+curl -sS 'https://api.wedosoft.net/api/curriculum/modules/7d8d329c-384a-4040-bb88-f9cdb9e0682d/contents' | jq .
+```
+
+---
+
 ## 🔄 진행 중 작업
 
 ### 2. Asset Management 모듈 - 인코딩 이슈로 중단
