@@ -59,6 +59,7 @@ const KnowledgeSection: React.FC = () => {
   const [deleteConfirm, setDeleteConfirm] = useState<KnowledgeArticle | null>(null);
   const [filterCategory, setFilterCategory] = useState<string>('');
   const [editingId, setEditingId] = useState<string | null>(null);
+  const isFormOpenRef = useRef(false);
 
   // Form state
   const [newTitle, setNewTitle] = useState('');
@@ -87,6 +88,10 @@ const KnowledgeSection: React.FC = () => {
     }
   }, [user]);
 
+  useEffect(() => {
+    isFormOpenRef.current = isFormOpen;
+  }, [isFormOpen]);
+
   const openCreateForm = () => {
     setNewTitle('');
     setNewAuthor(user?.name || '');
@@ -103,15 +108,17 @@ const KnowledgeSection: React.FC = () => {
     try {
       const data = await getKnowledgeArticles(filterCategory || undefined);
       setArticles(data);
-      if (data.length > 0 && !selectedArticle) {
-        setSelectedArticle(data[0]);
-      }
+      setSelectedArticle((prev) => {
+        if (isFormOpenRef.current) return prev;
+        if (prev && data.some((a) => a.id === prev.id)) return prev;
+        return data[0] || null;
+      });
     } catch (error) {
       console.error('Failed to load knowledge articles:', error);
     } finally {
       setIsLoading(false);
     }
-  }, [filterCategory, selectedArticle]);
+  }, [filterCategory]);
 
   useEffect(() => {
     loadArticles();
