@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { structureKnowledge, getKnowledgeArticles, createKnowledgeArticle, updateKnowledgeArticle, deleteKnowledgeArticle, KnowledgeArticle } from '../services/apiClient';
 import { useAuth } from '../contexts/AuthContext';
+import DOMPurify from 'dompurify';
+import KnowledgeEditor, { type KnowledgeEditorRef } from './KnowledgeEditor';
+import { extractTextFromHtml, normalizeLegacyContentToHtml, refreshSupabaseSignedUrlsInHtml } from '../services/knowledgeHtml';
+import { createSignedUrl, uploadKnowledgeObject } from '../services/knowledgeStorage';
 import { 
-  Plus, Filter, FolderOpen, X, Info, Sparkles, Clock, 
-  Trash2, Edit, AlignLeft, BookOpen, TriangleAlert 
+  Plus, Filter, FolderOpen, X, Info, Clock, Sparkles,
+  Trash2, Edit, AlignLeft, BookOpen, TriangleAlert, Paperclip, Check, Loader2
 } from 'lucide-react';
 
 // 범주 정의
@@ -21,11 +25,35 @@ const getCategoryInfo = (value: string) => {
   return CATEGORIES.find(c => c.value === value) || CATEGORIES[CATEGORIES.length - 1];
 };
 
+type SaveMode = 'raw' | 'ai';
+
+function hasMeaningfulContent(html: string): boolean {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const text = (doc.body.textContent || '').trim();
+  if (text.length > 0) return true;
+  if (doc.querySelector('img')) return true;
+  if (doc.querySelector('a')) return true;
+  return false;
+}
+
+function hasMeaningfulTextForAi(text: string): boolean {
+  const lines = text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+
+  // extractTextFromHtml()가 이미지 placeholder를 "[이미지]" 형태로 만들기 때문에
+  // placeholder만 있는 경우에는 AI를 호출하지 않는다.
+  const meaningful = lines.filter((l) => !/^\[[^\]]+\]$/.test(l));
+  return meaningful.join(' ').trim().length > 0;
+}
+
 const KnowledgeSection: React.FC = () => {
   const { user } = useAuth();
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isUploadingAttachments, setIsUploadingAttachments] = useState(false);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState<KnowledgeArticle | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<KnowledgeArticle | null>(null);
@@ -36,7 +64,21 @@ const KnowledgeSection: React.FC = () => {
   const [newTitle, setNewTitle] = useState('');
   const [newAuthor, setNewAuthor] = useState('');
   const [newCategory, setNewCategory] = useState('process');
-  const [newContent, setNewContent] = useState('');
+  const [newContentHtml, setNewContentHtml] = useState<string>('');
+  const [saveMode, setSaveMode] = useState<SaveMode>('ai');
+  const editorRef = useRef<KnowledgeEditorRef | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [renderedHtml, setRenderedHtml] = useState<string>('');
+  const editorLoadKeyRef = useRef<string | null>(null);
+  const [attachmentItems, setAttachmentItems] = useState<
+    Array<{
+      id: string;
+      name: string;
+      status: 'uploading' | 'done' | 'error';
+      url?: string;
+      error?: string;
+    }>
+  >([]);
 
   // Initialize author when form opens or user loads
   useEffect(() => {
@@ -44,6 +86,17 @@ const KnowledgeSection: React.FC = () => {
       setNewAuthor(user.name);
     }
   }, [user]);
+
+  const openCreateForm = () => {
+    setNewTitle('');
+    setNewAuthor(user?.name || '');
+    setNewCategory('process');
+    setNewContentHtml('');
+    setSaveMode('ai');
+    setEditingId(null);
+    setAttachmentItems([]);
+    setIsFormOpen(true);
+  };
 
   const loadArticles = useCallback(async () => {
     setIsLoading(true);
@@ -65,15 +118,32 @@ const KnowledgeSection: React.FC = () => {
   }, [loadArticles]);
 
   const handleProcessArticle = async () => {
-    if (!newContent.trim() || !newAuthor.trim() || !newTitle.trim()) {
-      alert('제목, 작성자, 내용을 모두 입력해주세요.');
+    if (!newAuthor.trim() || !newTitle.trim()) {
+      alert('제목, 작성자를 모두 입력해주세요.');
+      return;
+    }
+
+    const html = (await editorRef.current?.getHtml()) || newContentHtml;
+    if (!hasMeaningfulContent(html)) {
+      alert('내용을 입력해주세요.');
       return;
     }
 
     setIsProcessing(true);
     try {
-      // AI로 구조화된 요약 생성
-      const structuredSummary = await structureKnowledge(newContent, newCategory);
+      let structuredSummary = '';
+      if (saveMode === 'ai') {
+        const extractedText = extractTextFromHtml(html);
+        if (!hasMeaningfulTextForAi(extractedText)) {
+          const doc = new DOMParser().parseFromString(html, 'text/html');
+          const hasMedia = !!doc.querySelector('img, a');
+          structuredSummary = hasMedia
+            ? '이미지/첨부파일만 포함되어 있어 내용을 자동으로 파악할 수 없습니다. 본문에 설명 텍스트를 추가해 주세요.'
+            : '내용을 파악할 수 없습니다. 본문을 입력해 주세요.';
+        } else {
+          structuredSummary = await structureKnowledge(extractedText, newCategory);
+        }
+      }
 
       if (editingId) {
         // 수정
@@ -81,7 +151,7 @@ const KnowledgeSection: React.FC = () => {
           title: newTitle,
           author: newAuthor,
           category: newCategory,
-          rawContent: newContent,
+          rawContent: html,
           structuredSummary,
         });
 
@@ -93,7 +163,7 @@ const KnowledgeSection: React.FC = () => {
           title: newTitle,
           author: newAuthor,
           category: newCategory,
-          rawContent: newContent,
+          rawContent: html,
           structuredSummary,
         });
 
@@ -114,8 +184,10 @@ const KnowledgeSection: React.FC = () => {
     setNewTitle('');
     setNewAuthor(user?.name || '');
     setNewCategory('process');
-    setNewContent('');
+    setNewContentHtml('');
+    setSaveMode('ai');
     setEditingId(null);
+    setAttachmentItems([]);
     setIsFormOpen(false);
   };
 
@@ -124,9 +196,101 @@ const KnowledgeSection: React.FC = () => {
     setNewTitle(selectedArticle.title);
     setNewAuthor(selectedArticle.author);
     setNewCategory(selectedArticle.category);
-    setNewContent(selectedArticle.rawContent);
+    setNewContentHtml(selectedArticle.rawContent);
+    setSaveMode((selectedArticle.structuredSummary || '').trim().length > 0 ? 'ai' : 'raw');
     setEditingId(selectedArticle.id);
     setIsFormOpen(true);
+  };
+
+  useEffect(() => {
+    if (!isFormOpen) {
+      editorLoadKeyRef.current = null;
+      return;
+    }
+
+    const loadKey = editingId ? `edit:${editingId}` : 'new';
+    if (editorLoadKeyRef.current === loadKey) {
+      return;
+    }
+    editorLoadKeyRef.current = loadKey;
+
+    const raw = editingId
+      ? (selectedArticle?.rawContent || newContentHtml || '<p></p>')
+      : (newContentHtml || '<p></p>');
+    const normalized = normalizeLegacyContentToHtml(raw);
+
+    refreshSupabaseSignedUrlsInHtml(normalized)
+      .then((refreshed) => editorRef.current?.setHtml(refreshed))
+      .catch((error) => {
+        console.error('Failed to load editor HTML:', error);
+        editorRef.current?.setHtml(normalized).catch((e) => console.error('Failed to load editor HTML fallback:', e));
+      });
+  }, [isFormOpen, editingId, selectedArticle]);
+
+  useEffect(() => {
+    if (!selectedArticle) {
+      setRenderedHtml('');
+      return;
+    }
+    const html = normalizeLegacyContentToHtml(selectedArticle.rawContent);
+    refreshSupabaseSignedUrlsInHtml(html)
+      .then(setRenderedHtml)
+      .catch((error) => {
+        console.error('Failed to refresh signed URLs:', error);
+        setRenderedHtml(html);
+      });
+  }, [selectedArticle]);
+
+  const handleAttachClick = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = '';
+    fileInputRef.current.click();
+  };
+
+  const handleFileSelected = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    if (!user?.id) {
+      alert('첨부파일 업로드는 로그인 후 사용할 수 있습니다.');
+      return;
+    }
+
+    try {
+      setIsUploadingAttachments(true);
+      const filesArr = Array.from(files);
+      const batch = filesArr.map((file) => ({
+        id: crypto.randomUUID(),
+        name: file.name,
+        status: 'uploading' as const,
+      }));
+      setAttachmentItems((prev) => [...batch, ...prev]);
+
+      const errors: string[] = [];
+      for (let i = 0; i < filesArr.length; i++) {
+        const file = filesArr[i];
+        const itemId = batch[i].id;
+        try {
+          const stored = await uploadKnowledgeObject(file, user.id);
+          const url = await createSignedUrl(stored);
+          editorRef.current?.insertFileBlock(file.name, url);
+          setAttachmentItems((prev) =>
+            prev.map((it) => (it.id === itemId ? { ...it, status: 'done', url } : it))
+          );
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : '첨부파일 업로드에 실패했습니다.';
+          errors.push(message);
+          setAttachmentItems((prev) =>
+            prev.map((it) => (it.id === itemId ? { ...it, status: 'error', error: message } : it))
+          );
+        }
+      }
+
+      if (errors.length > 0) {
+        alert(errors[0]);
+      }
+    } finally {
+      setIsUploadingAttachments(false);
+    }
   };
 
   const handleDelete = async () => {
@@ -150,6 +314,10 @@ const KnowledgeSection: React.FC = () => {
     ? articles.filter(a => a.category === filterCategory)
     : articles;
 
+  const attachmentUploadingCount = attachmentItems.filter((i) => i.status === 'uploading').length;
+  const attachmentDoneCount = attachmentItems.filter((i) => i.status === 'done').length;
+  const attachmentErrorCount = attachmentItems.filter((i) => i.status === 'error').length;
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -168,7 +336,7 @@ const KnowledgeSection: React.FC = () => {
         {/* Actions */}
         <div className="flex gap-2">
           <button
-            onClick={() => setIsFormOpen(true)}
+            onClick={openCreateForm}
             className="flex-1 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-lg shadow-primary/10 hover:bg-primary/90 transition-all flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
@@ -253,7 +421,9 @@ const KnowledgeSection: React.FC = () => {
 
               <p className="text-muted-foreground mb-6 text-sm bg-blue-500/10 p-3 rounded-lg border border-blue-500/20 flex items-start gap-2">
                 <Info className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                <span>내용을 자유롭게 작성하면 AI가 자동으로 구조화하여 <strong className="text-blue-500">요약본</strong>을 생성합니다.</span>
+                <span>
+                  <strong className="text-blue-500">그대로 저장</strong> 또는 <strong className="text-blue-500">AI 요약 저장</strong>을 선택할 수 있습니다.
+                </span>
               </p>
             </div>
 
@@ -302,15 +472,125 @@ const KnowledgeSection: React.FC = () => {
               </div>
 
               <div className="flex flex-col flex-1 min-h-0">
-                <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1.5 ml-1">
-                  내용
-                </label>
-                <textarea
-                  className="flex-1 w-full p-4 bg-muted/50 border border-border rounded-xl focus:ring-2 focus:ring-ring focus:border-primary focus:bg-card resize-none text-foreground placeholder-muted-foreground transition leading-relaxed text-sm min-h-[320px]"
-                  placeholder="공유하고 싶은 지식을 자유롭게 작성해주세요..."
-                  value={newContent}
-                  onChange={(e) => setNewContent(e.target.value)}
-                />
+                <div className="flex items-center justify-between gap-3 mb-1.5 ml-1">
+                  <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider">
+                    내용
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="inline-flex rounded-lg border border-border bg-card/60 p-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setSaveMode('raw')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                          saveMode === 'raw'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        그대로 저장
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSaveMode('ai')}
+                        className={`px-3 py-1.5 text-xs font-bold rounded-md transition-colors ${
+                          saveMode === 'ai'
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:bg-muted'
+                        }`}
+                      >
+                        AI 요약 저장
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleAttachClick}
+                      className="px-3 py-1.5 text-xs font-bold rounded-lg border border-border bg-card/60 text-muted-foreground hover:bg-muted transition-colors flex items-center gap-1.5"
+                      title="첨부파일 업로드"
+                    >
+                      <Paperclip className="w-3.5 h-3.5" />
+                      첨부
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleFileSelected(e.target.files)}
+                    />
+                  </div>
+                </div>
+                {attachmentItems.length > 0 ? (
+                  <div className="mb-2 ml-1">
+                    <div className="text-[11px] text-muted-foreground flex items-center gap-2">
+                      {isUploadingAttachments ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>첨부 업로드 중 ({attachmentUploadingCount}개)</span>
+                        </>
+                      ) : (
+                        <span>
+                          첨부 {attachmentDoneCount}개{attachmentErrorCount > 0 ? ` (실패 ${attachmentErrorCount}개)` : ''}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {attachmentItems.slice(0, 8).map((item) => {
+                        const baseClass =
+                          'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[11px] max-w-[320px] truncate';
+                        if (item.status === 'uploading') {
+                          return (
+                            <span
+                              key={item.id}
+                              className={`${baseClass} bg-card/60 border-border text-muted-foreground`}
+                              title="업로드 중..."
+                            >
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span className="truncate">{item.name}</span>
+                            </span>
+                          );
+                        }
+                        if (item.status === 'error') {
+                          return (
+                            <span
+                              key={item.id}
+                              className={`${baseClass} bg-destructive/10 border-destructive/30 text-destructive`}
+                              title={item.error || '업로드 실패'}
+                            >
+                              <TriangleAlert className="w-3.5 h-3.5" />
+                              <span className="truncate">{item.name}</span>
+                            </span>
+                          );
+                        }
+                        return (
+                          <a
+                            key={item.id}
+                            href={item.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`${baseClass} bg-primary/10 border-primary/20 text-primary hover:bg-primary/15`}
+                            title="클릭하면 파일을 엽니다"
+                          >
+                            <Check className="w-3.5 h-3.5" />
+                            <span className="truncate">{item.name}</span>
+                          </a>
+                        );
+                      })}
+                      {attachmentItems.length > 8 ? (
+                        <span className="text-[11px] text-muted-foreground self-center">
+                          +{attachmentItems.length - 8}개
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : null}
+                <div className="flex-1 min-h-[320px] bg-muted/50 border border-border rounded-xl overflow-hidden">
+                  <KnowledgeEditor
+                    editorRef={editorRef}
+                    onHtmlChange={setNewContentHtml}
+                    className="h-full"
+                  />
+                </div>
               </div>
             </div>
 
@@ -323,17 +603,17 @@ const KnowledgeSection: React.FC = () => {
               </button>
               <button
                 onClick={handleProcessArticle}
-                disabled={isProcessing || !newContent.trim() || !newTitle.trim()}
+                disabled={isProcessing || !newTitle.trim()}
                 className="px-8 py-2.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-bold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all shadow-lg hover:shadow-primary/30 transform active:scale-95"
               >
                 {isProcessing ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>AI 분석 중...</span>
+                    <span>{saveMode === 'ai' ? 'AI 분석 중...' : '저장 중...'}</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4" />
+                    {saveMode === 'ai' ? <Sparkles className="w-4 h-4" /> : null}
                     <span>저장하기</span>
                   </>
                 )}
@@ -392,25 +672,29 @@ const KnowledgeSection: React.FC = () => {
 
             {/* Scrollable Content */}
             <div className="flex-1 overflow-y-auto pb-8 space-y-8">
-              {/* AI Summary Section */}
-              <div className="px-8">
-                <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center"><Sparkles className="w-3 h-3" /></span>
-                  AI 요약 노트
-                </h3>
-                <div className="prose prose-sm max-w-none prose-headings:text-primary prose-p:text-foreground prose-strong:text-primary pl-1">
-                  <ReactMarkdown>{selectedArticle.structuredSummary || '_요약 내용이 없습니다._'}</ReactMarkdown>
+              {selectedArticle.structuredSummary && selectedArticle.structuredSummary.trim().length > 0 ? (
+                <div className="px-8">
+                  <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-lg bg-muted flex items-center justify-center">📝</span>
+                    요약 노트
+                  </h3>
+                  <div className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground pl-1">
+                    <ReactMarkdown>{selectedArticle.structuredSummary}</ReactMarkdown>
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
               {/* Raw Content Section */}
               <div className="px-8">
                 <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                   <AlignLeft className="w-3 h-3" /> 원본 내용
                 </h3>
-                <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap text-sm pl-1">
-                  {selectedArticle.rawContent}
-                </div>
+                <div
+                  className="prose prose-sm max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-a:text-primary prose-img:rounded-lg prose-img:max-w-full pl-1"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(renderedHtml || selectedArticle.rawContent || ''),
+                  }}
+                />
               </div>
             </div>
           </div>
