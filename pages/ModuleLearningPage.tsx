@@ -53,12 +53,6 @@ const SECTION_ICONS: Record<string, React.ElementType> = {
   quiz: CheckCircle,
 };
 
-const SUGGESTED_QUESTIONS = [
-  '이 기능의 핵심이 뭐예요?',
-  '실무에서 어떻게 활용하나요?',
-  '자주 하는 실수가 있나요?',
-];
-
 const ModuleLearningPage: React.FC = () => {
   const navigate = useNavigate();
   const { productId, moduleId } = useParams<{ productId: string; moduleId: string }>();
@@ -623,7 +617,6 @@ const ModuleLearningPage: React.FC = () => {
           onSendMessage={handleSendChat}
           isLoading={isChatLoading}
           onClearMessages={() => setChatMessages([])}
-          suggestedQuestions={SUGGESTED_QUESTIONS}
           mentorName="고복수 팀장"
         />
       }
